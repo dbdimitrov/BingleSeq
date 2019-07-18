@@ -1,0 +1,54 @@
+Package: BingleSeq
+Type: Package
+Title: User-friendly R package for Bulk-RNA-Seq and sc-RNA-Seq analyses
+Version: 0.1.0
+Author: Daniel Dimitrov
+Maintainer: Daniel Dimitrov <2412499d@student.gla.ac.uk>
+Description: Easy easy taman taman
+    Use four spaces when indenting paragraphs within the Description.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+biocViews: 
+Imports: dplyr,
+    shiny,
+    shinyjs,
+    shinyFiles,
+    shinyWidgets,
+    V8,
+    DT,
+    grDevices,
+    ggplot2,
+    VennDiagram,
+    factoextra,
+    fastcluster,
+    gridExtra,
+    ggrepel,
+    DESeq2,
+    edgeR,
+    limma,
+    ALDEx2,
+    MAST,
+    monocle,
+    Seurat,
+    scran,
+    SC3
+Suggests: org.Mm.eg.db, org.Hs.eg.db, GO.db, goseq
+RoxygenNote: 6.1.1
+Collate: 
+    'bulk_compDataTab.R'
+    'bulk_deDataTab.R'
+    'bulk_filterDataTab.R'
+    'bulk_goDataTab.R'
+    'bulk_loadDataTab.R'
+    'bulk_plotDataTab.R'
+    'sc_clustTab.R'
+    'sc_compTab.R'
+    'sc_deTab.R'
+    'sc_goTab.R'
+    'sc_loadDataTab.R'
+    'sc_normTab.R'
+    'sc_qcTab.R'
+    'server.R'
+    'ui.R'
+    'startApp.R'
