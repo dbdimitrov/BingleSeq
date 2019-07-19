@@ -1,7 +1,7 @@
 Package: BingleSeq
 Type: Package
 Title: User-friendly R package for Bulk-RNA-Seq and sc-RNA-Seq analyses
-Version: 0.1.0
+Version: 0.1.1
 Author: Daniel Dimitrov
 Maintainer: Daniel Dimitrov <2412499d@student.gla.ac.uk>
 Description: Easy easy taman taman
