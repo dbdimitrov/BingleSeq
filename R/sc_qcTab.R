@@ -8,64 +8,78 @@ sc_qcUI <- function(id) {
   tagList(
     # Sidebar panel for inputs ----
     sidebarPanel(
-
       h5("Prefilter Features:"),
 
-      numericInput(ns("minCellsObject"), label = "Mininum cells expressed",
-                   min = 1, value = 3),
-      numericInput(ns("minGenesObject"), label = "Minimum summed counts",
-                   min = 1, value = 200),
+      numericInput(
+        ns("minCellsObject"),
+        label = "Mininum cells expressed",
+        min = 1,
+        value = 3
+      ),
+      numericInput(
+        ns("minGenesObject"),
+        label = "Minimum summed counts",
+        min = 1,
+        value = 200
+      ),
 
 
       actionButton(ns("preqcButton"), label = "Initialize Project"),
 
       tags$hr(),
 
-      shinyjs::hidden(
+      conditionalPanel(
+        condition =  "input.preqcButton > 0",
+        ns = ns,
 
 
-            numericInput(ns("minFeatureInput"), label = "Minimum Feature No",
-                         min = 1, value = 100),
+        numericInput(
+          ns("minFeatureInput"),
+          label = "Minimum Feature No",
+          min = 1,
+          value = 100
+        ),
 
 
 
-            numericInput(ns("maxFeatureInput"), label = "Maximum Feature No",
-                         min = 1, value = 5000),
+        numericInput(
+          ns("maxFeatureInput"),
+          label = "Maximum Feature No",
+          min = 1,
+          value = 5000
+        ),
 
 
-            actionButton(ns("postqcButton"), label = "Filter Data")
+        actionButton(ns("postqcButton"), label = "Filter Data")
 
       )
 
     ),
 
     # Main panel for displaying outputs ----
-    mainPanel(
+    mainPanel(tabsetPanel(
+      id = ns("qcTabSet"),
 
-      tabsetPanel(id = ns("qcTabSet"),
+      #Add Text with No of cells and features as lodaded
 
-                  #Add Text with No of cells and features as lodaded
-
-                  tabPanel(title = "Object Preview",
-                           DT::dataTableOutput(ns("dataTable"))
-                  ),
+      tabPanel(title = "Object Preview",
+               DT::dataTableOutput(ns("dataTable"))),
 
 
-                  # extendShinyjs(script = "javascript.js"),
+      # extendShinyjs(script = "javascript.js"),
 
-                  tabPanel(title = "QC Violin Plot", value = "tab2_val",
-                           verbatimTextOutput(ns("preFilterText"), placeholder = T),
-                           plotOutput(ns("preqcPlot")),
+      tabPanel(
+        title = "QC Violin Plot",
+        value = "tab2_val",
+        verbatimTextOutput(ns("preFilterText"), placeholder = T),
+        plotOutput(ns("preqcPlot")),
 
-                           tags$hr(),
+        tags$hr(),
 
-                           verbatimTextOutput(ns("postFilterText"), placeholder = T),
-                           plotOutput(ns("postqcPlot"))
-                  )
+        verbatimTextOutput(ns("postFilterText"), placeholder = T),
+        plotOutput(ns("postqcPlot"))
       )
-
-
-    )
+    ))
   )
 }
 
@@ -75,56 +89,58 @@ sc_qcUI <- function(id) {
 #' @export
 #' @return A reactive value contaning the filtered data
 sc_qc <- function(input, output, session, countsT) {
-
   filt <- reactiveValues()
 
   ### Show PreQC INFO -------
   observeEvent(input$preqcButton, {
-
-    filt$data <- CreateSeuratObject(counts = countsT$countTable,
-                                    min.cells = input$minCellsObject,
-                                    min.features = input$minGenesObject,
-                                    project = "userProject")
-
-
-    output$dataTable <- DT::renderDataTable(
-      DT::datatable(as.data.frame(filt$data@meta.data))
-
+    filt$data <- CreateSeuratObject(
+      counts = countsT$countTable,
+      min.cells = input$minCellsObject,
+      min.features = input$minGenesObject,
+      project = "userProject"
     )
 
-    output$preFilterText <- renderText({
 
-      sprintf("Gene(Feature) No: %s;   Cell No: %s.", nrow(filt$data), ncol(filt$data))
+    output$dataTable <- DT::renderDataTable(DT::datatable(as.data.frame(filt$data@meta.data)))
+
+    output$preFilterText <- renderText({
+      sprintf("Gene(Feature) No: %s;   Cell No: %s.",
+              nrow(filt$data),
+              ncol(filt$data))
     })
 
     output$preqcPlot <- renderPlot({
-
-      VlnPlot(filt$data, features = c("nFeature_RNA", "nCount_RNA"), ncol = 2)
+      VlnPlot(
+        filt$data,
+        features = c("nFeature_RNA", "nCount_RNA"),
+        ncol = 2
+      )
 
     })
-
-    shinyjs::showElement("minFeatureInput")
-    shinyjs::showElement("maxFeatureInput")
-    shinyjs::showElement("postqcButton")
-
   })
 
 
 
   ### SHOW postQC INFO ------
   observeEvent(input$postqcButton, {
-
     filt$filteredData <- seuratQC(filt$data, input$minFeatureInput,
-                                  input$maxFeatureInput)
+                                  input$maxFeatureInput, session)
 
 
     output$postFilterText <- renderText({
-      sprintf("Gene(Feature) No: %s;   Cell No: %s.", nrow(filt$filteredData), ncol(filt$filteredData))
+      sprintf(
+        "Gene(Feature) No: %s;   Cell No: %s.",
+        nrow(filt$filteredData),
+        ncol(filt$filteredData)
+      )
     })
 
     output$postqcPlot <- renderPlot({
-
-      VlnPlot(filt$filteredData, features = c("nFeature_RNA", "nCount_RNA"), ncol = 2)
+      VlnPlot(
+        filt$filteredData,
+        features = c("nFeature_RNA", "nCount_RNA"),
+        ncol = 2
+      )
     })
   })
 
@@ -139,16 +155,31 @@ sc_qc <- function(input, output, session, countsT) {
 #' @param seurat_object The initialized seurat object with the count data
 #' @param minF Minimum feature counts per cell
 #' @param maxF Maximum feature counts per cell
+#' @param session Current R session supplied by the server
+#'
 #' @export
 #' @return A Seurat_object with the filtered data
-seuratQC <- function(seurat_object, minF, maxF){
-
-  keep <- seurat_object$nFeature_RNA > minF &
-    seurat_object$nFeature_RNA < maxF
+seuratQC <- function(seurat_object, minF, maxF, session) {
 
 
-  seurat_object <- seurat_object[,keep]
+  seurat_object <- tryCatch(
+    {
+      keep <- seurat_object$nFeature_RNA > minF &
+        seurat_object$nFeature_RNA < maxF
 
+
+      seurat_object <- seurat_object[, keep]
+    },
+    error=function(cond) {
+      sendSweetAlert(
+        session = session,
+        title = "Data format error",
+        text = "Ensure that a correctly formatted data was supplied",
+        type = "error"
+      )
+      return()
+    }
+  )
 
   return(seurat_object)
 }

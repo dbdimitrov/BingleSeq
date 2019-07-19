@@ -6,16 +6,19 @@ bulk_loadDataUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-
     # Sidebar layout with input and output definitions ----
     sidebarPanel(
-
       # Input: Select a file ----
-      fileInput(ns("file1"), "Choose Counts File",
-                multiple = FALSE,
-                accept = c("text/csv",
-                           "text/comma-separated-values,text/plain",
-                           ".csv")),
+      fileInput(
+        ns("file1"),
+        "Choose Counts File",
+        multiple = FALSE,
+        accept = c(
+          "text/csv",
+          "text/comma-separated-values,text/plain",
+          ".csv"
+        )
+      ),
 
       tags$hr(),
 
@@ -23,25 +26,25 @@ bulk_loadDataUI <- function(id) {
       checkboxInput(ns("header"), "Header", FALSE),
 
       # Input: Select separator ----
-      radioButtons(ns("sep"), "Separator",
-                   choices = c(Comma = ",",
-                               Space = " ",
-                               Tab = "\t",
-                               Semicolumn = ";"
-                   ),
+      radioButtons(
+        ns("sep"),
+        "Separator",
+        choices = c(
+          Comma = ",",
+          Space = " ",
+          Tab = "\t",
+          Semicolumn = ";"
+        ),
 
-                   selected = ",")
+        selected = ","
+      )
 
     ),
 
     # Main panel for displaying outputs ----
-    mainPanel(
-        tags$h4("Preview Data"),
+    mainPanel(tags$h4("Preview Data"),
 
-        DT::dataTableOutput(ns("dto"))
-
-
-    )
+              DT::dataTableOutput(ns("dto")))
   )
 }
 
@@ -52,19 +55,16 @@ bulk_loadDataUI <- function(id) {
 #' @export
 #' @return counts the loaded Count Table
 bulk_loadData <- function(input, output, session) {
-
   counts <- reactiveValues()
 
   # Load File ----
   observeEvent(input$file1, {
     counts$countTable <- read.csv(input$file1$datapath,
-                        header = input$header,
-                        sep = input$sep)
+                                  header = input$header,
+                                  sep = input$sep)
 
 
-    output$dto <- DT::renderDataTable(
-      DT::datatable(counts$countTable, options = list(pageLength = 10))
-    )
+    output$dto <- DT::renderDataTable(DT::datatable(counts$countTable, options = list(pageLength = 10)))
 
   })
 
@@ -79,10 +79,9 @@ bulk_loadData <- function(input, output, session) {
 #'
 #' @export
 #' @return df a dataframe containing the summary
-generateSummary <- function(counts){
-
-  countTable  <- counts[,-1]
-  rownames(countTable)<- counts[,1]
+generateSummary <- function(counts) {
+  countTable  <- counts[, -1]
+  rownames(countTable) <- counts[, 1]
 
   x1 <- vector()
 
@@ -91,25 +90,25 @@ generateSummary <- function(counts){
   colSums(countTable[])
 
 
-  for(i in 1:ncol(countTable)){
+  for (i in 1:ncol(countTable)) {
     x1[i] <-  colnames(countTable)[i]
 
     x2[i] <- colSums(countTable[i])
   }
 
-  x1[ncol(countTable)+1] <- "Total"
-  x2[ncol(countTable)+1] <- sum(x2)
+  x1[ncol(countTable) + 1] <- "Total"
+  x2[ncol(countTable) + 1] <- sum(x2)
 
-  x1[ncol(countTable)+2] <- "Median"
-  x2[ncol(countTable)+2] <- median(x2)
+  x1[ncol(countTable) + 2] <- "Median"
+  x2[ncol(countTable) + 2] <- median(x2)
 
-  x1[ncol(countTable)+3] <- "Genes#"
-  x2[ncol(countTable)+3] <- nrow(countTable)
+  x1[ncol(countTable) + 3] <- "Genes#"
+  x2[ncol(countTable) + 3] <- nrow(countTable)
 
 
-  df <- data.frame(x1,x2)
+  df <- data.frame(x1, x2)
 
-  format.data.frame(df, big.mark=",")
+  format.data.frame(df, big.mark = ",")
 
   colnames(df) <- c("Sample", "Counts")
 

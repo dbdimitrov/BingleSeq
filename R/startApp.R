@@ -25,13 +25,17 @@
 #' @import Seurat
 #' @import scran
 #' @import SC3
+#' @import goseq
+#' @import org.Mm.eg.db
+#' @import org.Hs.eg.db
+#' @import GO.db
 #'
 #' @include server.R
 #' @include ui.R
 #'
 #' @export
 #' @return None
-startBingleSeq <- function(){
+startBingleSeq <- function() {
   if (interactive()) {
     # Load packages
     library(shiny)
@@ -64,10 +68,10 @@ startBingleSeq <- function(){
     library('scran')
     library('SC3')
 
-    # library(goseq)
-    # library(org.Mm.eg.db)
-    # library(org.Hs.eg.db)
-    # library(GO.db)
+    library(goseq)
+    library(org.Mm.eg.db)
+    library(org.Hs.eg.db)
+    library(GO.db)
 
     app <- shinyApp(ui = shinyUI(ui),
                     server = shinyServer(server))

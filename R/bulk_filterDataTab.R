@@ -6,45 +6,55 @@ bulk_filterDataUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-         sidebarPanel(
+    sidebarPanel(
+      # Input: Select a package ----
+      # Select DE package
+      selectInput(
+        ns("selectFilter"),
+        label = "Select Filter Method",
+        choices = list(
+          "CPM" = 1,
+          "Median" = 2,
+          "Max" = 3
+        ),
+        selected = 1
+      ),
 
-           # Input: Select a package ----
-           # Select DE package
-           selectInput(ns("selectFilter"), label = "Select Filter Method",
-                       choices = list("CPM" = 1, "Median" = 2, "Max" = 3),
-                       selected = 1),
-
-           # Horizontal line
-           tags$hr(),
-
-
-           # Input: Select replicate number ----
-           numericInput(ns("filterValue"), label = "Value to filter", value = 5),
-
-           hr(),
-           fluidRow(column(3, verbatimTextOutput(ns("filterValue")))),
-
+      # Horizontal line
+      tags$hr(),
 
 
-           # Input: Button that runs the analysis ----
-           actionButton(ns("filterButton"), label = "Filter Data")
+      # Input: Select replicate number ----
+      numericInput(ns("filterValue"), label = "Value to filter", value = 5),
 
-         ),
+      hr(),
+      fluidRow(column(3, verbatimTextOutput(
+        ns("filterValue")
+      ))),
 
-         # Main panel for displaying outputs ----
-         mainPanel(
-           fluidRow(
-             column(width = 4, offset = 0,
-                    tags$h4("Raw Data Summary"),
-                    DT::dataTableOutput(ns("prefilterTable"))
-             ),
 
-             column(width = 4, offset = 0,
-                    tags$h4("Filtered Data Summary"),
-                    DT::dataTableOutput(ns("postfilterTable"))
-             )
-           )
-         )
+
+      # Input: Button that runs the analysis ----
+      actionButton(ns("filterButton"), label = "Filter Data")
+
+    ),
+
+    # Main panel for displaying outputs ----
+    mainPanel(fluidRow(
+      column(
+        width = 4,
+        offset = 0,
+        tags$h4("Raw Data Summary"),
+        DT::dataTableOutput(ns("prefilterTable"))
+      ),
+
+      column(
+        width = 4,
+        offset = 0,
+        tags$h4("Filtered Data Summary"),
+        DT::dataTableOutput(ns("postfilterTable"))
+      )
+    ))
   )
 }
 
@@ -56,16 +66,21 @@ bulk_filterDataUI <- function(id) {
 #' @export
 #' @return filt A reactive value with the filtered Count Table
 bulk_filterData <- function(input, output, session, counts) {
-
   filt <- reactiveValues()
 
   observeEvent(input$filterButton, {
-    filt$filteredCounts <- filterFunction(counts$countTable, as.numeric(input$selectFilter), as.numeric(input$filterValue))
+    filt$filteredCounts <-
+      filterFunction(
+        counts$countTable,
+        as.numeric(input$selectFilter),
+        as.numeric(input$filterValue)
+      )
 
-    output$postfilterTable <- DT::renderDataTable(
-      DT::datatable(generateSummary(filt$filteredCounts),
-                    options = list(paging = FALSE, searching = FALSE), rownames = FALSE)
-    )
+    output$postfilterTable <- DT::renderDataTable(DT::datatable(
+      generateSummary(filt$filteredCounts),
+      options = list(paging = FALSE, searching = FALSE),
+      rownames = FALSE
+    ))
 
   })
 
@@ -81,25 +96,23 @@ bulk_filterData <- function(input, output, session, counts) {
 #'
 #' @export
 #' @return countTable The filtered Count Table
-filterFunction <- function(data, method, value){
+filterFunction <- function(data, method, value) {
+  countTable  <- data[, -1]
+  rownames(countTable) <- data[, 1]
 
-  countTable  <- data[,-1]
-  rownames(countTable) <- data[,1]
-
-
-  head(countTable)
 
   #filter by CPM
-  if(method==1){
-    keep <- rowSums(edgeR::cpm.default(countTable)>1)>= value
-    countTable <- countTable[keep,]
+  if (method == 1) {
+    keep <- rowSums(edgeR::cpm.default(countTable) > 1) >= value
+    countTable <- countTable[keep, ]
 
     #filter by Median
-  }else if(method==2){
-    countTable <- subset(countTable, apply(countTable, 1, median) >= value)
+  } else if (method == 2) {
+    countTable <-
+      subset(countTable, apply(countTable, 1, median) >= value)
 
     #filter by Max
-  }else if(method==3){
+  } else if (method == 3) {
     countTable <- subset(countTable, apply(countTable, 1, max) >= value)
 
   }
@@ -111,7 +124,7 @@ filterFunction <- function(data, method, value){
 
   rownames(countTable) <- NULL
 
-  countTable <- cbind(IDs,countTable)
+  countTable <- cbind(IDs, countTable)
 
   head(countTable)
   # write.csv(countTable, file="output/filtered_Data.csv", row.names = FALSE)
