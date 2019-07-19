@@ -4,7 +4,7 @@
 \alias{seuratQC}
 \title{Single Cell Quality Control}
 \usage{
-seuratQC(seurat_object, minF, maxF)
+seuratQC(seurat_object, minF, maxF, session)
 }
 \arguments{
 \item{seurat_object}{The initialized seurat object with the count data}
@@ -12,6 +12,8 @@ seuratQC(seurat_object, minF, maxF)
 \item{minF}{Minimum feature counts per cell}
 
 \item{maxF}{Maximum feature counts per cell}
+
+\item{session}{Current R session supplied by the server}
 }
 \value{
 A Seurat_object with the filtered data

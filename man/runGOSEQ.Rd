@@ -4,7 +4,8 @@
 \alias{runGOSEQ}
 \title{Functional Annotation Pipeline (Bulk)}
 \usage{
-runGOSEQ(deGenes, data, genome, symbol, testType, pCorrect, pValue)
+runGOSEQ(deGenes, data, genome, symbol, testType, pCorrect, pValue, appNum,
+  session)
 }
 \arguments{
 \item{deGenes}{a vector with DE gene names}
@@ -20,6 +21,8 @@ runGOSEQ(deGenes, data, genome, symbol, testType, pCorrect, pValue)
 \item{pCorrect}{Whether to filter by FDR p-value or uncorrected p-value}
 
 \item{pValue}{P-value threshold}
+
+\item{appNum}{Format entered data appropriately to the app launched}
 }
 \value{
 GO.wall A dataframe with Functional Annotation Results

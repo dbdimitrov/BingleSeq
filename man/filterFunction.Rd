@@ -4,9 +4,13 @@
 \alias{filterFunction}
 \title{Filter Function}
 \usage{
-filterFunction(countTable, method, value)
+filterFunction(data, method, value)
 }
 \arguments{
+\item{method}{Filter Option (CPM, MAX, Median)}
+
+\item{value}{Keep only genes with counts > than this value}
+
 \item{countTable}{The loaded Count Table}
 }
 \value{
