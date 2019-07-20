@@ -242,7 +242,7 @@ server <- function(input, output, session) {
             # Filter Tab Table prefilter (to be changed) ----
             output$"filterTab-prefilterTable" <-
               DT::renderDataTable(DT::datatable(
-                generateSummary(counts$countTable),
+                generateSummary(counts$countTable, session),
                 options = list(paging = FALSE, searching = FALSE),
                 rownames = FALSE
               ))
@@ -254,7 +254,7 @@ server <- function(input, output, session) {
         filt <- callModule(bulk_filterData, "filterTab", counts)
 
         observe({
-          if (!is.null(filt$filteredCounts) && !tabs$filt) {
+          if (!is.null(filt$filteredCounts) && !tabs$filt && filt$correctFormat) {
             appendTab(
               inputId = "mainPage",
               tabPanel(

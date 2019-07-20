@@ -77,11 +77,13 @@ bulk_filterData <- function(input, output, session, counts) {
       )
 
     output$postfilterTable <- DT::renderDataTable(DT::datatable(
-      generateSummary(filt$filteredCounts),
+      generateSummary(filt$filteredCounts, session),
       options = list(paging = FALSE, searching = FALSE),
       rownames = FALSE
     ))
 
+    # Used to generate DE Tab only when generateSummary is OK
+    filt$correctFormat <- TRUE
   })
 
   return(filt)

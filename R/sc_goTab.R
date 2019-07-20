@@ -18,9 +18,6 @@ sc_goUI <- function(id) {
                 condition = "!input.goClustCheck",
                 ns = ns,
 
-                # numericInput(ns("goClustNoInput"),
-                #              label = "Select Cluster of Interest",
-                #              value = 0, min = 0, max = 8)
                 uiOutput("goClustNoInputUI")
               ),
 
@@ -216,8 +213,9 @@ sc_go <- function(input, output, session, de, countsT) {
           session
         )
 
-      output$goTermTable <- DT::renderDataTable(DT::datatable(
-        go$goTermTable,
+      output$goTermTable <- DT::renderDataTable(
+        go$goTermTable %>% datatable() %>%
+          formatSignif(columns = c(2:3), digits = 4),
         rownames = FALSE,
         colnames = c(
           "ID",
@@ -228,7 +226,7 @@ sc_go <- function(input, output, session, de, countsT) {
           "GO Term",
           "Ontology"
         )
-      ))
+      )
 
 
       updateTabsetPanel(session, "goMainTabSet", selected = "goTableTab")
@@ -239,7 +237,7 @@ sc_go <- function(input, output, session, de, countsT) {
 
   observeEvent(input$goHistButton, {
     if(!is.null(go$goTermTable)){
-      go$goHistPlot <- histGoTerms(go$goTermTable, input$goHistCheck)
+      go$goHistPlot <- histGoTerms(go$goTermTable, input$goHistCheck, session)
 
       output$goHistPlot <- renderPlot({
         go$goHistPlot
@@ -255,14 +253,9 @@ sc_go <- function(input, output, session, de, countsT) {
   })
 
   observeEvent(input$goInfoButton, {
-    go.term <- GOTERM[[input$goInfoInput]]
 
     output$goInfoText <- renderText({
-      paste(GOID(go.term),
-            Term(go.term),
-            Definition(go.term),
-            Synonym(go.term),
-            sep = "\n")
+      goInfo(input$goInfoInput, session)
     })
 
     updateTabsetPanel(session, "goMainTabSet", selected = "goInfoTab")

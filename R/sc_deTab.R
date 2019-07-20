@@ -29,7 +29,7 @@ sc_deUI <- function(id) {
                 label = "FC Threshold",
                 min = 0,
                 max = 10,
-                value = 1.5
+                value = 2
               ),
 
               numericInput(
@@ -134,13 +134,18 @@ sc_de <- function(input, output, session, finData) {
       logfc.threshold = log(input$logFCdgeInput)
     )
 
+
+
     # write.csv(de$markers, file="output/AllMarkerGenes.csv", row.names = FALSE)
 
-    output$dgeTable <- DT::renderDataTable(if (input$dgeClusterCheck) {
-      DT::datatable(de$markers, options = list(pageLength = 10))
-    } else{
-      DT::datatable(de$markers[de$markers$cluster == input$dgeClustInput, ], options = list(pageLength = 10))
-    })
+    output$dgeTable <-
+      DT::renderDataTable(if (input$dgeClusterCheck) {
+        de$markers %>% datatable() %>%
+          formatSignif(columns = c(1:2, 5), digits = 4)
+      } else{
+        de$markers[de$markers$cluster == input$dgeClustInput,] %>% datatable() %>%
+          formatSignif(columns = c(1:2, 5), digits = 4)
+      }, options = list(pageLength = 10))
     # }
   })
 
@@ -163,13 +168,27 @@ sc_de <- function(input, output, session, finData) {
   ## DE Plots
   observeEvent(input$dgePlotButton, {
     if (!is.null(de$markers)) {
-
-      de$dgePlot <- genePlot(finData$finalData, input$dgePlotType, input$geneNameInput, session)
+      de$dgePlot <-
+        genePlot(finData$finalData,
+                 input$dgePlotType,
+                 input$geneNameInput,
+                 session)
 
 
       output$dgePlot <- renderPlot({
         de$dgePlot
       })
+
+      updateTabsetPanel(session, "deMainTabSet", selected = "dePlotTab")
+
+    } else {
+      sendSweetAlert(
+        session = session,
+        title = "Marker Data Not Found",
+        text = "Please run the differential expression pipeline first",
+        type = "warning"
+      )
+
     }
   })
 
@@ -184,16 +203,16 @@ sc_de <- function(input, output, session, finData) {
           ...,
           width = width,
           height = height,
-          units = "in",
-          pointsize = 12
+          units = "px",
+          pointsize = 14
         )
       }
       ggsave(
         file,
         plot = de$dgePlot,
         device = device,
-        width = 12,
-        height = 8,
+        width = 1280,
+        height = 720,
         limitsize = FALSE
       )
     }

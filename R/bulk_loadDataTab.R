@@ -79,7 +79,7 @@ bulk_loadData <- function(input, output, session) {
 #'
 #' @export
 #' @return df a dataframe containing the summary
-generateSummary <- function(counts) {
+generateSummary <- function(counts, session) {
   countTable  <- counts[, -1]
   rownames(countTable) <- counts[, 1]
 
@@ -87,32 +87,44 @@ generateSummary <- function(counts) {
 
   x2 <- vector()
 
-  colSums(countTable[])
+  out <- tryCatch(
+    {
+      for (i in 1:ncol(countTable)) {
+        x1[i] <-  colnames(countTable)[i]
+
+        x2[i] <- colSums(countTable[i])
+      }
+
+      x1[ncol(countTable) + 1] <- "Total"
+      x2[ncol(countTable) + 1] <- sum(x2)
+
+      x1[ncol(countTable) + 2] <- "Median"
+      x2[ncol(countTable) + 2] <- median(x2)
+
+      x1[ncol(countTable) + 3] <- "Genes#"
+      x2[ncol(countTable) + 3] <- nrow(countTable)
 
 
-  for (i in 1:ncol(countTable)) {
-    x1[i] <-  colnames(countTable)[i]
+      df <- data.frame(x1, x2)
 
-    x2[i] <- colSums(countTable[i])
-  }
+      format.data.frame(df, big.mark = ",")
 
-  x1[ncol(countTable) + 1] <- "Total"
-  x2[ncol(countTable) + 1] <- sum(x2)
+      colnames(df) <- c("Sample", "Counts")
 
-  x1[ncol(countTable) + 2] <- "Median"
-  x2[ncol(countTable) + 2] <- median(x2)
+      out <- df
 
-  x1[ncol(countTable) + 3] <- "Genes#"
-  x2[ncol(countTable) + 3] <- nrow(countTable)
+      # write.csv(df, file="output/Data_Summary.csv", row.names = FALSE)
 
-
-  df <- data.frame(x1, x2)
-
-  format.data.frame(df, big.mark = ",")
-
-  colnames(df) <- c("Sample", "Counts")
-
-  # write.csv(df, file="output/Data_Summary.csv", row.names = FALSE)
-
-  return(df)
+    },
+    error=function(cond) {
+      sendSweetAlert(
+        session = session,
+        title = "Data Format Error",
+        text = "Ensure that correctly formatted data with appropriately chosen number of conditions and replicates were supplied",
+        type = "error"
+      )
+      return()
+    }
+  )
+  return(out)
 }

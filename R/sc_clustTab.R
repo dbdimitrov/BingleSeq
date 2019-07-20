@@ -7,7 +7,7 @@ sc_clustUI <- function(id) {
   tagList(
     # Sidebar panel for inputs ----
     sidebarPanel(
-      actionButton(ns("elbowButton"), "Scale, PCA, and Elbowplot"),
+      actionButton(ns("elbowButton"), "Scale and Check Dimensionality"),
 
       conditionalPanel(
         condition =  "input.elbowButton > 0",
@@ -148,6 +148,7 @@ sc_clustUI <- function(id) {
             ns("clustplotType"),
             label = "Choose Plot Type",
             c(
+              "Elbow plot" = "elbow",
               "PCA plot" = "pca",
               "tSNE Plot" = "tsne",
               "Dimensions Heatmap" = "heatmap"
@@ -173,9 +174,14 @@ sc_clustUI <- function(id) {
     ),
 
     # Main panel for displaying outputs ----
-    mainPanel(verbatimTextOutput(ns("clustNoText"), placeholder = F),
+    mainPanel(
 
-              plotOutput(ns("clusterPlot")))
+      plotOutput(ns("clusterPlot")),
+
+      verbatimTextOutput(ns("clustNoText"), placeholder = F),
+
+      downloadButton(ns("downloadClustPlot"), "Download Plot")
+    )
 
   )
 }
@@ -194,16 +200,13 @@ sc_clust <- function(input, output, session, normData) {
     # if(!is.null(normData$normalizedData)){
     clust$scaledData <- seuratElbow(normData$normalizedData)
 
-    clust$elbowPlot <- ElbowPlot(clust$scaledData)
+    clust$clustPlot <- ElbowPlot(clust$scaledData)
 
     output$clusterPlot <- renderPlot({
-      clust$elbowPlot
+      clust$clustPlot
 
     })
 
-    # ggsave("figures/ElbowPlot.png", plot = clust$elbowPlot, device = png(),
-    #        width = 9, height = 6, limitsize = FALSE)
-    # }
   })
 
 
@@ -260,7 +263,9 @@ sc_clust <- function(input, output, session, normData) {
         clust$finalData <- RunTSNE(clust$finalData)
       }
 
-      if (input$clustplotType != "heatmap") {
+      if (input$clustplotType == "elbow") {
+        clust$clustPlot <- ElbowPlot(clust$scaledData)
+      } else if (input$clustplotType != "heatmap") {
         clust$clustPlot <-
           DimPlot(clust$finalData,
                   reduction = input$clustplotType,
@@ -290,11 +295,37 @@ sc_clust <- function(input, output, session, normData) {
 
       })
 
-      # ggsave(clustPlotName, plot = clust$clustPlot, device = png(),
-      #        width = 9, height = 6, limitsize = FALSE)
+
 
     }
   })
+
+  # Download current plot
+  output$downloadClustPlot <- downloadHandler(
+    filename = function() {
+      paste(as.character(input$clustplotType), device = ".png", sep = "")
+    },
+    content = function(file) {
+      device <- function(..., width, height) {
+        grDevices::png(
+          ...,
+          width = width,
+          height = height,
+          units = "px",
+          pointsize = 14
+        )
+      }
+      ggsave(
+        file,
+        plot = clust$clustPlot,
+        device = device,
+        width = 1280,
+        height = 720,
+        limitsize = FALSE
+      )
+    }
+  )
+
 
   return(clust)
 }

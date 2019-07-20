@@ -101,51 +101,91 @@ bulk_deData <- function(input, output, session, fCounts) {
     print(de$offset)
 
 
-    if (as.numeric(input$selectPackage) == 1) {
-      de$deTable <-
-        deSequence(
-          fCounts$filteredCounts,
-          as.numeric(input$conditionNo),
-          as.numeric(input$replicateNo)
-        )
-      print(nrow(de$deTable))
+    de$deTable <- dePipelineCaller(fCounts$filteredCounts,
+                                   as.numeric(input$conditionNo),
+                                   as.numeric(input$replicateNo),
+                                   as.numeric(input$selectPackage),
+                                   session
+                                   )
 
-    } else if (as.numeric(input$selectPackage) == 2) {
-      de$deTable <-
-        deEdgeR(
-          fCounts$filteredCounts,
-          as.numeric(input$conditionNo),
-          as.numeric(input$replicateNo)
-        )
-      print(nrow(de$deTable))
-
-    } else if (as.numeric(input$selectPackage) == 3) {
-      de$deTable <-
-        deALDE(
-          fCounts$filteredCounts,
-          as.numeric(input$conditionNo),
-          as.numeric(input$replicateNo)
-        )
-      print(nrow(de$deTable))
-
-    } else if (as.numeric(input$selectPackage) == 4) {
-      de$deTable <-
-        deLimma(
-          fCounts$filteredCounts,
-          as.numeric(input$conditionNo),
-          as.numeric(input$replicateNo)
-        )
-      print(nrow(de$deTable))
-
-    }
-
-    output$deTable <- DT::renderDataTable(DT::datatable(de$deTable[, 1:(de$offset)], options = list(pageLength = 10)))
+    output$deTable <-
+      DT::renderDataTable(
+        de$deTable[, 1:(de$offset)] %>% datatable() %>%
+          formatSignif(columns = c(1:de$offset), digits = 4),
+        options = list(pageLength = 10)
+      )
 
   })
 
   return(de)
 
 }
+
+
+#' Differential Expression Pipeline Caller
+#'
+#' Function that calls the appropriate DGE pipeline
+#' and provides exception handling
+#'
+#' @param readCounts The filtered CountTable
+#' @param conditionNo The number of Conditions
+#' @param replicateNo The number of Replicates
+#' @param selectedPackage The package(pipeline) to be executed
+#' @param session Current R session
+#'
+#'
+#' @export
+#' @return The results of the appropriate DE pipeline
+dePipelineCaller <- function(filteredCounts, conditionNo, replicateNo, selectedPackage, session) {
+  out <- tryCatch(
+    {
+      if (selectedPackage == 1) {
+        out <-
+          deSequence(
+            filteredCounts,
+            conditionNo,
+            replicateNo
+          )
+
+      } else if (selectedPackage == 2) {
+        out <-
+          deEdgeR(
+            filteredCounts,
+            conditionNo,
+            replicateNo
+          )
+
+      } else if (selectedPackage == 3) {
+        out <-
+          deALDE(
+            filteredCounts,
+            conditionNo,
+            replicateNo
+          )
+
+      } else if (selectedPackage == 4) {
+        out <-
+          deLimma(
+            filteredCounts,
+            conditionNo,
+            replicateNo
+          )
+
+      }
+    },
+    error=function(cond) {
+      sendSweetAlert(
+        session = session,
+        title = "Data Format Error",
+        text = "Please ensure that the data was formatted and loaded correctly",
+        type = "error"
+      )
+      return()      # Choose a return value in case of error
+    }
+  )
+  return(out)
+}
+
 
 
 #' DESeq2 Differential Expression Pipeline
@@ -155,7 +195,7 @@ bulk_deData <- function(input, output, session, fCounts) {
 #' @param replicateNo The number of Replicates
 #'
 #' @export
-#' @return The results of from the differential expression table
+#' @return DESeq2 DE pipeline results
 deSequence <- function(readCounts, conditionNo, replicateNo) {
   ## 2. Format Count dataframe
   output2 <- readCounts[, -1]
@@ -165,14 +205,12 @@ deSequence <- function(readCounts, conditionNo, replicateNo) {
   # Create Name vectors for conditions
   if (conditionNo == 2) {
     samplescondition <- c(rep("C1", replicateNo), rep("C2", replicateNo))
-    print(samplescondition)
 
   } else if (conditionNo == 3) {
     samplescondition <-
       c(rep("C1", replicateNo),
         rep("C2", replicateNo),
         rep("C3", replicateNo))
-    print(samplescondition)
   }
 
 
@@ -273,7 +311,7 @@ deSequence <- function(readCounts, conditionNo, replicateNo) {
 #' @param replicateNo The number of Replicates
 #'
 #' @export
-#' @return The results of from the differential expression table
+#' @return EdgeR DE pipeline results
 deEdgeR <- function(readCounts, conditionNo, replicateNo) {
   ## 1. Load and Format Count dataframe
   countTable  <- readCounts[, -1]
@@ -355,7 +393,7 @@ deEdgeR <- function(readCounts, conditionNo, replicateNo) {
 #' @param replicateNo The number of Replicates
 #'
 #' @export
-#' @return The results of from the differential expression table
+#' @return ALDEx2 DE pipeline results (with normalized counts and logFC from Edge)
 deALDE <- function(readCounts, conditionNo, replicateNo) {
   # Format Count dataframe
   countTable <- readCounts [, -1]
@@ -370,6 +408,7 @@ deALDE <- function(readCounts, conditionNo, replicateNo) {
     samples = c(rep("C1", replicateNo),
                 rep("C2", replicateNo),
                 rep("C3", replicateNo))
+
     samplescondition = factor(c(
       rep("C1", replicateNo),
       rep("C2", replicateNo),
@@ -390,6 +429,7 @@ deALDE <- function(readCounts, conditionNo, replicateNo) {
   # Must filter to match because ALDEx2 removes all 0 rows by default
   countTable <- subset(countTable, apply(countTable, 1, mean) > 0)
 
+
   # EdgeR object, Normalization, and Dispersion
   dge  <- DGEList(countTable, group = samplescondition)
   dge = calcNormFactors(dge)
@@ -399,6 +439,7 @@ deALDE <- function(readCounts, conditionNo, replicateNo) {
 
   ## Run the pipeline and create the object
   if (conditionNo == 2) {
+
     # Create object
     clr <-
       aldex.clr(
@@ -423,6 +464,7 @@ deALDE <- function(readCounts, conditionNo, replicateNo) {
     de = exactTest(dge, pair = c("C1", "C2"))
     tt = topTags(de, n = nrow(dge))
 
+
     ## Combine and Format MasterFileDE
 
     # reorder edgeR logFC to match ALDEx2
@@ -441,23 +483,30 @@ deALDE <- function(readCounts, conditionNo, replicateNo) {
 
   } else if (conditionNo == 3) {
     # ALDEx2
+
     clr <- aldex.clr(countTable,
-                     samples,
+                     design,
                      mc.samples = 1,
                      denom = "all")
+
     kw.test <- aldex.glm(clr)
 
     # format and save KW pvalues (exclude glm/anova pvalues)
-    ALDEData <- kw.test[order(row.names(kw.test)), c(1:2)]
+    ALDEData <- kw.test[order(row.names(kw.test)),]
 
-    # glm
+    head(ALDEData)
+    #access ALDEx2 Normalized Counts
+    #head(cbind(clr@analysisData$s1,clr@analysisData$s2, clr@analysisData$s3))
+
+    # EdgeR glm
     fit <- glmFit(dge, design)
     lrt <- glmLRT(fit, contrast = my.contrasts)
 
     tt = topTags(lrt, n = nrow(dge))
     edgeRData <- tt$table[order(row.names(tt$table)), ]
 
-    edgeRData[, c(6:7)] <- c(ALDEData$kw.ep , ALDEData$kw.eBH)
+    edgeRData[, c(6:7)] <- c(ALDEData$`(Intercept) Pr(>|t|)` , ALDEData$`(Intercept) Pr(>|t|).BH`)
+
 
 
     ## 4.Extract normalized  CPMs
@@ -466,29 +515,31 @@ deALDE <- function(readCounts, conditionNo, replicateNo) {
     resdata <- resdata[order(row.names(resdata)), ]
 
     masterFileDE <- cbind(edgeRData, resdata)
+
+    head(masterFileDE)
+    colnames(masterFileDE)[c(6, 7)] <- c("PValue", "FDR")
+
   }
 
 
-  ## 5. Write NormalizedCounts and MasterFile
-
+  ## 5. Format, Write, Return
   df <- masterFileDE
-
-  IDs <- rownames(masterFileDE)
-
   rownames(df) <- NULL
-
+  IDs <- rownames(masterFileDE)
   masterFileDE <- cbind(IDs, df)
 
   countTable <- masterFileDE[, -1]
-  rownames(countTable) <- readCounts[, 1]
+  rownames(countTable) <- masterFileDE[, 1]
 
   # Write normalised read counts
   # write.csv(resdata, file="output/normalizedCounts.csv", quote = FALSE)
 
+  # Write results table
   # write.csv(masterFileDE, file="output/ALDEx2_DE_output.csv", row.names = TRUE)
 
-  return(masterFileDE)
+  return(countTable)
 }
+
 
 #' Limma Differential Expression Pipeline
 #'
@@ -497,7 +548,7 @@ deALDE <- function(readCounts, conditionNo, replicateNo) {
 #' @param replicateNo The number of Replicates
 #'
 #' @export
-#' @return The results of from the differential expression table
+#' @return Limma DE pipeline results (with normalized/logtransformed counts with EdgeR and voom)
 deLimma <- function(readCounts, conditionNo, replicateNo) {
   ## 1. Load Data
   countTable  <- readCounts[, -1]
@@ -530,14 +581,13 @@ deLimma <- function(readCounts, conditionNo, replicateNo) {
 
   d  <- DGEList(countTable, group = samplescondition)
 
-  # normalize - method can be selected here
+  # Normalize - method can be selected here
   d <- calcNormFactors(d)
 
   # Transform count data to log2-counts per million (logCPM)
   v <- voom(d, design = design, plot = FALSE)
 
   # DE
-
   fit <- lmFit(v, design)
 
   if (conditionNo > 2) {
@@ -568,9 +618,9 @@ deLimma <- function(readCounts, conditionNo, replicateNo) {
     colnames(DEData)[4] <- "FDR"
   } else if (conditionNo == 3) {
     DEData <- tab[, c(1:7)]
-    colnames(DEData)[7] <- "FDR" #FDR is the one from ANOVA
+    colnames(DEData)[7] <- "FDR"
 
-    # # extract FC between conditions - ????
+    # # extract FC between conditions (check later)
     # DEData[1] <- topTable(fit2, coef="C1", n=Inf, sort.by="none")[1]
     # DEData[2] <- topTable(fit2, coef="C2", n=Inf, sort.by="none")[1]
     # DEData[3] <- topTable(fit2, coef="C3", n=Inf, sort.by="none")[1]

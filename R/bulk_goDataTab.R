@@ -113,7 +113,7 @@ bulk_goDataUI <- function(id) {
 
               tags$hr(),
 
-              textInput(ns("goInfoInput"), "Enter GO ID"),
+              textInput(ns("goInfoInput"), "Enter GO:ID of interest:"),
               actionButton(ns("goInfoButton"), label = "Get Information")
 
             )
@@ -162,12 +162,12 @@ bulk_goDataUI <- function(id) {
 #' @param de Differential Expression Results (Reactive Value)
 #' @return None
 bulk_goData <- function(input, output, session, counts, de) {
-  rv <- reactiveValues()
+  go <- reactiveValues()
 
 
   # Functional Annotation ------
   observeEvent(input$goGetButton, {
-    rv$goGetGenes <-
+    go$goGetGenes <-
       getDEgenes(
         de$deTable,
         input$goGetType,
@@ -176,7 +176,7 @@ bulk_goData <- function(input, output, session, counts, de) {
         as.numeric(input$goGetCondition)
       )
 
-    x <- as.data.frame(rv$goGetGenes)
+    x <- as.data.frame(go$goGetGenes)
 
     output$goGenesTable <-
       DT::renderDataTable(x, colnames = ("Differentially Expressed Genes"))
@@ -192,9 +192,9 @@ bulk_goData <- function(input, output, session, counts, de) {
   })
 
   observeEvent(input$goTermButton, {
-    rv$goTermTable <-
+    go$goTermTable <-
       runGOSEQ(
-        rv$goGetGenes,
+        go$goGetGenes,
         counts$countTable,
         input$goTermGenome,
         input$goTermSymbol,
@@ -206,8 +206,9 @@ bulk_goData <- function(input, output, session, counts, de) {
       )
 
 
-    output$goTermTable <- DT::renderDataTable(DT::datatable(
-      rv$goTermTable,
+    output$goTermTable <- DT::renderDataTable(
+      go$goTermTable %>% datatable() %>%
+        formatSignif(columns = c(2:3), digits = 4),
       rownames = FALSE,
       colnames = c(
         "ID",
@@ -218,8 +219,7 @@ bulk_goData <- function(input, output, session, counts, de) {
         "GO Term",
         "Ontology"
       )
-    ))
-
+    )
     updateTabsetPanel(session, "goMainTabSet", selected = "goTableTab")
 
   })
@@ -227,10 +227,10 @@ bulk_goData <- function(input, output, session, counts, de) {
 
 
   observeEvent(input$goHistButton, {
-    rv$hist <- histGoTerms(rv$goTermTable, input$goHistCheck)
+    go$hist <- histGoTerms(go$goTermTable, input$goHistCheck, session)
 
     output$goHistPlot <- renderPlot({
-      rv$hist
+      go$hist
 
     })
 
@@ -241,14 +241,8 @@ bulk_goData <- function(input, output, session, counts, de) {
   })
 
   observeEvent(input$goInfoButton, {
-    go.term <- GOTERM[[input$goInfoInput]]
-
     output$goInfoText <- renderText({
-      paste(GOID(go.term),
-            Term(go.term),
-            Definition(go.term),
-            Synonym(go.term),
-            sep = "\n")
+      goInfo(input$goInfoInput, session)
     })
 
     updateTabsetPanel(session, "goMainTabSet", selected = "goInfoTab")
@@ -390,50 +384,91 @@ runGOSEQ <-
 #' @param data Functional Annotation results
 #' @param gof Boolean to use GO:Terms or GO:ID
 #' @return p The histogram
-histGoTerms <- function(data, gof) {
-  if (nrow(data) > 10) {
-    data <- head(data, n = 10)
-  }
-
-  if (gof) {
-    goVector <- as.list(NULL)
-    n <- length(data$category)
-
-    for (i in 1:n) {
-      go.term <- (GOTERM[data$category[i]])
-      goVector[i] <- Term(go.term)
-
+histGoTerms <- function(data, gof, session) {
+  plot <- tryCatch({
+    if (nrow(data) > 10) {
+      data <- head(data, n = 10)
     }
 
-    data$goVector <- goVector
-    out <- transform(data, goVector = unlist(goVector))
-    data$category <- as.factor(out$goVector)
-    levels(data$category) <-
-      gsub("(.{20,}?)\\s", "\\1\n", levels(data$category))
-  }
+    if (gof) {
+      goVector <- as.list(NULL)
+      n <- length(data$category)
+
+      for (i in 1:n) {
+        go.term <- (GOTERM[data$category[i]])
+        goVector[i] <- Term(go.term)
+
+      }
+
+      data$goVector <- goVector
+      out <- transform(data, goVector = unlist(goVector))
+      data$category <- as.factor(out$goVector)
+      levels(data$category) <-
+        gsub("(.{20,}?)\\s", "\\1\n", levels(data$category))
+    }
 
 
-  p <- ggplot(data, aes(category,-log2(over_represented_pvalue))) +
-    geom_col(color = "black") +
-    theme_bw() +
-    labs(y = "-log2(p-value)", x = "") +
-    theme(
-      text = element_text(size = 20),
-      axis.text.x = element_text(
-        angle = 90,
-        hjust = 0,
-        vjust = 0.2
-      ),
-      axis.ticks.x = element_blank(),
-      panel.grid.minor = element_blank(),
-      panel.border = element_blank(),
-      plot.background = element_blank(),
-      panel.grid.major = element_blank()
+    plot <-
+      ggplot(data, aes(category, -log2(over_represented_pvalue))) +
+      geom_col(color = "black") +
+      theme_bw() +
+      labs(y = "-log2(p-value)", x = "") +
+      theme(
+        text = element_text(size = 20),
+        axis.text.x = element_text(
+          angle = 90,
+          hjust = 0,
+          vjust = 0.2
+        ),
+        axis.ticks.x = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        plot.background = element_blank(),
+        panel.grid.major = element_blank()
+      )
+  },
+  error = function(cond) {
+    sendSweetAlert(
+      session = session,
+      title = "GO:Term Data Not Found",
+      text = "Please run GO:TERM pipeline first",
+      type = "error"
     )
+    return()
+  })
 
-  # png("figures/GOTermHistogram.png", height=900, width=1200)
-  print(p)
-  dev.off()
+  return(plot)
+}
 
-  return(p)
+
+
+#' Generate GO Term Info
+#'
+#' Calls GOTERM function and concatinates output
+#'
+#' @param goID ID of the GO term of interest
+#' @param session Current R session
+#'
+#'
+#' @return The concatinated GO TERM information
+goInfo <- function(goID, session) {
+  out <- tryCatch({
+    go.term <- GOTERM[[goID]]
+
+    out <-  paste(GOID(go.term),
+                  Term(go.term),
+                  Definition(go.term),
+                  Synonym(go.term),
+                  sep = "\n")
+  },
+  error = function(cond) {
+    sendSweetAlert(
+      session = session,
+      title = "GO:ID Not Found",
+      text = "Please ensure that the GO:ID was appropriately typed",
+      type = "error"
+    )
+    return()
+  })
+  return(out)
 }
