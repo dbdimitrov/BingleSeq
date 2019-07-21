@@ -14,7 +14,7 @@ deALDE(readCounts, conditionNo, replicateNo)
 \item{replicateNo}{The number of Replicates}
 }
 \value{
-The results of from the differential expression table
+ALDEx2 DE pipeline results (with normalized counts and logFC from Edge)
 }
 \description{
 ALDEx2 Differential Expression Pipeline

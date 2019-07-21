@@ -4,7 +4,7 @@
 \alias{histGoTerms}
 \title{Generate GO Histogram}
 \usage{
-histGoTerms(data, gof)
+histGoTerms(data, gof, session)
 }
 \arguments{
 \item{data}{Functional Annotation results}

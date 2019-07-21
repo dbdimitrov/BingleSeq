@@ -14,7 +14,7 @@ deSequence(readCounts, conditionNo, replicateNo)
 \item{replicateNo}{The number of Replicates}
 }
 \value{
-The results of from the differential expression table
+DESeq2 DE pipeline results
 }
 \description{
 DESeq2 Differential Expression Pipeline

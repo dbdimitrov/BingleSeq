@@ -4,7 +4,7 @@
 \name{ui}
 \alias{ui}
 \title{Initiate GUI}
-\format{An object of class \code{shiny.tag.list} (inherits from \code{list}) of length 2.}
+\format{An object of class \code{shiny.tag.list} (inherits from \code{list}) of length 3.}
 \usage{
 ui
 }

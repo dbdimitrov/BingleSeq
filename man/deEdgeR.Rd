@@ -14,7 +14,7 @@ deEdgeR(readCounts, conditionNo, replicateNo)
 \item{replicateNo}{The number of Replicates}
 }
 \value{
-The results of from the differential expression table
+EdgeR DE pipeline results
 }
 \description{
 EdgeR Differential Expression Pipeline

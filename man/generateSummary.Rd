@@ -4,7 +4,7 @@
 \alias{generateSummary}
 \title{Generate Summary}
 \usage{
-generateSummary(counts)
+generateSummary(counts, session)
 }
 \value{
 df a dataframe containing the summary

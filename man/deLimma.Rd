@@ -14,7 +14,7 @@ deLimma(readCounts, conditionNo, replicateNo)
 \item{replicateNo}{The number of Replicates}
 }
 \value{
-The results of from the differential expression table
+Limma DE pipeline results (with normalized/logtransformed counts with EdgeR and voom)
 }
 \description{
 Limma Differential Expression Pipeline
