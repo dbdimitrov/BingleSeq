@@ -126,7 +126,7 @@ sc_de <- function(input, output, session, finData) {
   ## Generate DE Data
   observeEvent(input$dgeButton, {
     # if(!is.null(finData$finalData)){
-
+    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
     de$markers <- FindAllMarkers(
       finData$finalData,
       test.use = input$dgeTestCombo,
@@ -135,6 +135,7 @@ sc_de <- function(input, output, session, finData) {
     )
 
 
+    hide_waiter()
 
     # write.csv(de$markers, file="output/AllMarkerGenes.csv", row.names = FALSE)
 
@@ -147,6 +148,7 @@ sc_de <- function(input, output, session, finData) {
           formatSignif(columns = c(1:2, 5), digits = 4)
       }, options = list(pageLength = 10))
     # }
+
   })
 
 

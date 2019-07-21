@@ -192,6 +192,9 @@ bulk_goData <- function(input, output, session, counts, de) {
   })
 
   observeEvent(input$goTermButton, {
+
+    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+
     go$goTermTable <-
       runGOSEQ(
         go$goGetGenes,
@@ -220,6 +223,9 @@ bulk_goData <- function(input, output, session, counts, de) {
         "Ontology"
       )
     )
+
+    hide_waiter()
+
     updateTabsetPanel(session, "goMainTabSet", selected = "goTableTab")
 
   })

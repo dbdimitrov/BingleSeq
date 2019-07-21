@@ -80,6 +80,8 @@ sc_comp <- function(input, output, session, finData) {
   observeEvent(input$comparisonButton, {
     #* quite different
 
+    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+
     comp$xlist <-
       sc_getAllDE(
         finData$finalData,
@@ -98,6 +100,8 @@ sc_comp <- function(input, output, session, finData) {
 
     # ggsave("figures/comparisonVenn.png", plot = comp$plot, device = png(),
     #        width = 12, height = 8, limitsize = FALSE)
+
+    hide_waiter()
 
   })
 

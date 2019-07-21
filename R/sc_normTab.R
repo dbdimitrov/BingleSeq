@@ -72,6 +72,8 @@ sc_norm <- function(input, output, session, filtData) {
 
   ### Normalization ------
   observeEvent(input$normalizeButton, {
+
+    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
     norm$normalizedData <-
       normalizeSeurat(
         filtData$filteredData,
@@ -92,6 +94,7 @@ sc_norm <- function(input, output, session, filtData) {
 
     })
 
+    hide_waiter()
     # ggsave("figures/variancePlot.png", plot = norm$variancePlot, device = png(),
     #        width = 9, height = 6, limitsize = FALSE)
 

@@ -198,6 +198,8 @@ sc_clust <- function(input, output, session, normData) {
 
   observeEvent(input$elbowButton, {
     # if(!is.null(normData$normalizedData)){
+
+    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
     clust$scaledData <- seuratElbow(normData$normalizedData)
 
     clust$clustPlot <- ElbowPlot(clust$scaledData)
@@ -207,11 +209,14 @@ sc_clust <- function(input, output, session, normData) {
 
     })
 
+    hide_waiter()
   })
 
 
   observeEvent(input$clustButton, {
     if (!is.null(clust$scaledData)) {
+
+      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
       if (input$clusterPackage == 1) {
         clust$finalData <-
           sueratClust(
@@ -253,12 +258,17 @@ sc_clust <- function(input, output, session, normData) {
       })
 
     }
+
+    hide_waiter()
   })
 
 
 
   observeEvent(input$pcaButton, {
     if (!is.null(clust$finalData)) {
+
+      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+
       if (is.null(clust$finalData@reductions$tsne)) {
         clust$finalData <- RunTSNE(clust$finalData)
       }
@@ -295,8 +305,7 @@ sc_clust <- function(input, output, session, normData) {
 
       })
 
-
-
+      hide_waiter()
     }
   })
 

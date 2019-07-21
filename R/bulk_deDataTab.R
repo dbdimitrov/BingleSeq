@@ -100,6 +100,8 @@ bulk_deData <- function(input, output, session, fCounts) {
     print("offset is:")
     print(de$offset)
 
+    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+
 
     de$deTable <- dePipelineCaller(fCounts$filteredCounts,
                                    as.numeric(input$conditionNo),
@@ -114,6 +116,8 @@ bulk_deData <- function(input, output, session, fCounts) {
           formatSignif(columns = c(1:de$offset), digits = 4),
         options = list(pageLength = 10)
       )
+
+    hide_waiter()
 
   })
 

@@ -323,6 +323,8 @@ server <- function(input, output, session) {
           } else if (!is.null(de$deTable) && de$conditionNo == 2) {
             updateSelectInput(session, "plotTab-selectPlotCombo", choices = plotChoices)
 
+            print("resets")
+
             updateSelectInput(session, "plotTab-selectConditionMA", selected = 1)
             updateSelectInput(session, "plotTab-selectConditionTHM", selected = 1)
             updateSelectInput(session, "goTab-goGetCondition", selected = 1)

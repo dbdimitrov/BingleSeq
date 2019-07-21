@@ -275,8 +275,7 @@ bulk_plotData <- function(input, output, session, rv) {
           ...,
           width = width,
           height = height,
-          res = 1200,
-          units = "in",
+          units = "px",
           pointsize = 12
         )
       }
@@ -284,8 +283,8 @@ bulk_plotData <- function(input, output, session, rv) {
         file,
         plot = rv$plot,
         device = device,
-        width = 12,
-        height = 8,
+        width = 1280,
+        height = 720,
         limitsize = FALSE
       )
     }

@@ -114,7 +114,7 @@ sc_goUI <- function(id) {
 
               tags$hr(),
 
-              textInput(ns("goInfoInput"), "Enter GO ID"),
+              textInput(ns("goInfoInput"), "Enter GO:ID of interest:"),
               actionButton(ns("goInfoButton"), label = "Get Information")
 
             )
@@ -200,6 +200,9 @@ sc_go <- function(input, output, session, de, countsT) {
   observeEvent(input$goTermButton, {
 
     if(!is.null(go$goGetGenes)){
+
+      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+
       go$goTermTable <-
         runGOSEQ(
           go$goGetGenes,
@@ -228,6 +231,7 @@ sc_go <- function(input, output, session, de, countsT) {
         )
       )
 
+      hide_waiter()
 
       updateTabsetPanel(session, "goMainTabSet", selected = "goTableTab")
     }

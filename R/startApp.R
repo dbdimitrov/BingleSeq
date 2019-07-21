@@ -6,6 +6,7 @@
 #' @import shinyjs
 #' @import shinyFiles
 #' @import shinyWidgets
+#' @import waiter
 #' @import V8
 #' @import DT
 #' @import grDevices
@@ -16,6 +17,8 @@
 #' @import reshape2
 #' @import gridExtra
 #' @import ggrepel
+#' @import GenomeInfoDbData
+#' @import geneLenDataBase
 #' @import DESeq2
 #' @import edgeR
 #' @import limma
@@ -43,6 +46,7 @@ startBingleSeq <- function() {
     library(shinyFiles)
     library(shinyWidgets)
 
+    library(waiter)
     library(V8) # enables js lines to be read intext
     library(dplyr)
     library(DT)
@@ -72,6 +76,7 @@ startBingleSeq <- function() {
     library(org.Mm.eg.db)
     library(org.Hs.eg.db)
     library(GO.db)
+
 
     app <- shinyApp(ui = shinyUI(ui),
                     server = shinyServer(server))

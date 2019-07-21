@@ -5,23 +5,27 @@
 #' @return None
 ui <-  tagList(
   useShinyjs(),
-  navbarPage(id = "mainPage",
-             title = "BingleSEQ",
+  use_waiter(),
+      navbarPage(id = "mainPage",
+                 title = "BingleSEQ",
 
-             tabPanel(title = "Choose App",
-                      value = "startApp",
+                 tabPanel(title = "Choose App",
+                          value = "startApp",
 
-                      h5("Choose directory to save additional files"),
-
-                      shinyDirButton('saveFilesDirButton', 'Select Directory', 'Please select a folder to save output'),
-
-
-                      radioButtons("chooseApp",
-                                   "Pick Data Type",
-                                   choices =  c("Single Cell" = 1, "Bulk" = 2)),
+                          radioGroupButtons("chooseApp",
+                                            "Pick Data Type",
+                                            size = 'lg',
+                                            choices =  c("Single-cell RNA-Seq Analysis" = 1,
+                                                         "Bulk RNA-Seq Data Analysis" = 2)),
 
 
-                      actionButton(("launch_app"), "Launch App"))
+                          actionBttn(("launch_app"), "Launch App", size = "md", style = "material-flat")
+                          # actionBttn(("launch_bulk"), "Bulk RNA-Seq Data Analysis", size = "md", style = "material-flat")
 
-  )
+                          # h5("Choose directory to save additional files"),
+
+                          # shinyDirButton('saveFilesDirButton', 'Select Directory', 'Please select a folder to save output'),
+
+                 )
+    )
 )

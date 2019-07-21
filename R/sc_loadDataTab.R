@@ -81,15 +81,21 @@ sc_loadData <- function(input, output, session) {
                    roots = volumes,
                    session = session)
 
+
+
     path1 <- reactive({
       return(print(parseDirPath(volumes, input$directoryButton)))
     })
 
+
     # show meta data table
     if (!is.null(path1)) {
 
-        req(nchar(path1()) > 0)
-        counts$countTable <- load10xData(path1(), session)
+      req(nchar(path1()) > 0)
+
+      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+      counts$countTable <- load10xData(path1(), session)
+      hide_waiter()
 
     }
   })
@@ -112,6 +118,8 @@ sc_loadData <- function(input, output, session) {
     })
 
   })
+
+  hide_waiter()
 
   return(counts)
 }
