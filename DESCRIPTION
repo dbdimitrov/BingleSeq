@@ -1,11 +1,10 @@
 Package: BingleSeq
 Type: Package
 Title: User-friendly R package for Bulk-RNA-Seq and sc-RNA-Seq analyses
-Version: 0.1.1
+Version: 0.1.3
 Author: Daniel Dimitrov
 Maintainer: Daniel Dimitrov <2412499d@student.gla.ac.uk>
-Description: Easy easy taman taman
-    Use four spaces when indenting paragraphs within the Description.
+Description: 
 License: MIT
 Encoding: UTF-8
 LazyData: true
@@ -15,6 +14,7 @@ Imports: dplyr,
     shinyjs,
     shinyFiles,
     shinyWidgets,
+    waiter,
     V8,
     DT,
     grDevices,
@@ -32,8 +32,14 @@ Imports: dplyr,
     monocle,
     Seurat,
     scran,
-    SC3
-Suggests: org.Mm.eg.db, org.Hs.eg.db, GO.db, goseq
+    SC3,
+    GenomeInfoDbData,
+    geneLenDataBase,
+    org.Mm.eg.db,
+    org.Hs.eg.db,
+    GO.db,
+    goseq
+Suggests: 
 RoxygenNote: 6.1.1
 Collate: 
     'bulk_compDataTab.R'
