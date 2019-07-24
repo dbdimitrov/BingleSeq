@@ -17,9 +17,8 @@ sc_deUI <- function(id) {
                   "MAST" = "MAST",
                   "Wilcoxon Rank Sum test" = "wilcox",
                   "Student's T-test" = "t",
-                  "ROC analysis" = "roc",
                   "Likelihood-ratio test(bimod)" = "bimod",
-                  "Negative Binomial" = "Negative Binomial",
+                  "DESeq2" = "DESeq2",
                   "Logistic Regression" = "LR"
                 )
               ),
@@ -30,6 +29,14 @@ sc_deUI <- function(id) {
                 min = 0,
                 max = 10,
                 value = 2
+              ),
+
+              numericInput(
+                ns("adjPdgeInput"),
+                label = "Adjusted P-value Threshold",
+                min = 0,
+                max = 1,
+                value = 0.05
               ),
 
               numericInput(
@@ -127,12 +134,21 @@ sc_de <- function(input, output, session, finData) {
   observeEvent(input$dgeButton, {
     # if(!is.null(finData$finalData)){
     show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+
+    if(input$dgeTestCombo == "DESeq2"){
+      finData$finalData[["RNA"]]@counts <- as.matrix(finData$finalData[["RNA"]]@counts) + 1
+    }
+
     de$markers <- FindAllMarkers(
       finData$finalData,
       test.use = input$dgeTestCombo,
       min.pct = input$pctdgeInput,
       logfc.threshold = log(input$logFCdgeInput)
     )
+
+    # Filter by adjusted P-value
+    filter <- de$markers$p_val_adj < input$adjPdgeInput
+    de$markers <- de$markers[filter,]
 
 
     hide_waiter()
@@ -141,10 +157,10 @@ sc_de <- function(input, output, session, finData) {
 
     output$dgeTable <-
       DT::renderDataTable(if (input$dgeClusterCheck) {
-        de$markers %>% datatable() %>%
+        de$markers[,1:(ncol(de$markers)-1)] %>% datatable() %>%
           formatSignif(columns = c(1:2, 5), digits = 4)
       } else{
-        de$markers[de$markers$cluster == input$dgeClustInput,] %>% datatable() %>%
+        de$markers[de$markers$cluster == input$dgeClustInput, 1:(ncol(de$markers)-1)] %>% datatable() %>%
           formatSignif(columns = c(1:2, 5), digits = 4)
       }, options = list(pageLength = 10))
     # }

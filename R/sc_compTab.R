@@ -24,7 +24,7 @@ sc_compUI <- function(id) {
       ),
       numericInput(
         ns("compPvalueInput"),
-        label = "P-value threshold",
+        label = "Adjusted P-value Threshold",
         value = 0.05,
         min = 0.000001,
         max = 0.5

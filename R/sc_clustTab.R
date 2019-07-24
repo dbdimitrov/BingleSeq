@@ -64,8 +64,8 @@ sc_clustUI <- function(id) {
           numericInput(
             ns("sc3minCells"),
             label = "Minimum Cells per Cluster",
-            min = 20,
-            value = 50
+            min = 1,
+            value = 10
           ),
 
           checkboxInput(ns("estKCheck"), label = "Estimate Cluster Number", TRUE),
@@ -95,6 +95,24 @@ sc_clustUI <- function(id) {
                            "DDRTree (Pseudotime)" = "DDRTree")
           ),
 
+          conditionalPanel(
+            condition = "input.monoRedMethod=='tSNE' ",
+            ns = ns,
+
+            selectInput(
+              ns("monoClustMethod"),
+              label = "Select Clustering Method",
+              choices = list("Density Peak" = "densityPeak",
+                             "Louvian algorithm" = "louvain")
+            ),
+
+            numericInput(
+              ns("monodimensionNo"),
+              label = "Dimensions to be used",
+              min = 3,
+              value = 5
+            ),
+
           numericInput(
             ns("monoLowerDetection"),
             label = "Lower Detection Limit",
@@ -103,17 +121,6 @@ sc_clustUI <- function(id) {
             value = 0.1
           ),
 
-
-          conditionalPanel(
-            condition = "input.monoRedMethod=='tSNE' ",
-            ns = ns,
-
-            numericInput(
-              ns("monodimensionNo"),
-              label = "Dimensions to be used",
-              min = 3,
-              value = 5
-            ),
 
             checkboxInput(ns("estMonoClust"),
                           label = "Estimate Cluster Number", TRUE)
@@ -197,16 +204,14 @@ sc_clust <- function(input, output, session, normData) {
   clust <- reactiveValues()
 
   observeEvent(input$elbowButton, {
-    # if(!is.null(normData$normalizedData)){
 
     show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
-    clust$scaledData <- seuratElbow(normData$normalizedData)
 
-    clust$clustPlot <- ElbowPlot(clust$scaledData)
+    clust$scaledData <- seuratElbow(normData$normalizedData)
+    clust$clustPlot <- clust$scaledData[[2]]
 
     output$clusterPlot <- renderPlot({
       clust$clustPlot
-
     })
 
     hide_waiter()
@@ -216,40 +221,51 @@ sc_clust <- function(input, output, session, normData) {
   observeEvent(input$clustButton, {
     if (!is.null(clust$scaledData)) {
 
-      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+      show_waiter(tagList(spin_folding_cube(), h2("Loading...")))
+
+
       if (input$clusterPackage == 1) {
-        clust$finalData <-
+        clust$results <-
           sueratClust(
-            clust$scaledData,
+            clust$scaledData[[1]],
             input$dimensionsInput,
             input$resolutionInput,
-            as.numeric(input$clusterAlgCombo)
+            as.numeric(input$clusterAlgCombo),
+            session
           )
 
+        clust$finalData <- clust$results[[1]]
+
       } else if (input$clusterPackage == 2) {
-        print(1)
-        clust$finalData <-
+
+        clust$results <-
           sc3Cluster(
-            clust$scaledData,
+            clust$scaledData[[1]],
             input$estKCheck,
             input$sc3ClustNoInput,
-            input$sc3minCells
+            input$sc3minCells,
+            session
           )
+
+        clust$finalData <- clust$results[[1]]
 
       } else{
         # Monocle normalization is suggested by the authors
         # however using Seurat Normalization seemed to work fine
 
-        clust$finalData <-
+        clust$results <-
           clusterMonocle(
-            clust$scaledData,
+            clust$scaledData[[1]],
             input$monoLowerDetection,
             input$monoRedMethod,
+            input$monoClustMethod,
             input$monodimensionNo,
             input$estMonoClust,
-            input$monoClustNo
+            input$monoClustNo,
+            session
           )
 
+        clust$finalData <- clust$results[[1]]
       }
 
       output$clustNoText <- renderText({
@@ -269,19 +285,18 @@ sc_clust <- function(input, output, session, normData) {
 
       show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
 
-      if (is.null(clust$finalData@reductions$tsne)) {
-        clust$finalData <- RunTSNE(clust$finalData)
-      }
-
       if (input$clustplotType == "elbow") {
-        clust$clustPlot <- ElbowPlot(clust$scaledData)
-      } else if (input$clustplotType != "heatmap") {
-        clust$clustPlot <-
-          DimPlot(clust$finalData,
-                  reduction = input$clustplotType,
-                  pt.size = 1.2)
-        clustPlotName <-
-          paste("figures/", input$clustplotType, ".png", sep = "")
+        clust$clustPlot <- clust$scaledData[[2]]
+
+      } else if (input$clustplotType == "pca") {
+        clust$clustPlot <- DimPlot(clust$finalData,
+                                   reduction = input$clustplotType,
+                                   pt.size = 1.4)
+
+      } else if(input$clustplotType == "tsne"){
+
+        clust$clustPlot <- clust$results[[2]]
+
       } else{
         clust$clustPlot <-
           DimHeatmap(
@@ -291,18 +306,15 @@ sc_clust <- function(input, output, session, normData) {
             balanced = TRUE,
             fast = FALSE
           )
-        clustPlotName <-
-          paste("figures/",
-                input$clustplotType,
-                "DimNo",
-                input$dimNoInput,
-                ".png",
-                sep = "")
+
+        hm.palette <-
+          colorRampPalette(c("red", "white", "blue")) # Set the colour range
+
+        clust$clustPlot <- clust$clustPlot +  scale_fill_gradientn(colours = hm.palette(100))
       }
 
       output$clusterPlot <- renderPlot({
         clust$clustPlot
-
       })
 
       hide_waiter()
@@ -342,7 +354,7 @@ sc_clust <- function(input, output, session, normData) {
 
 #' Single Cell Scale and Dimension Reduction function
 #'
-#' @param s_object Seurat object with normalized data
+#' @param scaled_object Seurat object with scaled data
 #'
 #' @export
 #' @return Seurat object with scaled counts and reduced dimensions (PCA data)
@@ -351,21 +363,53 @@ seuratElbow <- function(s_object) {
   scaled_object <-
     RunPCA(scaled_object, features = VariableFeatures(object = scaled_object))
 
-  return(scaled_object)
+  elbow <- ElbowPlot(scaled_object)
+
+  out <- list(scaled_object, elbow)
+
+  return(out)
 }
 
 #' Seurat Clustering Pipeline
 #'
 #' @param s_object Seurat object with scaled and PCA data
+#' @param dimNo Number of dimensions to be used when clustering
+#' @param resQuant Resolution parameter used to control the number of clusters
+#' @param algorithmNo The clustering algorithm to be used
+#' @param session Current R session
 #'
 #' @export
 #' @return Seurat object with clustering data
-sueratClust <- function(s_object, dimNo, resQuant, algorithmNo) {
-  s_object <- FindNeighbors(s_object, dims = 1:dimNo)
-  s_object <-
-    FindClusters(s_object, resolution = resQuant, algorithm = algorithmNo)
+sueratClust <- function(s_object, dimNo, resQuant, algorithmNo, session) {
 
-  return(s_object)
+  out <- tryCatch(
+    {
+      s_object <- FindNeighbors(s_object, dims = 1:dimNo)
+      s_object <- FindClusters(s_object,
+                               resolution = resQuant,
+                               algorithm = algorithmNo)
+      s_object <- RunTSNE(s_object, dims = 1:dimNo)
+
+
+      tsne <- DimPlot(s_object,
+                      reduction = "tsne",
+                      pt.size = 1.4)
+
+
+      out <- list(s_object, tsne)
+    },
+    error=function(cond) {
+      sendSweetAlert(
+        session = session,
+        title = "Clustering Error Encountered",
+        text = "Consider applying more stringent QC",
+        type = "error"
+      )
+      return()
+    }
+  )
+
+  return(out)
 }
 
 #' SC3 Clustering Pipeline
@@ -374,56 +418,93 @@ sueratClust <- function(s_object, dimNo, resQuant, algorithmNo) {
 #' @param estK Boolean - whether to estimate cluster number or not
 #' @param clustNo If estK is false - Give desired cluster number
 #' @param cellsPerC Minimum cells per cluster
+#' @param Current R session
 #'
 #' @export
 #' @return Seurat object with SC3 clustering data
-sc3Cluster <- function(s_object, estK, clustNo, cellsPerC) {
-  # Convert from Seurat to sc3
-  sce <- as.SingleCellExperiment(s_object)
-  rowData(sce)$feature_symbol <- rownames(s_object)
+sc3Cluster <- function(s_object, estK, clustNo, cellsPerC, session) {
 
-  counts(sce) <- as.matrix(counts(sce))
-  # normcounts(sce) <- as.matrix((s_object@assays$RNA@data))
-  # logcounts(sce) <- as.matrix(logcounts(sce))
-  logcounts(sce) <- as.matrix((s_object@assays$RNA@data))
+  out <- tryCatch(
+    {
+      # delete
+      # s_object <- pbmc
+      # cellsPerC = 10
 
 
-  # Cluster similar cells
-  qclust <-
-    scran::quickCluster(sce, min.size = cellsPerC, assay.type = "logcounts")
-  print(qclust)
+      # Convert from Seurat to sc3
+      sce <- as.SingleCellExperiment(s_object)
+      rowData(sce)$feature_symbol <- rownames(s_object)
 
-  ## Data Normalization
-  sce <-
-    scran::computeSumFactors(
-      sce,
-      sizes = 20,
-      clusters = qclust,
-      positive = TRUE,
-      assay.type = "logcounts"
-    )
-  # sce <- scater::normalize(sce)
+      counts(sce) <- as.matrix(counts(sce))
+      # normcounts(sce) <- as.matrix((s_object@assays$RNA@data))
+      # logcounts(sce) <- as.matrix(logcounts(sce))
+      logcounts(sce) <- as.matrix((s_object@assays$RNA@data))
 
-  browseVignettes("SC3")
-  if (estK) {
-    # estimate No of clusters
 
-    sce <- sc3_estimate_k(sce)
-    clustNo <- sce@metadata$sc3$k_estimation
-  }
+      # Cluster similar cells ??????????????? Any point?
+      qclust <-
+        scran::quickCluster(sce, min.size = cellsPerC, assay.type = "logcounts")
+      print(qclust)
 
-  print(clustNo)
-  # Perform unsupervised clustering of the cells and produce plots.
-  sce <- sc3(object = sce,
-             ks = clustNo)
 
-  ### assign clusters from sc3 to s_object
-  sce@metadata$sc3$consensus[[1]]$silhouette[, 1]
-  clusters <- sce@metadata$sc3$consensus[[1]]$silhouette[, 1]
-  names(clusters) <- colnames(s_object)
-  s_object@active.ident <- as.factor(clusters)
+      # sce <-
+      #   scran::computeSumFactors(
+      #     sce,
+      #     sizes = 20,
+      #     clusters = qclust,
+      #     positive = TRUE,
+      #     min.mean = 2, # NumericInput required (0.5 as default) + tryCatch
+      #     assay.type = "logcounts"
+      #   )
 
-  return(s_object)
+      # Data Normalization (done with Seurat)
+      # sce <- scater::normalize(sce) #probvam s i bez
+
+      browseVignettes("SC3")
+      if (estK) {
+        # estimate No of clusters
+
+        sce <- sc3_estimate_k(sce)
+        clustNo <- sce@metadata$sc3$k_estimation
+      }
+
+      print(clustNo)
+      # Perform unsupervised clustering of the cells and produce plots.
+      sce <- sc3(object = sce,
+                 ks = clustNo)
+
+      ### assign clusters from sc3 to s_object
+      sce@metadata$sc3$consensus[[1]]$silhouette[, 1]
+      clusters <- sce@metadata$sc3$consensus[[1]]$silhouette[, 1]
+      names(clusters) <- colnames(s_object)
+      s_object@active.ident <- as.factor(clusters)
+
+      ###
+      k_estimated_field <- paste("sc3", clustNo, "clusters", sep = '_')
+      #
+      #
+      tsne <- scater::plotTSNE(sce , colour_by = k_estimated_field) +
+        theme_classic() +
+        guides(fill=guide_legend("Clusters")) +
+        theme(legend.text=element_text(size=12))
+
+      plot(tsne)
+
+      out <- list(s_object, tsne)
+
+    },
+    error=function(cond) {
+      sendSweetAlert(
+        session = session,
+        title = "Clustering Error Encountered",
+        text = "Consider using another clustering method or applying more stringent QC",
+        type = "error"
+      )
+      return()
+    }
+  )
+
+  return(out)
 }
 
 #' Monocle Clustering Pipeline
@@ -441,72 +522,109 @@ clusterMonocle <-
   function(s_object,
            lowerDetection,
            redMethod,
+           clustMethod,
            dimensionNo,
            estimateClust,
-           clustNo) {
-    #1. Extract data, phenotype data, and feature data from the SeuratObject
-    data <- as(as.matrix(s_object@assays$RNA@data), 'sparseMatrix')
+           clustNo,
+           session) {
 
-    pd <- new('AnnotatedDataFrame', data = s_object@meta.data)
+      # delete
+    # lowerDetection = 0.1
+    # dimensionNo = 10
+    # redMethod = "tSNE"
+    # clustMethod = "densityPeak"
+    # clustNo = 4
 
-    fData <-
-      data.frame(gene_short_name = row.names(data),
-                 row.names = row.names(data))
-    fd <- new('AnnotatedDataFrame', data = fData)
+    out <- tryCatch(
+      {
+        #1. Extract data, phenotype data, and feature data from the SeuratObject
+        data <- as(as.matrix(s_object@assays$RNA@data), 'sparseMatrix')
 
+        pd <- new('AnnotatedDataFrame', data = s_object@meta.data)
 
-    # 2. Construct monocle cds
-    my_cds <- newCellDataSet(
-      data,
-      phenoData = pd,
-      featureData = fd,
-      lowerDetectionLimit = lowerDetection,
-      #* lowerDetection limit
-      expressionFamily = uninormal()
-    ) #* data type option (norm done with seurat)
-
-    ## 3. normalisation and variance estimation steps (used in the differential expression analyses later on)
-    # my_cds <- estimateSizeFactors(my_cds)
-    # my_cds <- estimateDispersions(my_cds)
-
-    # Not really a fix to DDRTree though..
-    my_cds@reducedDimA <-
-      t(s_object@reductions$pca@feature.loadings)
+        fData <-
+          data.frame(gene_short_name = row.names(data),
+                     row.names = row.names(data))
+        fd <- new('AnnotatedDataFrame', data = fData)
 
 
-    ## 4. Dimension reduction
-    my_cds <- reduceDimension(
-      my_cds,
-      max_components = 2,
-      num_dim = dimensionNo,
-      reduction_method = redMethod,
-      scaling = TRUE,
-      pseudo_expr = 0,
-      norm_method = 'none',
-      #Normalization from Seurat
-      verbose = TRUE
+        # 2. Construct monocle cds
+        my_cds <- newCellDataSet(
+          data,
+          phenoData = pd,
+          featureData = fd,
+          lowerDetectionLimit = lowerDetection,
+          #* lowerDetection limit
+          expressionFamily = uninormal()
+        ) #* data type option (norm done with seurat)
+
+        ## 3. normalisation and variance estimation steps (used in the differential expression analyses later on)
+        # my_cds <- estimateSizeFactors(my_cds)
+        # my_cds <- estimateDispersions(my_cds)
+
+        # Save PCA to this object
+        my_cds@reducedDimA <-
+          t(s_object@reductions$pca@feature.loadings)
+
+
+        ## 4. Dimension reduction
+        my_cds <- reduceDimension(
+          my_cds,
+          max_components = 2,
+          num_dim = dimensionNo,
+          reduction_method = redMethod,
+          scaling = TRUE,
+          pseudo_expr = 0,
+          norm_method = 'none',
+          #Normalization from Seurat
+          verbose = TRUE
+        )
+
+        if (redMethod == "tSNE") {
+          if (estimateClust) {
+            # 5A. Unsupervized Clustering
+            my_cds <- clusterCells(my_cds, method = clustMethod)
+          } else {
+            # 5B. Unsupervised clustering requesting x-1 clusters
+            my_cds <- clusterCells(my_cds, num_clusters = (clustNo + 1), method = clustMethod)
+          }
+
+          # 6. Store clusters
+
+          print(pData(my_cds)$Cluster)
+
+          clusters <- pData(my_cds)$Cluster
+          names(clusters) <- colnames(s_object)
+          s_object@active.ident <- as.factor(clusters)
+
+
+          tsne <- plot_cell_clusters(my_cds) # Did not work with DDRTree
+
+          out <- list(s_object, tsne)
+
+        } else{
+          # Get the "State" of each cell according to pseudotime
+          my_cds <- orderCells(my_cds)
+
+          # use the state as cluster in the seurat object
+          s_object@active.ident <- pData(my_cds)$State
+
+        }
+
+
+      },
+      error=function(cond) {
+        sendSweetAlert(
+          session = session,
+          title = "Clustering Error Encountered",
+          text = "Consider using another clustering method/package or applying more stringent QC",
+          type = "error"
+        )
+
+        message(cond)
+        return()
+      }
     )
 
-    if (redMethod == "tSNE") {
-      if (estimateClust) {
-        # 5A. Unsupervized Clustering
-        my_cds <- clusterCells(my_cds)
-      } else {
-        # 5B. Unsupervised clustering requesting x-1 clusters
-        my_cds <- clusterCells(my_cds, num_clusters = (clustNo + 1))
-      }
-
-
-      # 6. Store clusters
-      s_object@active.ident <- pData(my_cds)$Cluster
-    } else{
-      # Get the "State" of each cell according to pseudotime
-      my_cds <- orderCells(my_cds)
-
-      # use the state as cluster in the seurat object
-      s_object@active.ident <- pData(my_cds)$State
-
-    }
-
-    return(s_object)
+    return(out)
   }
