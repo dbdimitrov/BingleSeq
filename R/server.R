@@ -143,6 +143,27 @@ server <- function(input, output, session) {
           }
         })
 
+        observe({
+          if (!is.null(finalData$finalData)) {
+
+            updateNumericInput(
+              session = session,
+              inputId = "deTab-dgeClustInput",
+              label = "Select Cluster of Interest",
+              value = min(as.numeric(
+                levels(finalData$finalData@active.ident)
+              )),
+              min = min(as.numeric(
+                levels(finalData$finalData@active.ident)
+              )),
+              max = max(as.numeric(
+                levels(finalData$finalData@active.ident)
+              ))
+            )
+          }
+        })
+
+
 
         # Differential Expression Markers ----
         markers <- callModule(sc_de, "deTab", finalData)
