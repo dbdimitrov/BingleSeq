@@ -7,7 +7,7 @@
 seuratElbow(s_object)
 }
 \arguments{
-\item{s_object}{Seurat object with normalized data}
+\item{scaled_object}{Seurat object with scaled data}
 }
 \value{
 Seurat object with scaled counts and reduced dimensions (PCA data)

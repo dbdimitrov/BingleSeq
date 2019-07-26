@@ -4,7 +4,7 @@
 \alias{sc3Cluster}
 \title{SC3 Clustering Pipeline}
 \usage{
-sc3Cluster(s_object, estK, clustNo, cellsPerC)
+sc3Cluster(s_object, estK, clustNo, cellsPerC, session)
 }
 \arguments{
 \item{s_object}{Seurat object with scaled and PCA data}
@@ -14,6 +14,8 @@ sc3Cluster(s_object, estK, clustNo, cellsPerC)
 \item{clustNo}{If estK is false - Give desired cluster number}
 
 \item{cellsPerC}{Minimum cells per cluster}
+
+\item{Current}{R session}
 }
 \value{
 Seurat object with SC3 clustering data

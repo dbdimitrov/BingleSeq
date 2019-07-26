@@ -4,10 +4,18 @@
 \alias{sueratClust}
 \title{Seurat Clustering Pipeline}
 \usage{
-sueratClust(s_object, dimNo, resQuant, algorithmNo)
+sueratClust(s_object, dimNo, resQuant, algorithmNo, session)
 }
 \arguments{
 \item{s_object}{Seurat object with scaled and PCA data}
+
+\item{dimNo}{Number of dimensions to be used when clustering}
+
+\item{resQuant}{Resolution parameter used to control the number of clusters}
+
+\item{algorithmNo}{The clustering algorithm to be used}
+
+\item{session}{Current R session}
 }
 \value{
 Seurat object with clustering data
