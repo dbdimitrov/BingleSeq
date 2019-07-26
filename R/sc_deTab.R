@@ -18,6 +18,7 @@ sc_deUI <- function(id) {
                   "Wilcoxon Rank Sum test" = "wilcox",
                   "Student's T-test" = "t",
                   "Likelihood-ratio test(bimod)" = "bimod",
+                  "Negative Binomial" = "negbinom",
                   "DESeq2" = "DESeq2",
                   "Logistic Regression" = "LR"
                 )

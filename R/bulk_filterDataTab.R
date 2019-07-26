@@ -25,7 +25,7 @@ bulk_filterDataUI <- function(id) {
 
 
       # Input: Select replicate number ----
-      numericInput(ns("filterValue"), label = "Value to filter", value = 5),
+      numericInput(ns("filterValue"), label = "Value to filter", value = 0),
 
       hr(),
       fluidRow(column(3, verbatimTextOutput(

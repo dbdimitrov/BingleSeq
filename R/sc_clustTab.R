@@ -62,10 +62,26 @@ sc_clustUI <- function(id) {
           ns = ns,
 
           numericInput(
-            ns("sc3minCells"),
-            label = "Minimum Cells per Cluster",
+            ns("sc3minDropout"),
+            label = "Filter genes by minimum percent of dropouts",
+            min = 0,
+            max = 50,
+            value = 0
+          ),
+
+          numericInput(
+            ns("sc3maxDropout"),
+            label = "Filter genes by maximum percent of dropouts",
             min = 1,
-            value = 10
+            max = 100,
+            value = 100
+          ),
+
+          numericInput(
+            ns("sc3nStart"),
+            label = "Random sets used in clustering (nStart)",
+            min = 50,
+            value = 1000
           ),
 
           checkboxInput(ns("estKCheck"), label = "Estimate Cluster Number", TRUE),
@@ -91,8 +107,9 @@ sc_clustUI <- function(id) {
           selectInput(
             ns("monoRedMethod"),
             label = "Select Reduction Method",
-            choices = list("tSNE" = "tSNE",
-                           "DDRTree (Pseudotime)" = "DDRTree")
+            choices = list("tSNE" = "tSNE"
+                           # ,"DDRTree (Pseudotime)" = "DDRTree"
+                           )
           ),
 
           conditionalPanel(
@@ -110,7 +127,7 @@ sc_clustUI <- function(id) {
               ns("monodimensionNo"),
               label = "Dimensions to be used",
               min = 3,
-              value = 5
+              value = 10
             ),
 
           numericInput(
@@ -118,7 +135,7 @@ sc_clustUI <- function(id) {
             label = "Lower Detection Limit",
             min = 0,
             max = 1,
-            value = 0.1
+            value = 0
           ),
 
 
@@ -156,9 +173,9 @@ sc_clustUI <- function(id) {
             label = "Choose Plot Type",
             c(
               "Elbow plot" = "elbow",
+              "Dimensions Heatmap" = "heatmap",
               "PCA plot" = "pca",
-              "tSNE Plot" = "tsne",
-              "Dimensions Heatmap" = "heatmap"
+              "tSNE Plot" = "tsne"
             )
           ),
 
@@ -199,7 +216,7 @@ sc_clustUI <- function(id) {
 #' @param normData Reactive value containing seurat object with normalized data
 #'
 #' @export
-#' @return Reactive value containing seurat object with scaled counts and reduced dimensions (PCA data)
+#' @return Returns a Reactive value containing seurat object with scaled counts and reduced dimensions (PCA data)
 sc_clust <- function(input, output, session, normData) {
   clust <- reactiveValues()
 
@@ -241,9 +258,11 @@ sc_clust <- function(input, output, session, normData) {
         clust$results <-
           sc3Cluster(
             clust$scaledData[[1]],
+            input$sc3minDropout,
+            input$sc3maxDropout,
             input$estKCheck,
             input$sc3ClustNoInput,
-            input$sc3minCells,
+            input$sc3nStart,
             session
           )
 
@@ -283,7 +302,7 @@ sc_clust <- function(input, output, session, normData) {
   observeEvent(input$pcaButton, {
     if (!is.null(clust$finalData)) {
 
-      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+      # show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
 
       if (input$clustplotType == "elbow") {
         clust$clustPlot <- clust$scaledData[[2]]
@@ -317,7 +336,7 @@ sc_clust <- function(input, output, session, normData) {
         clust$clustPlot
       })
 
-      hide_waiter()
+      # hide_waiter()
     }
   })
 
@@ -357,7 +376,7 @@ sc_clust <- function(input, output, session, normData) {
 #' @param scaled_object Seurat object with scaled data
 #'
 #' @export
-#' @return Seurat object with scaled counts and reduced dimensions (PCA data)
+#' @return Returns a Seurat object with scaled counts and reduced dimensions (PCA data)
 seuratElbow <- function(s_object) {
   scaled_object <- ScaleData(s_object)
   scaled_object <-
@@ -379,7 +398,7 @@ seuratElbow <- function(s_object) {
 #' @param session Current R session
 #'
 #' @export
-#' @return Seurat object with clustering data
+#' @return Returns a list containing a Seurat object with clustering data and a tSNE plot
 sueratClust <- function(s_object, dimNo, resQuant, algorithmNo, session) {
 
   out <- tryCatch(
@@ -415,36 +434,40 @@ sueratClust <- function(s_object, dimNo, resQuant, algorithmNo, session) {
 #' SC3 Clustering Pipeline
 #'
 #' @param s_object Seurat object with scaled and PCA data
+#' @param minDrop Genes with percent of dropouts smaller than minDrop are filtered out before clustering.
+#' @param maxDrop Genes with percent of dropouts larger than maxDrop are filtered out before clustering.
 #' @param estK Boolean - whether to estimate cluster number or not
 #' @param clustNo If estK is false - Give desired cluster number
-#' @param cellsPerC Minimum cells per cluster
+#' @param nStart Minimum cells per cluster
 #' @param Current R session
 #'
 #' @export
-#' @return Seurat object with SC3 clustering data
-sc3Cluster <- function(s_object, estK, clustNo, cellsPerC, session) {
+#' @return Returns a list containing a Seurat object with SC3-produced clustering data and tSNE plot
+sc3Cluster <- function(s_object, minDrop, maxDrop, estK, clustNo, nStart, session) {
 
   out <- tryCatch(
     {
-      # delete
+      # # delete
       # s_object <- pbmc
-      # cellsPerC = 10
+      # nStart = 1000
+      # minDrop = 0
+      # maxDrop = 100
+      # head(counts(sce))
+      # head(normcounts(sce))
 
 
-      # Convert from Seurat to sc3
+      # Convert sparse matrix counts Seurat object to dense matrix in SC3 object
       sce <- as.SingleCellExperiment(s_object)
       rowData(sce)$feature_symbol <- rownames(s_object)
 
-      counts(sce) <- as.matrix(counts(sce))
-      # normcounts(sce) <- as.matrix((s_object@assays$RNA@data))
-      # logcounts(sce) <- as.matrix(logcounts(sce))
-      logcounts(sce) <- as.matrix((s_object@assays$RNA@data))
+      counts(sce) <- as.matrix(counts(sce)) # using non-normalized counts
+      logcounts(sce) <- as.matrix((s_object@assays$RNA@data)) # normalized counts (used in clustering)
 
 
-      # Cluster similar cells ??????????????? Any point?
-      qclust <-
-        scran::quickCluster(sce, min.size = cellsPerC, assay.type = "logcounts")
-      print(qclust)
+      # Delete commented lines (only used in testing)
+      # qclust <-
+      #   scran::quickCluster(sce, min.size = 10, assay.type = "logcounts")
+      # print(qclust)
 
 
       # sce <-
@@ -460,18 +483,19 @@ sc3Cluster <- function(s_object, estK, clustNo, cellsPerC, session) {
       # Data Normalization (done with Seurat)
       # sce <- scater::normalize(sce) #probvam s i bez
 
-      browseVignettes("SC3")
       if (estK) {
-        # estimate No of clusters
-
-        sce <- sc3_estimate_k(sce)
+        sce <- sc3_estimate_k(sce) # estimate clustNo
         clustNo <- sce@metadata$sc3$k_estimation
       }
 
-      print(clustNo)
       # Perform unsupervised clustering of the cells and produce plots.
       sce <- sc3(object = sce,
+                 gene_filter = TRUE,
+                 pct_dropout_min = minDrop,
+                 pct_dropout_max = maxDrop,
+                 kmeans_nstart = nStart,
                  ks = clustNo)
+
 
       ### assign clusters from sc3 to s_object
       sce@metadata$sc3$consensus[[1]]$silhouette[, 1]
@@ -479,16 +503,13 @@ sc3Cluster <- function(s_object, estK, clustNo, cellsPerC, session) {
       names(clusters) <- colnames(s_object)
       s_object@active.ident <- as.factor(clusters)
 
-      ###
+      # tSNE plot
       k_estimated_field <- paste("sc3", clustNo, "clusters", sep = '_')
-      #
-      #
+
       tsne <- scater::plotTSNE(sce , colour_by = k_estimated_field) +
         theme_classic() +
         guides(fill=guide_legend("Clusters")) +
         theme(legend.text=element_text(size=12))
-
-      plot(tsne)
 
       out <- list(s_object, tsne)
 
@@ -517,7 +538,7 @@ sc3Cluster <- function(s_object, estK, clustNo, cellsPerC, session) {
 #' @param clustNo If estimateClust is False - provide number of desired clusters
 #'
 #' @export
-#' @return Seurat object with SC3 clustering data
+#' @return Returns a list containing a Seurat object with Monocle-produced clustering data and tSNE plot
 clusterMonocle <-
   function(s_object,
            lowerDetection,
