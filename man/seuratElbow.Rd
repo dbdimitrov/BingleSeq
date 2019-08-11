@@ -10,7 +10,7 @@ seuratElbow(s_object)
 \item{scaled_object}{Seurat object with scaled data}
 }
 \value{
-Seurat object with scaled counts and reduced dimensions (PCA data)
+Returns a Seurat object with scaled counts and reduced dimensions (PCA data)
 }
 \description{
 Single Cell Scale and Dimension Reduction function

@@ -4,21 +4,25 @@
 \alias{sc3Cluster}
 \title{SC3 Clustering Pipeline}
 \usage{
-sc3Cluster(s_object, estK, clustNo, cellsPerC, session)
+sc3Cluster(s_object, minDrop, maxDrop, estK, clustNo, nStart, session)
 }
 \arguments{
 \item{s_object}{Seurat object with scaled and PCA data}
+
+\item{minDrop}{Genes with percent of dropouts smaller than minDrop are filtered out before clustering.}
+
+\item{maxDrop}{Genes with percent of dropouts larger than maxDrop are filtered out before clustering.}
 
 \item{estK}{Boolean - whether to estimate cluster number or not}
 
 \item{clustNo}{If estK is false - Give desired cluster number}
 
-\item{cellsPerC}{Minimum cells per cluster}
+\item{nStart}{Minimum cells per cluster}
 
 \item{Current}{R session}
 }
 \value{
-Seurat object with SC3 clustering data
+Returns a list containing a Seurat object with SC3-produced clustering data and tSNE plot
 }
 \description{
 SC3 Clustering Pipeline

@@ -21,7 +21,7 @@ clusterMonocle(s_object, lowerDetection, redMethod, clustMethod,
 \item{clustNo}{If estimateClust is False - provide number of desired clusters}
 }
 \value{
-Seurat object with SC3 clustering data
+Returns a list containing a Seurat object with Monocle-produced clustering data and tSNE plot
 }
 \description{
 Monocle Clustering Pipeline

@@ -10,7 +10,7 @@ sc_clust(input, output, session, normData)
 \item{normData}{Reactive value containing seurat object with normalized data}
 }
 \value{
-Reactive value containing seurat object with scaled counts and reduced dimensions (PCA data)
+Returns a Reactive value containing seurat object with scaled counts and reduced dimensions (PCA data)
 }
 \description{
 Single Cell Cluster Tab Server

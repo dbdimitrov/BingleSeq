@@ -18,7 +18,7 @@ sueratClust(s_object, dimNo, resQuant, algorithmNo, session)
 \item{session}{Current R session}
 }
 \value{
-Seurat object with clustering data
+Returns a list containing a Seurat object with clustering data and a tSNE plot
 }
 \description{
 Seurat Clustering Pipeline
