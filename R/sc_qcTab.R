@@ -8,17 +8,17 @@ sc_qcUI <- function(id) {
   tagList(
     # Sidebar panel for inputs ----
     sidebarPanel(
-      h5("Prefilter Features:"),
+      h4("Prefilter Cells and Counts"),
 
       numericInput(
         ns("minCellsObject"),
-        label = "Mininum cells expressed",
+        label = "Minimum number of cells per gene",
         min = 1,
         value = 3
       ),
       numericInput(
         ns("minGenesObject"),
-        label = "Minimum summed counts",
+        label = "Minimum number of genes per cell",
         min = 1,
         value = 200
       ),
@@ -26,12 +26,13 @@ sc_qcUI <- function(id) {
 
       actionButton(ns("preqcButton"), label = "Initialize Project"),
 
-      tags$hr(),
-
       conditionalPanel(
         condition =  "input.preqcButton > 0",
         ns = ns,
 
+        tags$hr(),
+
+        h4("Filter Cell outliers"),
 
         numericInput(
           ns("minFeatureInput"),
@@ -49,8 +50,7 @@ sc_qcUI <- function(id) {
           value = 5000
         ),
 
-
-        actionButton(ns("postqcButton"), label = "Filter Data")
+        actionButton(ns("postqcButton"), label = "Filter Cells")
 
       )
 
@@ -63,21 +63,23 @@ sc_qcUI <- function(id) {
       #Add Text with No of cells and features as lodaded
 
       tabPanel(title = "Object Preview",
-               DT::dataTableOutput(ns("dataTable"))),
 
+               htmlOutput(ns("helpQCInfo")),
 
-      # extendShinyjs(script = "javascript.js"),
+               DT::dataTableOutput(ns("dataTable"))
+               ),
+
 
       tabPanel(
-        title = "QC Violin Plot",
+        title = "Outlier Violin Plot",
         value = "tab2_val",
         verbatimTextOutput(ns("preFilterText"), placeholder = T),
-        plotOutput(ns("preqcPlot")),
+        plotOutput(ns("preqcPlot"), width = "100%", height = "500px"),
 
         tags$hr(),
 
         verbatimTextOutput(ns("postFilterText"), placeholder = T),
-        plotOutput(ns("postqcPlot"))
+        plotOutput(ns("postqcPlot"), width = "100%", height = "500px")
       )
     ))
   )
@@ -91,13 +93,29 @@ sc_qcUI <- function(id) {
 sc_qc <- function(input, output, session, countsT) {
   filt <- reactiveValues()
 
+
+  output$helpQCInfo <- renderUI({
+    if(is.null(filt$data)){
+      HTML("<div style='border:2px solid blue; padding-top: 8px; padding-bot: 8px; font-size: 14px;
+      border-radius: 10px;'>
+      <p style='text-align: center'><b>This tab enables Quality control. </b> </p> <br>
+      First, filter genes detected below a certain number of cells and cells with less than a certain number of expressed genes. <br>
+      <i> This is done as the project (object) is initialized and subsequently displayed as a table. </i> <br>
+      Then, swap to the 'Outlier Violin plot' tab to visualize and exclude Cell Outliers. </div>")
+    } else{
+      HTML("")
+    }
+
+  })
+
+
   ### Show PreQC INFO -------
   observeEvent(input$preqcButton, {
     filt$data <- CreateSeuratObject(
       counts = countsT$countTable,
       min.cells = input$minCellsObject,
       min.features = input$minGenesObject,
-      project = "userProject"
+      project = ""
     )
 
 

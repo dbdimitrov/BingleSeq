@@ -8,12 +8,13 @@ sc_normUI <- function(id) {
   tagList(
     # Sidebar panel for inputs ----
     sidebarPanel(
+      h4("Normalize the Data"),
       selectInput(
         ns("normalizeCombo"),
         label = "Select Normalization method",
         choices = list(
           "Log Normalize" = "LogNormalize",
-          "Centered log ratio transformation" = "CLR",
+          #"Centered log ratio transformation" = "CLR",
           "Relative counts" = "RC"
         ),
         selected = 1
@@ -29,7 +30,7 @@ sc_normUI <- function(id) {
 
       tags$hr(),
 
-
+      h4("Find Variable Features"),
 
       selectInput(
         ns("varianceCombo"),
@@ -51,12 +52,15 @@ sc_normUI <- function(id) {
 
       tags$hr(),
 
-      actionButton(ns("normalizeButton"), label = "Normalize Data")
+      actionButton(ns("normalizeButton"), label = "Find Variable Genes")
     ),
 
     # Main panel for displaying outputs ----
-    mainPanel(#verbatimTextOutput("normalizeText", placeholder = T),
-      plotOutput(ns("normalizePlot")))
+    mainPanel(
+      htmlOutput(ns("helpNormInfo")),
+      plotOutput(ns("normalizePlot"), width = "850px", height = "500px"),
+      textOutput(ns("violionPlotInfo"))
+      )
   )
 }
 
@@ -69,6 +73,25 @@ sc_normUI <- function(id) {
 #' @return Reactive value containing Seurat object with normalized data
 sc_norm <- function(input, output, session, filtData) {
   norm <- reactiveValues()
+
+  output$helpNormInfo <- renderUI({
+    if(is.null(norm$normalizedData)){
+    HTML("<div style='border:2px solid blue; padding-top: 8px; padding-bot: 8px; font-size: 14px;
+      border-radius: 10px;'>
+    <p style='text-align: center'><b> This tab enables the normalization of the data. </b> </p> <br>
+    For integer counts use the 'Log Normalize' method,
+    while for relative counts (e.g. FPMKs, CPM) use 'Relative Counts' normalization. <br>
+    10,000 Scale Factor should be appropriate for almost any type of data,
+    besides when working with CPM as 1,000,000 should be used in this case. <br> <br>
+    Simultaneously with Normalization, the Most Variable Features in the dataset will be identified.
+    The number of Variable Features is set with 'FeatureNo' and variance is estimated with a method of choice. <br>
+    Following this process a Variance plot with the Most Variable Features is displayed. <br> <br>
+    <i>Note that: the identified Most Variable Features are relavant only for unsupervised clustering with Seurat.</i> </div>")
+    } else{
+      HTML("")
+    }
+
+  })
 
   ### Normalization ------
   observeEvent(input$normalizeButton, {
@@ -92,6 +115,10 @@ sc_norm <- function(input, output, session, filtData) {
     output$normalizePlot <- renderPlot({
       norm$variancePlot
 
+    })
+
+    output$violionPlotInfo <- renderText({
+      "Note: Highly Variable Features are shown in red"
     })
 
     hide_waiter()
@@ -124,14 +151,15 @@ normalizeSeurat <-
                     normalization.method = normalizeMet,
                     scale.factor = scaleF)
 
-    if (startsWith(varianceMet, "vst")) {
+    if (startsWith(varianceMet, "mvp")) {
+      normalized_object <-
+        FindVariableFeatures(normalized_object,
+                             selection.method = varianceMet)
+    } else{
       normalized_object <-
         FindVariableFeatures(normalized_object,
                              selection.method = varianceMet,
                              nfeatures = nfeat)
-    } else{
-      normalized_object <-
-        FindVariableFeatures(normalized_object, selection.method = varianceMet)
     }
 
     return(normalized_object)

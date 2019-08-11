@@ -12,7 +12,7 @@ sc_goUI <- function(id) {
               value = "getGOGenesTab",
               title = "Get DE Genes",
 
-              checkboxInput(ns("goClustCheck"), label = "Genes from All Clusters", TRUE),
+              checkboxInput(ns("goClustCheck"), label = h5("Get Genes from All Clusters"), TRUE),
 
               conditionalPanel(
                 condition = "!input.goClustCheck",
@@ -61,6 +61,7 @@ sc_goUI <- function(id) {
             ),
 
 
+
             tabPanel(
               value = "getGOTermsTab",
               title = "Get GO Terms",
@@ -86,7 +87,7 @@ sc_goUI <- function(id) {
 
               radioButtons(
                 ns("goTermTest"),
-                label = "Test Type",
+                label = "Ontology Type",
                 c(
                   "Cellular Component" = "GO:CC",
                   "Biological Process" = "GO:BP",
@@ -127,6 +128,9 @@ sc_goUI <- function(id) {
               tabPanel(
                 value = "goGenesTab",
                 title = "DE Genes Table",
+
+                htmlOutput(ns("helpGoGeneInfo")),
+
                 verbatimTextOutput(ns("goGenesText"), placeholder = T),
 
                 tags$hr(),
@@ -144,7 +148,7 @@ sc_goUI <- function(id) {
                 value = "goHistTab",
                 title = "GO Term Histogram",
                 checkboxInput(ns("goHistCheck"), "Function Names", FALSE),
-                plotOutput(ns("goHistPlot"))
+                plotOutput(ns("goHistPlot"), width = "800px", height = "500px")
               ),
 
               tabPanel(
@@ -165,6 +169,32 @@ sc_goUI <- function(id) {
 sc_go <- function(input, output, session, de, countsT) {
   go <- reactiveValues()
 
+  output$helpGoGeneInfo <- renderUI({
+    if(input$goGetButton == 0){
+      HTML("<div style='border:2px solid blue; font-size: 14px;
+        padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
+        The <i> 'Get DE Genes' </i> tab enables DE genes obtained from the DE analysis to be pre-filtered according to: <br>
+        Fold-change, adj. P-value threshold, and according to a specific cluster <br>
+        Once the DE genes are filtered, the 'Get GO Terms' tab will be automatically selected. </div>")
+    } else {
+      if(is.null(go$goTermTable)){
+      HTML("<div style='border:2px solid blue; font-size: 14px;
+        padding-top: 8px; padding-bot: 8px; border-radius: 10px;'>
+      The <i> 'Get GO Terms' </i> tab provides a comprehensive Functional Annotation Pipeline using the filtered DE genes. <br> <br>
+
+      Prior to running the pipeline, please specify the following parameters:
+      adjusted or non-adjusted P-value threshold for ontologies;
+      Symbol type - the type of symbols used for the genes in the count table;
+      Ontology type; and Genome of interest. <br> <br>
+
+      Once a table with results is returned, proceed to visualizing the top 10 GO terms results via the histogram option
+      and to exploring GO terms of interest using their GO:IDs </div>" )
+      }else{
+        HTML("")
+      }
+
+    }
+  })
 
   observeEvent(input$goGetButton, {
     if(!is.null(de$markers)){

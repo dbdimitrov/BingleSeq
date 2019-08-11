@@ -6,8 +6,10 @@ bulk_compDataUI <- function(id) {
   ns <- NS(id)
 
   tagList(sidebarPanel(
-    actionButton(ns("comparisonButton"), "Generate Venn Diagram"),
 
+    h4("Generate Venn Diagram"),
+
+    actionButton(ns("comparisonButton"), "Run DE Pipelines"),
 
 
     conditionalPanel(
@@ -40,7 +42,11 @@ bulk_compDataUI <- function(id) {
     )
   ),
 
-  mainPanel(plotOutput(ns("comparsionPlot"))))
+  mainPanel(
+    htmlOutput(ns("helpCompInfo")),
+    plotOutput(ns("comparsionPlot"), width = "800px", height = "500px")
+            )
+  )
 }
 
 
@@ -50,6 +56,24 @@ bulk_compDataUI <- function(id) {
 #' @export
 #' @return None
 bulk_compData <- function(input, output, session, rv, de) {
+
+  output$helpCompInfo <- renderUI({
+    if(input$comparisonButton == 0){
+      HTML("<div style='border:2px solid blue; font-size: 14px;
+        padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
+
+        <p style ='text-align: center'> <b> This tab supplies users with an option to assess the agreement
+        between the different DE analysis packages.</b> </p> <br>
+
+        Once the pipeline is finished a Venn Diagram with the overlap between selected DE methods is returned. <br>
+        Each overlap(intersect) can then be downloaded <br> <br>
+        <i>Note that Differentially Expressed Genes are considered significant if FDR adjusted p-value < 0.05. <br>
+           Moreover, the procedure runs each DE analysis pipeline, as such it is rather time-consuming.</i> </div>" )
+    } else {
+      HTML("")
+    }
+  })
+
   observeEvent(input$comparisonButton, {
 
     show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))

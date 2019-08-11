@@ -72,11 +72,12 @@ startBingleSeq <- function() {
     library('scran')
     library('SC3')
 
+#     library(org.Mm.eg.db)
+#     library(org.Hs.eg.db)
     library(goseq)
-    library(org.Mm.eg.db)
-    library(org.Hs.eg.db)
     library(GO.db)
 
+    options(shiny.maxRequestSize=500*1024^2)
 
     app <- shinyApp(ui = shinyUI(ui),
                     server = shinyServer(server))

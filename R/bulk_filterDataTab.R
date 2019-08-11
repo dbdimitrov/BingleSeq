@@ -7,8 +7,9 @@ bulk_filterDataUI <- function(id) {
 
   tagList(
     sidebarPanel(
-      # Input: Select a package ----
-      # Select DE package
+      h4("Filter Counts Table"),
+
+      # Select Filter Method
       selectInput(
         ns("selectFilter"),
         label = "Select Filter Method",
@@ -24,8 +25,8 @@ bulk_filterDataUI <- function(id) {
       tags$hr(),
 
 
-      # Input: Select replicate number ----
-      numericInput(ns("filterValue"), label = "Value to filter", value = 0),
+      # Input: Select threshold number ----
+      numericInput(ns("filterValue"), label = "Value to filter", value = 2),
 
       hr(),
       fluidRow(column(3, verbatimTextOutput(
@@ -34,7 +35,7 @@ bulk_filterDataUI <- function(id) {
 
 
 
-      # Input: Button that runs the analysis ----
+      # Input: Button that calls the filter function ----
       actionButton(ns("filterButton"), label = "Filter Data")
 
     ),

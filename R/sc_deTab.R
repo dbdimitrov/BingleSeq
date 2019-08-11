@@ -10,6 +10,8 @@ sc_deUI <- function(id) {
             tabPanel(
               title = "DGE test",
 
+              h4("Generate DE Data"),
+
               selectInput(
                 ns("dgeTestCombo"),
                 label = "Select Test Type",
@@ -110,13 +112,13 @@ sc_deUI <- function(id) {
           mainPanel(tabsetPanel(
             id = ns("deMainTabSet"),
             tabPanel(title = "Table",
-
+                     htmlOutput(ns("helpDEInfo")),
                      DT::dataTableOutput(ns("dgeTable"))),
             tabPanel(
               title = "Plot",
               value = "dePlotTab",
 
-              plotOutput(ns("dgePlot")),
+              plotOutput(ns("dgePlot"), width = "800px", height = "500px"),
               downloadButton(ns("downloaddgePlot"), "Download Curret Plot")
             )
           )))
@@ -130,6 +132,24 @@ sc_deUI <- function(id) {
 #' @return Diffenretial Expression data
 sc_de <- function(input, output, session, finData) {
   de <- reactiveValues()
+
+  output$helpDEInfo <- renderUI({
+    if(input$dgeButton == 0){
+      HTML(
+        "<div style='border:2px solid blue; font-size: 14px;
+        padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
+
+        <p style='text-align: center'><b>This tab enables DE analysis of clustering results.</b> </p> <br>
+        To indentify Marker Genes for each cluster, proceed first by selecting the preferred DE method. <br>
+        Then specify pre-filter options according to: <br>
+        Fold-change, adj. P-value threshold, and genes expressed in a minimum fraction of cells. <br> <br>
+        <i>Note: MAST was shown to be among the best scRNA-Seq DE methods (Soneson & Robinson, 2018),
+        as such it is likely the best option here. </i> </div>"
+      )
+    } else {
+      HTML("")
+    }
+  })
 
   ## Generate DE Data
   observeEvent(input$dgeButton, {
@@ -172,12 +192,21 @@ sc_de <- function(input, output, session, finData) {
   ## Cluster Heatmap
   observeEvent(input$dgeHeatButton, {
     if (!is.null(de$markers)) {
+      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+
       de$dgePlot <-
         getClusterHeatmap(finData$finalData, de$markers, input$clustHeatInput)
+
+      hm.palette <-
+        colorRampPalette(c("red", "white", "blue")) # Set the colour range
+
+      de$dgePlot <- de$dgePlot +  scale_fill_gradientn(colours = hm.palette(100))
 
       output$dgePlot <- renderPlot({
         de$dgePlot
       })
+
+      hide_waiter()
 
       updateTabsetPanel(session, "deMainTabSet", selected = "dePlotTab")
     }

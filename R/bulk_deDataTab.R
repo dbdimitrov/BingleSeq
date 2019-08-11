@@ -9,6 +9,9 @@ bulk_deDataUI <- function(id) {
     # Sidebar panel for inputs ----
 
     sidebarPanel(
+
+      h4("Run DE Pipeline"),
+
       # Input: Select a package ----
       # Select DE package
       selectInput(
@@ -61,6 +64,7 @@ bulk_deDataUI <- function(id) {
 
     # Main panel for displaying outputs ----
     mainPanel(# Output: DE Table ----
+              htmlOutput(ns("helpDEInfo")),
               DT::dataTableOutput(ns("deTable")))
 
 
@@ -77,6 +81,24 @@ bulk_deDataUI <- function(id) {
 bulk_deData <- function(input, output, session, fCounts) {
   de <- reactiveValues()
 
+  output$helpDEInfo <- renderUI({
+    if(is.null(de$deTable)){
+      HTML("<div style='border:2px solid blue; font-size: 14px; border-radius: 10px;'>
+
+      <p style ='font-size: 15px; text-align: center'><b>This tab enables DE analysis using <i>DESeq2,
+      edgeR,</i> and <i>limma</i> pipelines. </b> </p> <br>
+
+      Upon DE pipeline completion, a results table is displayed
+      that contains the log2 expression fold-change (logFC), package specific test statistics, p-value,
+      multiple-testing adjusted p-value (FDR). <br> <br>
+
+      <i>Note: Diffrences among different samples are accounted for using the package-specific methods.
+      Furthermore, only comparisons with up to 3 conditions with the same number of replicates across
+      each condition are implemented and the  appropriate number of conditions and replicates must be provided. </i></div>")
+    } else{
+      HTML("")
+    }
+  })
 
   # Run DE ----
   observeEvent(input$dePackageButton, {

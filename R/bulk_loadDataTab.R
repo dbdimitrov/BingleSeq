@@ -8,6 +8,9 @@ bulk_loadDataUI <- function(id) {
   tagList(
     # Sidebar layout with input and output definitions ----
     sidebarPanel(
+
+      h4("Load Counts Data"),
+
       # Input: Select a file ----
       fileInput(
         ns("file1"),
@@ -42,8 +45,8 @@ bulk_loadDataUI <- function(id) {
     ),
 
     # Main panel for displaying outputs ----
-    mainPanel(tags$h4("Preview Data"),
-
+    mainPanel(
+              htmlOutput(ns("helpLoadInfo")),
               DT::dataTableOutput(ns("dto")))
   )
 }
@@ -56,6 +59,20 @@ bulk_loadDataUI <- function(id) {
 #' @return counts the loaded Count Table
 bulk_loadData <- function(input, output, session) {
   counts <- reactiveValues()
+
+
+  output$helpLoadInfo <- renderUI({
+    if(is.null(counts$countTable)){
+      HTML("<div style='border:2px solid blue; font-size: 14px; border-radius: 10px;'>
+      <p style ='font-size: 15px; text-align: center'; padding-top: 8px;> <b>Upload Data tab. </b> </p>
+      <p>Please select a count table that contains the read counts in .csv/.txt file format. </p>
+      <p style ='font-style: italic; padding-bottom: 8px;'> Note: The first row (header) may contain contain condition(sample) names,
+      and first column should contain gene names/IDs. </p> </div>")
+    } else{
+      HTML("<h4 style='padding-top: 8px'>Preview Count Table</h4>
+           <p style='padding-bot: 8px;'><i>Please ensure that the table was loaded appropraitely.</i></p>")
+    }
+  })
 
   # Load File ----
   observeEvent(input$file1, {
@@ -95,13 +112,13 @@ generateSummary <- function(counts, session) {
         x2[i] <- colSums(countTable[i])
       }
 
-      x1[ncol(countTable) + 1] <- "Total"
+      x1[ncol(countTable) + 1] <- "Total Counts"
       x2[ncol(countTable) + 1] <- sum(x2)
 
-      x1[ncol(countTable) + 2] <- "Median"
+      x1[ncol(countTable) + 2] <- "Sample Median"
       x2[ncol(countTable) + 2] <- median(x2)
 
-      x1[ncol(countTable) + 3] <- "Genes#"
+      x1[ncol(countTable) + 3] <- "Gene#"
       x2[ncol(countTable) + 3] <- nrow(countTable)
 
 
@@ -109,7 +126,7 @@ generateSummary <- function(counts, session) {
 
       format.data.frame(df, big.mark = ",")
 
-      colnames(df) <- c("Sample", "Counts")
+      colnames(df) <- c("", "Counts")
 
       out <- df
 

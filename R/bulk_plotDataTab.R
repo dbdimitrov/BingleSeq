@@ -8,6 +8,9 @@ bulk_plotDataUI <- function(id) {
   tagList(
     # Sidebar panel for inputs ----
     sidebarPanel(
+
+      h4("Visualize DE Results"),
+
       selectInput(
         ns("selectPlotCombo"),
         label = "Select Plot Type",
@@ -35,7 +38,7 @@ bulk_plotDataUI <- function(id) {
 
         numericInput(
           ns("plotPvalue"),
-          label = ("p-value threshold"),
+          label = ("FDR threshold"),
           value = 0.05,
           min = 0.0001,
           max = 0.5
@@ -141,7 +144,9 @@ bulk_plotDataUI <- function(id) {
 
     # Main panel for displaying outputs ----
     mainPanel(
-      plotOutput(ns("mainPlot")),
+      htmlOutput(ns("helpPlotInfo")),
+
+      plotOutput(ns("mainPlot"), width = "800px", height = "500px"),
 
       conditionalPanel(
         condition = "input.selectPlotCombo == 'bar'",
@@ -171,6 +176,32 @@ bulk_plotData <- function(input, output, session, rv) {
   )
 
   vennChoice = list("Venn Diagram" = "venn")
+
+
+  output$helpPlotInfo <- renderUI({
+    if(is.null(rv$plot)){
+      HTML("<div style='border:2px solid blue; font-size: 14px; border-radius: 10px;'>
+
+      <p style='text-align: center'><b> This tab enables the visualization of DE results. </b> </p> <br>
+
+      <b>The Barchart</b> serves as an excellent way to summarize the up- and downregulated DEGs <br> <br>
+
+      <b>Volcano</b> and <b>MA plots</b> are great ways to assess DE results.
+      A Volcano plot represents the relationship between significance and fold-change,
+      whereas a MA plot shows the average expression of genes versus log fold-change <br> <br>
+
+      <b>Heatmaps</b> can be used to visualize the top DEGs according to significance,
+      assess expression patterns across the different conditions,
+      and also as a quality control plot. <br> <br>
+
+      <b>Venn Diagrams</b> were implemented as an option to assess the overlapping DEGs between the comparisons when working with
+      more than two groups.
+
+           </div>")
+    } else{
+      HTML("")
+    }
+  })
 
 
   observeEvent(input$figButton, {

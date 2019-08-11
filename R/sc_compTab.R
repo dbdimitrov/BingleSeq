@@ -7,10 +7,13 @@ sc_compUI <- function(id) {
 
   tagList(
     sidebarPanel(
+
+      h4("Generate Venn Diagram"),
+
       numericInput(
         ns("compMpctInput"),
         label = "Minimum Cell Fraction of Genes",
-        value = 0.25,
+        value = 0.01,
         min = 0,
         max = 0.5
       ),
@@ -29,7 +32,7 @@ sc_compUI <- function(id) {
         min = 0.000001,
         max = 0.5
       ),
-      actionButton(ns("comparisonButton"), "Generate Venn Diagram"),
+      actionButton(ns("comparisonButton"), "Run DE Pipelines"),
 
       conditionalPanel(
         condition = "input.comparisonButton > 0",
@@ -63,7 +66,10 @@ sc_compUI <- function(id) {
       )
     ),
 
-    mainPanel(plotOutput(ns("comparsionPlot")))
+    mainPanel(
+      htmlOutput(ns("helpCompInfo")),
+      plotOutput(ns("comparsionPlot"), width = "800px", height = "500px")
+      )
   )
 }
 
@@ -76,6 +82,25 @@ sc_compUI <- function(id) {
 #' @return None
 sc_comp <- function(input, output, session, finData) {
   comp <- reactiveValues()
+
+  output$helpCompInfo <- renderUI({
+    if(input$comparisonButton == 0){
+      HTML("<div style='border:2px solid blue; font-size: 14px;
+        padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
+        <p style ='text-align: center'><b>This tab supplies users with an option to assess
+        the agreement between the different DE analysis packages.</b> </p> <br>
+
+        Prior to running the pipeline, users can pre-filter genes according to: <br>
+        Fold-change, adj. P-value threshold, and genes expressed in a minimum fraction of cells. <br> <br>
+
+        Once the pipeline is finished a Venn Diagram with the overlap between selected DE methods is returned.
+        Each overlap(intersect) can then be downloaded <br> <br>
+
+        <i>Note that the procedure runs 4 subsequent DE analysis pipelines, as such it is rather time-consuming.</i> </div>" )
+    } else {
+      HTML("")
+    }
+  })
 
   observeEvent(input$comparisonButton, {
     #* quite different

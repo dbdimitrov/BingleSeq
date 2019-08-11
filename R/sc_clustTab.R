@@ -7,13 +7,18 @@ sc_clustUI <- function(id) {
   tagList(
     # Sidebar panel for inputs ----
     sidebarPanel(
-      actionButton(ns("elbowButton"), "Scale and Check Dimensionality"),
+
+      h4("Load Clustering Prerequisites"),
+
+      actionButton(ns("elbowButton"), "Generate Clustering Prerequisites"),
 
       conditionalPanel(
         condition =  "input.elbowButton > 0",
         ns = ns,
 
         tags$hr(),
+
+        h4("Run Clustering"),
 
         selectInput(
           ns("clusterPackage"),
@@ -53,7 +58,7 @@ sc_clustUI <- function(id) {
             label = "Resolution parameter Value",
             min = 0,
             max = 3,
-            value = 0.5
+            value = 0.6
           )
         ),
 
@@ -63,7 +68,7 @@ sc_clustUI <- function(id) {
 
           numericInput(
             ns("sc3minDropout"),
-            label = "Filter genes by minimum percent of dropouts",
+            label = "Filter genes below minimum percent of dropouts",
             min = 0,
             max = 50,
             value = 0
@@ -71,7 +76,7 @@ sc_clustUI <- function(id) {
 
           numericInput(
             ns("sc3maxDropout"),
-            label = "Filter genes by maximum percent of dropouts",
+            label = "Filter genes above maximum percent of dropouts",
             min = 1,
             max = 100,
             value = 100
@@ -166,7 +171,7 @@ sc_clustUI <- function(id) {
           ns = ns,
           tags$hr(),
 
-          h4("Visualize Data"),
+          h4("Visualize Results"),
 
           radioButtons(
             ns("clustplotType"),
@@ -200,7 +205,10 @@ sc_clustUI <- function(id) {
     # Main panel for displaying outputs ----
     mainPanel(
 
-      plotOutput(ns("clusterPlot")),
+      htmlOutput(ns("helpClustInfo")),
+
+
+      plotOutput(ns("clusterPlot"), width = "800px", height = "500px"),
 
       verbatimTextOutput(ns("clustNoText"), placeholder = F),
 
@@ -219,6 +227,56 @@ sc_clustUI <- function(id) {
 #' @return Returns a Reactive value containing seurat object with scaled counts and reduced dimensions (PCA data)
 sc_clust <- function(input, output, session, normData) {
   clust <- reactiveValues()
+
+  output$helpClustInfo <- renderUI({
+    if(input$elbowButton == 0){
+    HTML("<div style='border:2px solid blue; padding-top: 8px; padding-bottom: 8px; font-size: 14px;
+      border-radius: 10px;'>
+     <p style='text-align: center'> <b>This tab enables unsupervised clustering with <i> Seurat, monocle, and SC3</i>. </b> </p> <br>
+    To begin, press the 'Generate Clustering Prerequisites' button. What this will do is to: <br>
+    Scale the data, linear dimensional reduction with PCA, and return an Elbow plot that can be used in PC Selection. <br> <br>
+
+    Once the prerequisites are generated, the unsupervised clustering methods will become available. <br>
+    Subsequent to clustering, visualization options themselves become available.
+        </div> ")
+    } else {
+    if(input$clusterPackage == 1){
+      HTML("<div style='border:2px solid blue; font-size: 14px;
+       padding-top: 8px; padding-bot: 8px; border-radius: 10px;'>
+       <p style='text-align: center'><b>Unsupervised Clustering with <i>Seurat</i>:</b> </p> <br>
+       First, choose clustering algorithm of preference. <br>
+       Then, provide the true dimensionality of the dataset via the 'Dimension to be used' parameter. <br>
+       The true dimensionality can be estimated by looking at the 'elbow' of the elbow plot. <br> <br>
+       Finally, use the 'Resolution' parameter to set the clustering ‘granularity’ and control the number of clusters.
+       <br>Note that the optimal 'Resolution' for datasets with ~3000 cells is 0.6-1.2
+       and it is typically higher for larger datasets. <br> </div>")
+    } else if(input$clusterPackage == 2){
+      HTML("<div style='border:2px solid blue; font-size: 14px;
+      padding-top: 8px; padding-bot: 8px; border-radius: 10px;'>
+      <p style='text-align: center'><b>Unsupervised Clustering with <i>SC3</i>:</b> </p> <br>
+      SC3’s inbuilt filtering options enable further reducion of noise by filtering out <br>
+      genes below and above certain dropout (zero value) percentage thresholds. <br> <br>
+      'nStart' parameter enables control over the number of random datasets used in clustering and hence computational time. <br>
+      By default, this parameter is set to 1000 when working with
+      less than 2000 cells and to 50 when working with more than 2000 cells. <br>
+      SC3 is magnitudes slower than the other approaches and appropriately setting 'nStart' is essential. <br> <br>
+      Note that SC3 enables the number of clusters to be specified or estimated. <br>
+      However, it should be noted that estimating cluster number with SC3 often results in overestimations. </div")
+
+    } else{
+      HTML(
+        "<div style='border:2px solid blue; font-size: 14px;
+        padding-top: 8px; padding-bot: 8px; border-radius: 10px;'>
+              <p style='text-align: center'><b>Unsupervised Clustering with <i>monocle</i>:</b> </p> <br>
+        First, Select clustering algorithm of preference (use Louvian when working with large datasets). <br>
+        Then use 'Dimension to be used' parameter, to provide the true dimensionality, determined using the Elbow plot <br>
+        If required, further filter noise according to the 'Lower Detection Limit' parameter <br> <br>
+        Finally, choose whether to estimate with monocle or specify a desired cluster number. </div>"
+      )
+    }
+    }
+  })
+
 
   observeEvent(input$elbowButton, {
 
@@ -286,6 +344,8 @@ sc_clust <- function(input, output, session, normData) {
 
         clust$finalData <- clust$results[[1]]
       }
+
+      clust$clustPlot <- clust$results[[2]]
 
       output$clustNoText <- renderText({
         sprintf("Number of estimated clusters is: %s",
@@ -549,7 +609,7 @@ clusterMonocle <-
            clustNo,
            session) {
 
-      # delete
+    # delete
     # lowerDetection = 0.1
     # dimensionNo = 10
     # redMethod = "tSNE"

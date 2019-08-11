@@ -301,7 +301,7 @@ server <- function(input, output, session) {
               tabPanel(
                 id = "plotTab",
                 value = "plotTab",
-                title = "Visualize data",
+                title = "Visualize Data",
                 bulk_plotDataUI("plotTab")
               )
             )

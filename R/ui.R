@@ -13,10 +13,10 @@ ui <-  tagList(
                           value = "startApp",
 
                           radioGroupButtons("chooseApp",
-                                            "Pick Data Type",
+                                            h4("Pick Data Type"),
                                             size = 'lg',
-                                            choices =  c("Single-cell RNA-Seq Analysis" = 1,
-                                                         "Bulk RNA-Seq Data Analysis" = 2)),
+                                            choices =  c("scRNA-Seq Analysis" = 1,
+                                                         "Bulk RNA-Seq Analysis" = 2)),
 
 
                           actionBttn(("launch_app"), "Launch App", size = "md", style = "material-flat")
