@@ -36,12 +36,12 @@ BingleSeq's scRNA-Seq pipeline accepts 10x genomics data as well as count tables
 
 ### Prerequisites
 
-To Run BingleSeq, you must have R>= 3.5.3
+BingleSeq requires R>= 3.5.3
 
 
 ### Installing
 
-To install BingleSeq on your machine you must type the following R code:
+To install BingleSeq on your machine simply type the following R code:
 
 ```
 install.packages("devtools")
@@ -62,8 +62,8 @@ BingleSeq::startBingleSeq()  # Starts the application
 
 ## Built With
 
-* [shiny](https://shiny.rstudio.com/) - The R framework used
-* [RStudio](https://www.rstudio.com/) - Dependency Management
+* [shiny](https://shiny.rstudio.com/)
+* [RStudio](https://www.rstudio.com/)
 
 
 
