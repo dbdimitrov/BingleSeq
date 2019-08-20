@@ -16,7 +16,7 @@ bulk_goDataUI <- function(id) {
 
               numericInput(
                 ns("goGetPvalue"),
-                label = "Adjusted p-value threshold (FDR)",
+                label = "Adjusted P-value threshold <",
                 value = 0.05,
                 min = 0.00001,
                 max = 0.5
@@ -26,7 +26,7 @@ bulk_goDataUI <- function(id) {
 
               numericInput(
                 ns("goGetFC"),
-                label = "Fold change threshold",
+                label = "Fold-change threshold >",
                 value = 2,
                 min = 0,
                 max = 20
@@ -56,8 +56,6 @@ bulk_goDataUI <- function(id) {
                 )
               ),
 
-
-              # Input: Button gets Differentially Expressed Genes ----
               actionButton(ns("goGetButton"), label = "Get DE genes")
 
             ),
@@ -114,6 +112,11 @@ bulk_goDataUI <- function(id) {
               ),
 
               actionButton(ns("goTermButton"), label = "Get GO Terms"),
+
+              tags$hr(),
+
+              tags$b("Top 10 GO Term Histogram"),
+              checkboxInput(ns("goHistCheck"), "Function Names", TRUE),
               actionButton(ns("goHistButton"), label = "Plot Histogram"),
 
               tags$hr(),
@@ -144,13 +147,16 @@ bulk_goDataUI <- function(id) {
               tabPanel(
                 value = ("goTableTab"),
                 title = "GO Term Table",
-                DT::dataTableOutput(ns("goTermTable"))
+                DT::dataTableOutput(ns("goTermTable")),
+                conditionalPanel(condition = "input.goTermButton > 0",
+                                 ns = ns,
+                                 downloadButton(ns("goDownload"), "Download Table")
+                )
               ),
 
               tabPanel(
                 value = ("goHistTab"),
                 title = "GO Term Histogram",
-                checkboxInput(ns("goHistCheck"), "Function Names", FALSE),
                 plotOutput(ns("goHistPlot"), width = "800px", height = "500px")
               ),
 
@@ -176,22 +182,26 @@ bulk_goData <- function(input, output, session, counts, de) {
     if(input$goGetButton == 0){
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px'>
-        The <i> 'Get DE Genes' </i> tab enables DE genes obtained from the DE analysis to be pre-filtered according to:
+        The <i> 'Get DE Genes' </i> tab enables
+        DE genes obtained from the DE analysis to be pre-filtered according to:
         Fold-change, adj. P-value threshold <br>
-        Once the DE genes are filtered, the 'Get GO Terms' tab will be automatically selected. </div>")
+        Once the DE genes are filtered,
+           the 'Get GO Terms' tab will be automatically selected. </div>")
     } else {
       if(is.null(go$goTermTable)){
         HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
-      The <i> 'Get GO Terms' </i> tab provides a comprehensive Functional Annotation Pipeline using the filtered DE genes. <br> <br>
+        The <i> 'Get GO Terms' </i> tab provides a comprehensive
+        Functional Annotation Pipeline using the filtered DE genes. <br> <br>
 
-      Prior to running the pipeline, please specify the following parameters:
-      adjusted or non-adjusted P-value threshold for ontologies;
-      Symbol type - the type of symbols used for the genes in the count table;
-      Ontology type; and Genome of interest. <br> <br>
+        Prior to running the pipeline, please specify the following parameters:
+        adjusted or non-adjusted P-value threshold for ontologies;
+        Symbol type - the type of symbols used for the genes in the count table;
+        Ontology type; and Genome of interest. <br> <br>
 
-      Once a table with results is returned, proceed to visualizing the top 10 GO terms results via the histogram option
-      and to exploring GO terms of interest using their GO:IDs </div>" )
+        Once a table with results is returned, proceed to visualizing
+        the top 10 GO terms results via the histogram option
+        and to exploring GO terms of interest using their GO:IDs </div>" )
       }else{
         HTML("")
       }
@@ -264,8 +274,6 @@ bulk_goData <- function(input, output, session, counts, de) {
 
   })
 
-
-
   observeEvent(input$goHistButton, {
     go$hist <- histGoTerms(go$goTermTable, input$goHistCheck, session)
 
@@ -273,9 +281,6 @@ bulk_goData <- function(input, output, session, counts, de) {
       go$hist
 
     })
-
-    # ggsave("figures/GOTermHistogram.png", plot = rv$hist, device = png(),
-    # width = 12, height = 8, limitsize = FALSE)
 
     updateTabsetPanel(session, "goMainTabSet", selected = "goHistTab")
   })
@@ -287,6 +292,17 @@ bulk_goData <- function(input, output, session, counts, de) {
 
     updateTabsetPanel(session, "goMainTabSet", selected = "goInfoTab")
   })
+
+  output$goDownload <- downloadHandler(
+    filename = function() {
+      paste(format(Sys.time(), "%y-%m-%d_%H-%M"), "_goTermResults" , ".csv", sep = "")
+    },
+    content = function(file) {
+      data <- go$goTermTable
+
+      write.csv(data, file)
+    }
+  )
 }
 
 
@@ -299,18 +315,16 @@ bulk_goData <- function(input, output, session, counts, de) {
 #' @param pvalue P-value threshold
 #' @param fchange Fold-Change threshold
 #' @param condition Filters by a given condition (AvB, BvC, etc.)
-#' @return gene.vector a vector with DE gene names
+#' @return Returns a vector with DE gene names
 getDEgenes <- function(data, type, pvalue, fchange, condition) {
   table <- data
 
   fchange <- log2(fchange) # convert to log2
 
-
   if (condition == 0) {
     #to filter for all conditions
     condition = c(1, 2, 3)
   }
-
 
   #filter
   if (type == 1) {
@@ -334,12 +348,11 @@ getDEgenes <- function(data, type, pvalue, fchange, condition) {
 
   gene.vector <- as.vector(row.names(table))
 
-  # write.csv(gene.vector, file="output/GO_DEgenes.csv", row.names = FALSE)
 
   return(gene.vector)
 }
 
-#' Functional Annotation Pipeline (Bulk)
+#' Functional Annotation Pipeline (Both pipelines)
 #'
 #' Runs the GO pipeline according to the users preferences
 #'
@@ -352,7 +365,7 @@ getDEgenes <- function(data, type, pvalue, fchange, condition) {
 #' @param pValue P-value threshold
 #' @param appNum Format entered data appropriately to the app launched
 #'
-#' @return GO.wall A dataframe with Functional Annotation Results
+#' @return Returns a dataframe with Functional Annotation Results
 runGOSEQ <-
   runGOSEQ <-
   function(deGenes,
@@ -400,7 +413,6 @@ runGOSEQ <-
           holder = "KEGG"
         }
 
-        # write.csv(GO.wall, file = paste("output/GO_Terms_", holder, ".csv", sep=""), row.names = FALSE)
         return(GO.wall)
       },
       error=function(cond) {
@@ -417,13 +429,14 @@ runGOSEQ <-
     )
   }
 
+
 #' Generate GO Histogram
 #'
 #' Creates a GO Histogram with GO terms or GO IDs
 #'
 #' @param data Functional Annotation results
 #' @param gof Boolean to use GO:Terms or GO:ID
-#' @return p The histogram
+#' @return Returns a top 10 GO terms histogram
 histGoTerms <- function(data, gof, session) {
   plot <- tryCatch({
     if (nrow(data) > 10) {
@@ -490,7 +503,7 @@ histGoTerms <- function(data, gof, session) {
 #' @param session Current R session
 #'
 #'
-#' @return The concatinated GO TERM information
+#' @return Returns the concatinated GO TERM information
 goInfo <- function(goID, session) {
   out <- tryCatch({
     go.term <- GOTERM[[goID]]

@@ -16,13 +16,13 @@ sc_qcUI <- function(id) {
         min = 1,
         value = 3
       ),
+
       numericInput(
         ns("minGenesObject"),
         label = "Minimum number of genes per cell",
         min = 1,
         value = 200
       ),
-
 
       actionButton(ns("preqcButton"), label = "Initialize Project"),
 
@@ -41,8 +41,6 @@ sc_qcUI <- function(id) {
           value = 100
         ),
 
-
-
         numericInput(
           ns("maxFeatureInput"),
           label = "Maximum Feature No",
@@ -53,14 +51,11 @@ sc_qcUI <- function(id) {
         actionButton(ns("postqcButton"), label = "Filter Cells")
 
       )
-
     ),
 
     # Main panel for displaying outputs ----
     mainPanel(tabsetPanel(
       id = ns("qcTabSet"),
-
-      #Add Text with No of cells and features as lodaded
 
       tabPanel(title = "Object Preview",
 
@@ -89,7 +84,7 @@ sc_qcUI <- function(id) {
 #'
 #' @param countsT countTable loaded by loadTab
 #' @export
-#' @return A reactive value contaning the filtered data
+#' @return Returns a reactive value contaning the filtered data
 sc_qc <- function(input, output, session, countsT) {
   filt <- reactiveValues()
 
@@ -99,13 +94,16 @@ sc_qc <- function(input, output, session, countsT) {
       HTML("<div style='border:2px solid blue; padding-top: 8px; padding-bot: 8px; font-size: 14px;
       border-radius: 10px;'>
       <p style='text-align: center'><b>This tab enables Quality control. </b> </p> <br>
-      First, filter genes detected below a certain number of cells and cells with less than a certain number of expressed genes. <br>
-      <i> This is done as the project (object) is initialized and subsequently displayed as a table. </i> <br>
-      Then, swap to the 'Outlier Violin plot' tab to visualize and exclude Cell Outliers. </div>")
+
+      First, filter genes detected below a certain number of cells
+      and cells with less than a certain number of expressed genes. <br>
+      <i> This is done as the project (object)
+      is initialized and subsequently displayed as a table. </i> <br>
+      Then, swap to the 'Outlier Violin plot' tab
+           to visualize and exclude Cell Outliers. </div>")
     } else{
       HTML("")
     }
-
   })
 
 
@@ -136,7 +134,6 @@ sc_qc <- function(input, output, session, countsT) {
 
     })
   })
-
 
 
   ### SHOW postQC INFO ------
@@ -176,7 +173,7 @@ sc_qc <- function(input, output, session, countsT) {
 #' @param session Current R session supplied by the server
 #'
 #' @export
-#' @return A Seurat_object with the filtered data
+#' @return Returns A Seurat_object with the filtered data
 seuratQC <- function(seurat_object, minF, maxF, session) {
 
 

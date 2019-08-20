@@ -7,7 +7,6 @@
 #' @import shinyFiles
 #' @import shinyWidgets
 #' @import waiter
-#' @import V8
 #' @import DT
 #' @import grDevices
 #' @import ggplot2
@@ -22,7 +21,6 @@
 #' @import DESeq2
 #' @import edgeR
 #' @import limma
-#' @import ALDEx2
 #' @import MAST
 #' @import monocle
 #' @import Seurat
@@ -47,7 +45,6 @@ startBingleSeq <- function() {
     library(shinyWidgets)
 
     library(waiter)
-    library(V8) # enables js lines to be read intext
     library(dplyr)
     library(DT)
     library(grDevices)
@@ -63,17 +60,15 @@ startBingleSeq <- function() {
     library(DESeq2)
     library(edgeR)
     library(limma)
-    library(ALDEx2)
     library("MAST")
 
-    # Load required SC packages
     library(monocle)
     library(Seurat)
     library('scran')
     library('SC3')
 
-#     library(org.Mm.eg.db)
-#     library(org.Hs.eg.db)
+    library(org.Mm.eg.db)
+    library(org.Hs.eg.db)
     library(goseq)
     library(GO.db)
 

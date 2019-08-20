@@ -20,19 +20,21 @@ sc_compUI <- function(id) {
 
       numericInput(
         ns("compFCInput"),
-        label = "Fold Change",
+        label = "Fold-Change Threshold >",
         value = 2,
         min = 1,
         max = 10
       ),
       numericInput(
         ns("compPvalueInput"),
-        label = "Adjusted P-value Threshold",
+        label = "Adjusted P-value Threshold <",
         value = 0.05,
         min = 0.000001,
         max = 0.5
       ),
       actionButton(ns("comparisonButton"), "Run DE Pipelines"),
+
+      tags$hr(),
 
       conditionalPanel(
         condition = "input.comparisonButton > 0",
@@ -42,21 +44,13 @@ sc_compUI <- function(id) {
           ns("selectIntersect"),
           label = ("Select intersect of interest"),
           choices = list(
-            "Negative Binomial (Only)" = "a1",
-            "Negative Binomial & MAST" = "a2",
-            "MAST (Only)" = "a3",
-            "Negative Binomial & Wilcoxon" = "a4",
-            "MAST & Negative Binomial & Wilcoxon" = "a5",
-            "All Four Statistics" = "a6",
-            "Negative Binomial & MAST & T-test" = "a7",
-            "MAST & T-test" = "a8",
-            "Wilcoxon (Only)" = "a9",
-            "Wilcoxon & MAST" = "a10",
-            "Wilcoxon & MAST & T-test" = "a11",
-            "Wilcoxon & Negative Binomial & T-test" = "a12",
-            "Negative Binomial & T-test" = "a13",
-            "T-test (Only)" = "a14",
-            "Wilcoxon & T-test" = "a15"
+            "Wilcoxon (only)" = "a1",
+            "Wilcoxon & t-test" = "a2",
+            "t-test (only)" = "a3",
+            "DESeq2 x MAST" = "a4",
+            "All Three Methods" = "a5",
+            "t-test & MAST" = "a6",
+            "MAST (only)" = "a7"
           ),
           selected = NULL
         ),
@@ -87,16 +81,21 @@ sc_comp <- function(input, output, session, finData) {
     if(input$comparisonButton == 0){
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
-        <p style ='text-align: center'><b>This tab supplies users with an option to assess
+        <p style ='text-align: center'><b>
+        This tab supplies users with an option to assess
         the agreement between the different DE analysis packages.</b> </p> <br>
 
-        Prior to running the pipeline, users can pre-filter genes according to: <br>
-        Fold-change, adj. P-value threshold, and genes expressed in a minimum fraction of cells. <br> <br>
+        Prior to running the pipeline,
+        users can pre-filter genes according to: <br>
+        Fold-change, adj. P-value threshold,
+        and genes expressed in a minimum fraction of cells. <br> <br>
 
-        Once the pipeline is finished a Venn Diagram with the overlap between selected DE methods is returned.
+        Once the pipeline is finished a Venn Diagram
+        with the overlap between selected DE methods is returned.
         Each overlap(intersect) can then be downloaded <br> <br>
 
-        <i>Note that the procedure runs 4 subsequent DE analysis pipelines, as such it is rather time-consuming.</i> </div>" )
+        <i>Note that the procedure runs 4 subsequent DE analysis pipelines,
+           as such it is rather time-consuming.</i> </div>" )
     } else {
       HTML("")
     }
@@ -122,9 +121,6 @@ sc_comp <- function(input, output, session, finData) {
     output$comparsionPlot <- renderPlot({
       grid.draw(comp$plot)
     })
-
-    # ggsave("figures/comparisonVenn.png", plot = comp$plot, device = png(),
-    #        width = 12, height = 8, limitsize = FALSE)
 
     hide_waiter()
 
@@ -154,8 +150,6 @@ sc_comp <- function(input, output, session, finData) {
 
 
 
-
-
 #' SC Generate Data required to compare DE Method Results
 #'
 #' @param data Clustering results
@@ -163,7 +157,7 @@ sc_comp <- function(input, output, session, finData) {
 #' @param fc Fold-change threshold
 #' @param pValue p-value threshold
 #' @export
-#' @return A list with DE genes according to the different methods
+#' @return Returns a list with DE genes according to the different methods
 sc_getAllDE <- function(data, mPCT, fc, pValue) {
   fc <- log(fc)
 
@@ -181,16 +175,8 @@ sc_getAllDE <- function(data, mPCT, fc, pValue) {
       min.pct = mPCT,
       logfc.threshold = fc
     )
-  data[["RNA"]]@counts <- as.matrix(data[["RNA"]]@counts) + 1
+
   x3 <-
-    FindAllMarkers(
-      data,
-      test.use = "negbinom",
-      min.pct = mPCT,
-      logfc.threshold = fc,
-      slot = "counts"
-    )
-  x4 <-
     FindAllMarkers(
       data,
       test.use = "MAST",
@@ -202,17 +188,15 @@ sc_getAllDE <- function(data, mPCT, fc, pValue) {
   x1_sig <- subset(x1, p_val_adj < pValue)
   x2_sig <- subset(x2, p_val_adj < pValue)
   x3_sig <- subset(x3, p_val_adj < pValue)
-  x4_sig <- subset(x4, p_val_adj < pValue)
 
 
   list <-
     list(rownames(x1_sig),
          rownames(x2_sig),
-         rownames(x3_sig),
-         rownames(x4_sig))
+         rownames(x3_sig))
 
   names(list) <-
-    c("Wilcoxon", "T-test", "Negative Binomial", "MAST")
+    c("Wilcoxon", "T-test", "MAST")
 
   return(list)
 }

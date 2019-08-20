@@ -12,7 +12,7 @@ sc_goUI <- function(id) {
               value = "getGOGenesTab",
               title = "Get DE Genes",
 
-              checkboxInput(ns("goClustCheck"), label = h5("Get Genes from All Clusters"), TRUE),
+              checkboxInput(ns("goClustCheck"), label = h4("Get Genes from All Clusters"), FALSE),
 
               conditionalPanel(
                 condition = "!input.goClustCheck",
@@ -23,7 +23,7 @@ sc_goUI <- function(id) {
 
               numericInput(
                 ns("goGetPvalue"),
-                label = "Corrected p-value threshold",
+                label = "Adjusted P-value Threshold <",
                 value = 0.05,
                 min = 0.00001,
                 max = 0.5
@@ -36,7 +36,7 @@ sc_goUI <- function(id) {
 
               numericInput(
                 ns("goGetFC"),
-                label = "Fold change threshold",
+                label = "Fold-Change Threshold >",
                 value = 2,
                 min = 0,
                 max = 20
@@ -60,15 +60,13 @@ sc_goUI <- function(id) {
               actionButton(ns("goGetButton"), label = "Get DE genes")
             ),
 
-
-
             tabPanel(
               value = "getGOTermsTab",
               title = "Get GO Terms",
 
               numericInput(
                 ns("goTermPvalue"),
-                label = "P-value threshold",
+                label = "P-value threshold <",
                 value = 0.05,
                 min = 0.00001,
                 max = 0.5
@@ -111,6 +109,11 @@ sc_goUI <- function(id) {
               ),
 
               actionButton(ns("goTermButton"), label = "Get GO Terms"),
+
+              tags$hr(),
+
+              tags$b("Top 10 GO Term Histogram"),
+              checkboxInput(ns("goHistCheck"), "Function Names", TRUE),
               actionButton(ns("goHistButton"), label = "Plot Histogram"),
 
               tags$hr(),
@@ -141,13 +144,16 @@ sc_goUI <- function(id) {
               tabPanel(
                 value = "goTableTab",
                 title = "GO Term Table",
-                DT::dataTableOutput(ns("goTermTable"))
+                DT::dataTableOutput(ns("goTermTable")),
+                conditionalPanel(condition = "input.goTermButton > 0",
+                                 ns = ns,
+                                 downloadButton(ns("goDownload"), "Download Table")
+                )
               ),
 
               tabPanel(
                 value = "goHistTab",
                 title = "GO Term Histogram",
-                checkboxInput(ns("goHistCheck"), "Function Names", FALSE),
                 plotOutput(ns("goHistPlot"), width = "800px", height = "500px")
               ),
 
@@ -173,21 +179,26 @@ sc_go <- function(input, output, session, de, countsT) {
     if(input$goGetButton == 0){
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
-        The <i> 'Get DE Genes' </i> tab enables DE genes obtained from the DE analysis to be pre-filtered according to: <br>
-        Fold-change, adj. P-value threshold, and according to a specific cluster <br>
-        Once the DE genes are filtered, the 'Get GO Terms' tab will be automatically selected. </div>")
+        The <i> 'Get DE Genes' </i> tab enables DE genes
+        obtained from the DE analysis to be pre-filtered according to: <br>
+        Fold-change, adj. P-value threshold,
+        and according to a specific cluster <br>
+        Once the DE genes are filtered, the 'Get GO Terms'
+           tab will be automatically selected. </div>")
     } else {
       if(is.null(go$goTermTable)){
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bot: 8px; border-radius: 10px;'>
-      The <i> 'Get GO Terms' </i> tab provides a comprehensive Functional Annotation Pipeline using the filtered DE genes. <br> <br>
+      The <i> 'Get GO Terms' </i> tab provides a comprehensive
+      Functional Annotation Pipeline using the filtered DE genes. <br> <br>
 
       Prior to running the pipeline, please specify the following parameters:
       adjusted or non-adjusted P-value threshold for ontologies;
       Symbol type - the type of symbols used for the genes in the count table;
       Ontology type; and Genome of interest. <br> <br>
 
-      Once a table with results is returned, proceed to visualizing the top 10 GO terms results via the histogram option
+      Once a table with results is returned,
+      proceed to visualizing the top 10 GO terms results via the histogram option
       and to exploring GO terms of interest using their GO:IDs </div>" )
       }else{
         HTML("")
@@ -222,7 +233,6 @@ sc_go <- function(input, output, session, de, countsT) {
                         "goSideTabSet",
                         selected = "getGOTermsTab")
     }
-
   })
 
 
@@ -268,19 +278,14 @@ sc_go <- function(input, output, session, de, countsT) {
   })
 
 
-
   observeEvent(input$goHistButton, {
     if(!is.null(go$goTermTable)){
       go$goHistPlot <- histGoTerms(go$goTermTable, input$goHistCheck, session)
 
       output$goHistPlot <- renderPlot({
         go$goHistPlot
-
       })
 
-
-      # ggsave("figures/GOTermHistogram.png", plot = go$goHistPlot, device = png(),
-      #        width = 12, height = 8, limitsize = FALSE)
 
       updateTabsetPanel(session, "goMainTabSet", selected = "goHistTab")
     }
@@ -294,6 +299,17 @@ sc_go <- function(input, output, session, de, countsT) {
 
     updateTabsetPanel(session, "goMainTabSet", selected = "goInfoTab")
   })
+
+  output$goDownload <- downloadHandler(
+    filename = function() {
+      paste(format(Sys.time(), "%y-%m-%d_%H-%M"), "_goTermResults" , ".csv", sep = "")
+    },
+    content = function(file) {
+      data <- go$goTermTable
+
+      write.csv(data, file)
+    }
+  )
 }
 
 
@@ -308,7 +324,7 @@ sc_go <- function(input, output, session, de, countsT) {
 #' @param pvalue P-value threshold
 #' @param fchange Fold-Change threshold
 #' @param condition Filters by a given condition (AvB, BvC, etc.)
-#' @return gene.vector a vector with DE gene names
+#' @return Returns a vector with DE gene names
 sc_getDEgenes <-
   function(data,
            type,
@@ -328,7 +344,6 @@ sc_getDEgenes <-
 
     }
 
-
     #filter
     if (type == 1) {
       table <-
@@ -347,23 +362,5 @@ sc_getDEgenes <-
 
     gene.vector <- as.vector(row.names(table))
 
-    # write.csv(gene.vector, file = "output/GO_DEgenes.csv", row.names = FALSE)
-
     return(gene.vector)
   }
-
-
-#' Functional Annotation Pipeline (Single Cell)
-#'
-#' Runs the GO pipeline according to the users preferences
-#'
-#' Only difference is in handling the first row (change it!)
-#'
-#' @param deGenes a vector with DE gene names
-#' @param data Filters by abs. significant, upregulation or downregulation
-#' @param genome The genome to be used
-#' @param symbol Type of Gene symbol
-#' @param testType Type of Test (Cellular component, Molecular function, etc.)
-#' @param pCorrect Whether to filter by FDR p-value or uncorrected p-value
-#' @param pValue P-value threshold
-#' @return GO.wall A dataframe with Functional Annotation Results

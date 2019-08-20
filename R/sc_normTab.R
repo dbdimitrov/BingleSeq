@@ -14,7 +14,6 @@ sc_normUI <- function(id) {
         label = "Select Normalization method",
         choices = list(
           "Log Normalize" = "LogNormalize",
-          #"Centered log ratio transformation" = "CLR",
           "Relative counts" = "RC"
         ),
         selected = 1
@@ -26,7 +25,6 @@ sc_normUI <- function(id) {
         min = 1000,
         value = 10000
       ),
-      # 1e6 for rc
 
       tags$hr(),
 
@@ -70,7 +68,7 @@ sc_normUI <- function(id) {
 #' @param filtData Reactive value containing the suerat Object with filtered data
 #'
 #' @export
-#' @return Reactive value containing Seurat object with normalized data
+#' @return Returns a reactive value containing Seurat object with normalized data
 sc_norm <- function(input, output, session, filtData) {
   norm <- reactiveValues()
 
@@ -79,14 +77,20 @@ sc_norm <- function(input, output, session, filtData) {
     HTML("<div style='border:2px solid blue; padding-top: 8px; padding-bot: 8px; font-size: 14px;
       border-radius: 10px;'>
     <p style='text-align: center'><b> This tab enables the normalization of the data. </b> </p> <br>
+
     For integer counts use the 'Log Normalize' method,
     while for relative counts (e.g. FPMKs, CPM) use 'Relative Counts' normalization. <br>
     10,000 Scale Factor should be appropriate for almost any type of data,
     besides when working with CPM as 1,000,000 should be used in this case. <br> <br>
+
     Simultaneously with Normalization, the Most Variable Features in the dataset will be identified.
-    The number of Variable Features is set with 'FeatureNo' and variance is estimated with a method of choice. <br>
-    Following this process a Variance plot with the Most Variable Features is displayed. <br> <br>
-    <i>Note that: the identified Most Variable Features are relavant only for unsupervised clustering with Seurat.</i> </div>")
+    The number of Variable Features is set with 'FeatureNo'
+    and variance is estimated with a method of choice. <br>
+    Following this process a Variance plot with the Most
+    Variable Features is displayed. <br> <br>
+
+    <i>Note that: the identified Most Variable Features
+         are relavant only for unsupervised clustering with Seurat.</i> </div>")
     } else{
       HTML("")
     }
@@ -122,8 +126,6 @@ sc_norm <- function(input, output, session, filtData) {
     })
 
     hide_waiter()
-    # ggsave("figures/variancePlot.png", plot = norm$variancePlot, device = png(),
-    #        width = 9, height = 6, limitsize = FALSE)
 
   })
 
@@ -139,7 +141,7 @@ sc_norm <- function(input, output, session, filtData) {
 #' @param varianceMet The variance estimation method to be used
 #' @param nfeat The number of features to be used in estimating variance
 #' @export
-#' @return Seurat object with normalized data
+#' @return Returns a Seurat object with normalized data
 normalizeSeurat <-
   function(s_object,
            normalizeMet,
@@ -169,7 +171,7 @@ normalizeSeurat <-
 #'
 #' @param s_object Suerat Object with filtered data
 #' @export
-#' @return Variance estimation plot with the ten most variable genes
+#' @return Returns a variance estimation plot
 variancePlotSeurat <- function(s_object) {
   # Identify the 10 most highly variable genes
   top10 <- head(VariableFeatures(s_object), 10)

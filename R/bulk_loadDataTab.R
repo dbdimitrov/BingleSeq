@@ -25,10 +25,8 @@ bulk_loadDataUI <- function(id) {
 
       tags$hr(),
 
-      # Input: Checkbox if file has header ----
       checkboxInput(ns("header"), "Header", FALSE),
 
-      # Input: Select separator ----
       radioButtons(
         ns("sep"),
         "Separator",
@@ -64,13 +62,18 @@ bulk_loadData <- function(input, output, session) {
   output$helpLoadInfo <- renderUI({
     if(is.null(counts$countTable)){
       HTML("<div style='border:2px solid blue; font-size: 14px; border-radius: 10px;'>
-      <p style ='font-size: 15px; text-align: center'; padding-top: 8px;> <b>Upload Data tab. </b> </p>
-      <p>Please select a count table that contains the read counts in .csv/.txt file format. </p>
-      <p style ='font-style: italic; padding-bottom: 8px;'> Note: The first row (header) may contain contain condition(sample) names,
+      <p style ='font-size: 15px; text-align: center'; padding-top: 8px;>
+      <b>Upload Data tab. </b> </p>
+
+      <p>Please select a count table that
+      contains the read counts in .csv/.txt file format. </p>
+      <p style ='font-style: italic; padding-bottom: 8px;'>
+      Note: The first row (header) may contain contain condition(sample) names,
       and first column should contain gene names/IDs. </p> </div>")
     } else{
       HTML("<h4 style='padding-top: 8px'>Preview Count Table</h4>
-           <p style='padding-bot: 8px;'><i>Please ensure that the table was loaded appropraitely.</i></p>")
+           <p style='padding-bot: 8px;'><i>Please ensure
+           that the table was loaded appropraitely.</i></p>")
     }
   })
 
@@ -79,7 +82,6 @@ bulk_loadData <- function(input, output, session) {
     counts$countTable <- read.csv(input$file1$datapath,
                                   header = input$header,
                                   sep = input$sep)
-
 
     output$dto <- DT::renderDataTable(DT::datatable(counts$countTable, options = list(pageLength = 10)))
 
@@ -130,14 +132,13 @@ generateSummary <- function(counts, session) {
 
       out <- df
 
-      # write.csv(df, file="output/Data_Summary.csv", row.names = FALSE)
-
     },
     error=function(cond) {
       sendSweetAlert(
         session = session,
         title = "Data Format Error",
-        text = "Ensure that correctly formatted data with appropriately chosen number of conditions and replicates were supplied",
+        text = "Ensure that correctly formatted data with
+        appropriately chosen number of conditions and replicates were supplied",
         type = "error"
       )
       return()

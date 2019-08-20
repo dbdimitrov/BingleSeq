@@ -29,36 +29,19 @@ server <- function(input, output, session) {
 
 
       })
-
-      # Create directories to save files
-      dir.create(file.path(globalRV$saveDir, "figures"), showWarnings = FALSE)
-      dir.create(file.path(globalRV$saveDir, "output"), showWarnings = FALSE)
-
     }
   })
 
 
   # Launch the app
   observeEvent(input$launch_app, {
-    # if (!is.null(globalRV$saveDir)) {
       globalRV$app <- input$chooseApp
 
       removeTab("mainPage", "startApp", session = session)
-    # } else{
-    #
-    #   sendSweetAlert(
-    #     session = session,
-    #     title = "No Output Directory",
-    #     text = "Please select a directory using the 'Select Directory' button",
-    #     type = "info"
-    #   )
-    # }
   })
 
 
   observe({
-
-
       if (!is.null(globalRV$app) && globalRV$app == 1) {
       ### Single-Cell RNA-Seq Pipeline App ----
 
@@ -206,6 +189,26 @@ server <- function(input, output, session) {
         callModule(sc_comp, "compTab", finalData)
 
 
+        observeEvent(input$"clustTab-saveObjectButton", {
+          if(!is.null(finalData$finalData)){
+            withProgress(message = "Saving Object...",{
+
+              data <- finalData$finalData
+
+              filename = paste("SeuratObj_", format(Sys.time(), "%y-%m-%d_%H-%M"), '.Robj', sep = "")
+
+              saveDir = file.path(tempdir(), filename)
+              print(saveDir)
+
+              shiny::setProgress(value = 0.4, detail = "This could take a while for large datasets...")
+
+              save(data, file = saveDir)
+
+            })
+          }
+        })
+
+
       } else if (!is.null(globalRV$app) && globalRV$app == 2) {
       ### Bulk RNA-Seq Pipeline App ----
 
@@ -228,7 +231,6 @@ server <- function(input, output, session) {
         vennChoice = list("Venn Diagram" = "venn")
 
 
-
         # Append Bulk Load Tab and Swap ----
         appendTab(inputId = "mainPage",
                   tabPanel(
@@ -238,7 +240,6 @@ server <- function(input, output, session) {
                   ))
 
         updateTabsetPanel(session, 'mainPage', 'loadTab')
-
 
 
         # Load Data ----
@@ -267,6 +268,11 @@ server <- function(input, output, session) {
                 options = list(paging = FALSE, searching = FALSE),
                 rownames = FALSE
               ))
+
+            output$"filterTab-preFiltHist" <- renderPlot({
+              qcHist(counts$countTable)
+            })
+
           }
         })
 

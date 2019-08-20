@@ -8,7 +8,7 @@ sc_clustUI <- function(id) {
     # Sidebar panel for inputs ----
     sidebarPanel(
 
-      h4("Load Clustering Prerequisites"),
+      h4("Perform Unsupervised clustering"),
 
       actionButton(ns("elbowButton"), "Generate Clustering Prerequisites"),
 
@@ -86,11 +86,10 @@ sc_clustUI <- function(id) {
             ns("sc3nStart"),
             label = "Random sets used in clustering (nStart)",
             min = 50,
-            value = 1000
+            value = 50
           ),
 
           checkboxInput(ns("estKCheck"), label = "Estimate Cluster Number", TRUE),
-
 
           conditionalPanel(
             condition = "!input.estKCheck",
@@ -196,8 +195,11 @@ sc_clustUI <- function(id) {
             )
           ),
 
-          actionButton(ns("pcaButton"), "Generate Plot")
+          actionButton(ns("pcaButton"), "Generate Plot"),
 
+          tags$hr(),
+
+          actionButton(ns("saveObjectButton"), "Save Object")
         )
       )
     ),
@@ -224,19 +226,25 @@ sc_clustUI <- function(id) {
 #' @param normData Reactive value containing seurat object with normalized data
 #'
 #' @export
-#' @return Returns a Reactive value containing seurat object with scaled counts and reduced dimensions (PCA data)
+#' @return Returns a Reactive value containing seurat object
+#'  with scaled counts and reduced dimensions (PCA data)
 sc_clust <- function(input, output, session, normData) {
   clust <- reactiveValues()
 
   output$helpClustInfo <- renderUI({
     if(input$elbowButton == 0){
-    HTML("<div style='border:2px solid blue; padding-top: 8px; padding-bottom: 8px; font-size: 14px;
-      border-radius: 10px;'>
-     <p style='text-align: center'> <b>This tab enables unsupervised clustering with <i> Seurat, monocle, and SC3</i>. </b> </p> <br>
-    To begin, press the 'Generate Clustering Prerequisites' button. What this will do is to: <br>
-    Scale the data, linear dimensional reduction with PCA, and return an Elbow plot that can be used in PC Selection. <br> <br>
+    HTML("<div style='border:2px solid blue; padding-top: 8px;
+    padding-bottom: 8px; font-size: 14px; border-radius: 10px;'>
+     <p style='text-align: center'> <b>This tab enables unsupervised clustering with
+     <i> Seurat, monocle, and SC3</i>. </b> </p> <br>
 
-    Once the prerequisites are generated, the unsupervised clustering methods will become available. <br>
+    To begin, press the 'Generate Clustering Prerequisites' button.
+    What this will do is to: <br>
+    Scale the data, linear dimensional reduction with PCA,
+    and return an Elbow plot that can be used in PC Selection. <br> <br>
+
+    Once the prerequisites are generated,
+    the unsupervised clustering methods will become available. <br>
     Subsequent to clustering, visualization options themselves become available.
         </div> ")
     } else {
@@ -244,34 +252,50 @@ sc_clust <- function(input, output, session, normData) {
       HTML("<div style='border:2px solid blue; font-size: 14px;
        padding-top: 8px; padding-bot: 8px; border-radius: 10px;'>
        <p style='text-align: center'><b>Unsupervised Clustering with <i>Seurat</i>:</b> </p> <br>
+
        First, choose clustering algorithm of preference. <br>
        Then, provide the true dimensionality of the dataset via the 'Dimension to be used' parameter. <br>
        The true dimensionality can be estimated by looking at the 'elbow' of the elbow plot. <br> <br>
-       Finally, use the 'Resolution' parameter to set the clustering ‘granularity’ and control the number of clusters.
+
+       Finally, use the 'Resolution' parameter to set the
+       clustering ‘granularity’ and control the number of clusters.
        <br>Note that the optimal 'Resolution' for datasets with ~3000 cells is 0.6-1.2
        and it is typically higher for larger datasets. <br> </div>")
     } else if(input$clusterPackage == 2){
       HTML("<div style='border:2px solid blue; font-size: 14px;
       padding-top: 8px; padding-bot: 8px; border-radius: 10px;'>
       <p style='text-align: center'><b>Unsupervised Clustering with <i>SC3</i>:</b> </p> <br>
+
       SC3’s inbuilt filtering options enable further reducion of noise by filtering out <br>
       genes below and above certain dropout (zero value) percentage thresholds. <br> <br>
-      'nStart' parameter enables control over the number of random datasets used in clustering and hence computational time. <br>
+
+      'nStart' parameter enables control over the number of
+      random datasets used in clustering and hence computational time. <br>
       By default, this parameter is set to 1000 when working with
       less than 2000 cells and to 50 when working with more than 2000 cells. <br>
-      SC3 is magnitudes slower than the other approaches and appropriately setting 'nStart' is essential. <br> <br>
+      SC3 is magnitudes slower than the other approaches
+      and appropriately setting 'nStart' is essential. <br> <br>
+
       Note that SC3 enables the number of clusters to be specified or estimated. <br>
-      However, it should be noted that estimating cluster number with SC3 often results in overestimations. </div")
+      However, it should be noted that estimating
+           cluster number with SC3 often results in overestimations. </div")
 
     } else{
       HTML(
         "<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bot: 8px; border-radius: 10px;'>
-              <p style='text-align: center'><b>Unsupervised Clustering with <i>monocle</i>:</b> </p> <br>
-        First, Select clustering algorithm of preference (use Louvian when working with large datasets). <br>
-        Then use 'Dimension to be used' parameter, to provide the true dimensionality, determined using the Elbow plot <br>
-        If required, further filter noise according to the 'Lower Detection Limit' parameter <br> <br>
-        Finally, choose whether to estimate with monocle or specify a desired cluster number. </div>"
+              <p style='text-align: center'><b>Unsupervised
+              Clustering with <i>monocle</i>:</b> </p> <br>
+
+        First, Select clustering algorithm of preference
+        (use Louvian when working with large datasets). <br>
+        Then use 'Dimension to be used' parameter, to provide the true dimensionality,
+        determined using the Elbow plot <br>
+        If required, further filter noise according
+        to the 'Lower Detection Limit' parameter <br> <br>
+
+        Finally, choose whether to estimate with
+        monocle or specify a desired cluster number. </div>"
       )
     }
     }
@@ -327,9 +351,6 @@ sc_clust <- function(input, output, session, normData) {
         clust$finalData <- clust$results[[1]]
 
       } else{
-        # Monocle normalization is suggested by the authors
-        # however using Seurat Normalization seemed to work fine
-
         clust$results <-
           clusterMonocle(
             clust$scaledData[[1]],
@@ -358,12 +379,8 @@ sc_clust <- function(input, output, session, normData) {
   })
 
 
-
   observeEvent(input$pcaButton, {
     if (!is.null(clust$finalData)) {
-
-      # show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
-
       if (input$clustplotType == "elbow") {
         clust$clustPlot <- clust$scaledData[[2]]
 
@@ -395,8 +412,6 @@ sc_clust <- function(input, output, session, normData) {
       output$clusterPlot <- renderPlot({
         clust$clustPlot
       })
-
-      # hide_waiter()
     }
   })
 
@@ -425,8 +440,6 @@ sc_clust <- function(input, output, session, normData) {
       )
     }
   )
-
-
   return(clust)
 }
 
@@ -438,7 +451,9 @@ sc_clust <- function(input, output, session, normData) {
 #' @export
 #' @return Returns a Seurat object with scaled counts and reduced dimensions (PCA data)
 seuratElbow <- function(s_object) {
-  scaled_object <- ScaleData(s_object)
+
+  all.genes <- rownames(s_object)
+  scaled_object <- ScaleData(s_object, features = all.genes)
   scaled_object <-
     RunPCA(scaled_object, features = VariableFeatures(object = scaled_object))
 
@@ -472,8 +487,7 @@ sueratClust <- function(s_object, dimNo, resQuant, algorithmNo, session) {
 
       tsne <- DimPlot(s_object,
                       reduction = "tsne",
-                      pt.size = 1.4)
-
+                      pt.size = 1.6)
 
       out <- list(s_object, tsne)
     },
@@ -507,41 +521,14 @@ sc3Cluster <- function(s_object, minDrop, maxDrop, estK, clustNo, nStart, sessio
 
   out <- tryCatch(
     {
-      # # delete
-      # s_object <- pbmc
-      # nStart = 1000
-      # minDrop = 0
-      # maxDrop = 100
-      # head(counts(sce))
-      # head(normcounts(sce))
-
 
       # Convert sparse matrix counts Seurat object to dense matrix in SC3 object
       sce <- as.SingleCellExperiment(s_object)
       rowData(sce)$feature_symbol <- rownames(s_object)
 
-      counts(sce) <- as.matrix(counts(sce)) # using non-normalized counts
-      logcounts(sce) <- as.matrix((s_object@assays$RNA@data)) # normalized counts (used in clustering)
+      counts(sce) <- as.matrix(counts(sce))
+      logcounts(sce) <- as.matrix((s_object@assays$RNA@data))
 
-
-      # Delete commented lines (only used in testing)
-      # qclust <-
-      #   scran::quickCluster(sce, min.size = 10, assay.type = "logcounts")
-      # print(qclust)
-
-
-      # sce <-
-      #   scran::computeSumFactors(
-      #     sce,
-      #     sizes = 20,
-      #     clusters = qclust,
-      #     positive = TRUE,
-      #     min.mean = 2, # NumericInput required (0.5 as default) + tryCatch
-      #     assay.type = "logcounts"
-      #   )
-
-      # Data Normalization (done with Seurat)
-      # sce <- scater::normalize(sce) #probvam s i bez
 
       if (estK) {
         sce <- sc3_estimate_k(sce) # estimate clustNo
@@ -554,11 +541,12 @@ sc3Cluster <- function(s_object, minDrop, maxDrop, estK, clustNo, nStart, sessio
                  pct_dropout_min = minDrop,
                  pct_dropout_max = maxDrop,
                  kmeans_nstart = nStart,
+                 svm_max = 100000, # prevents reshuffling when working with large datasets
                  ks = clustNo)
 
 
       ### assign clusters from sc3 to s_object
-      sce@metadata$sc3$consensus[[1]]$silhouette[, 1]
+      print(sce@metadata$sc3$consensus[[1]]$silhouette[, 1])
       clusters <- sce@metadata$sc3$consensus[[1]]$silhouette[, 1]
       names(clusters) <- colnames(s_object)
       s_object@active.ident <- as.factor(clusters)
@@ -598,7 +586,8 @@ sc3Cluster <- function(s_object, minDrop, maxDrop, estK, clustNo, nStart, sessio
 #' @param clustNo If estimateClust is False - provide number of desired clusters
 #'
 #' @export
-#' @return Returns a list containing a Seurat object with Monocle-produced clustering data and tSNE plot
+#' @return Returns a list containing a Seurat object with
+#' Monocle-produced clustering data and tSNE plot
 clusterMonocle <-
   function(s_object,
            lowerDetection,
@@ -609,16 +598,8 @@ clusterMonocle <-
            clustNo,
            session) {
 
-    # delete
-    # lowerDetection = 0.1
-    # dimensionNo = 10
-    # redMethod = "tSNE"
-    # clustMethod = "densityPeak"
-    # clustNo = 4
-
     out <- tryCatch(
       {
-        #1. Extract data, phenotype data, and feature data from the SeuratObject
         data <- as(as.matrix(s_object@assays$RNA@data), 'sparseMatrix')
 
         pd <- new('AnnotatedDataFrame', data = s_object@meta.data)
@@ -628,27 +609,18 @@ clusterMonocle <-
                      row.names = row.names(data))
         fd <- new('AnnotatedDataFrame', data = fData)
 
-
-        # 2. Construct monocle cds
         my_cds <- newCellDataSet(
           data,
           phenoData = pd,
           featureData = fd,
           lowerDetectionLimit = lowerDetection,
-          #* lowerDetection limit
           expressionFamily = uninormal()
-        ) #* data type option (norm done with seurat)
+        )
 
-        ## 3. normalisation and variance estimation steps (used in the differential expression analyses later on)
-        # my_cds <- estimateSizeFactors(my_cds)
-        # my_cds <- estimateDispersions(my_cds)
-
-        # Save PCA to this object
         my_cds@reducedDimA <-
           t(s_object@reductions$pca@feature.loadings)
 
-
-        ## 4. Dimension reduction
+        ## Dimension reduction
         my_cds <- reduceDimension(
           my_cds,
           max_components = 2,
@@ -657,42 +629,31 @@ clusterMonocle <-
           scaling = TRUE,
           pseudo_expr = 0,
           norm_method = 'none',
-          #Normalization from Seurat
           verbose = TRUE
         )
 
         if (redMethod == "tSNE") {
           if (estimateClust) {
-            # 5A. Unsupervized Clustering
+            # Unsupervized Clustering
             my_cds <- clusterCells(my_cds, method = clustMethod)
           } else {
-            # 5B. Unsupervised clustering requesting x-1 clusters
+            # Unsupervised clustering requesting x-1 clusters
             my_cds <- clusterCells(my_cds, num_clusters = (clustNo + 1), method = clustMethod)
           }
-
-          # 6. Store clusters
-
-          print(pData(my_cds)$Cluster)
 
           clusters <- pData(my_cds)$Cluster
           names(clusters) <- colnames(s_object)
           s_object@active.ident <- as.factor(clusters)
 
-
-          tsne <- plot_cell_clusters(my_cds) # Did not work with DDRTree
+          tsne <- plot_cell_clusters(my_cds, cell_size = 1.6)
 
           out <- list(s_object, tsne)
 
         } else{
-          # Get the "State" of each cell according to pseudotime
           my_cds <- orderCells(my_cds)
-
-          # use the state as cluster in the seurat object
           s_object@active.ident <- pData(my_cds)$State
 
         }
-
-
       },
       error=function(cond) {
         sendSweetAlert(
@@ -706,6 +667,5 @@ clusterMonocle <-
         return()
       }
     )
-
     return(out)
   }

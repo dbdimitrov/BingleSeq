@@ -19,8 +19,6 @@ sc_deUI <- function(id) {
                   "MAST" = "MAST",
                   "Wilcoxon Rank Sum test" = "wilcox",
                   "Student's T-test" = "t",
-                  "Likelihood-ratio test(bimod)" = "bimod",
-                  "Negative Binomial" = "negbinom",
                   "DESeq2" = "DESeq2",
                   "Logistic Regression" = "LR"
                 )
@@ -28,7 +26,7 @@ sc_deUI <- function(id) {
 
               numericInput(
                 ns("logFCdgeInput"),
-                label = "FC Threshold",
+                label = "Fold-Change Threshold >",
                 min = 0,
                 max = 10,
                 value = 2
@@ -36,7 +34,7 @@ sc_deUI <- function(id) {
 
               numericInput(
                 ns("adjPdgeInput"),
-                label = "Adjusted P-value Threshold",
+                label = "Adjusted P-value Threshold <",
                 min = 0,
                 max = 1,
                 value = 0.05
@@ -113,13 +111,21 @@ sc_deUI <- function(id) {
             id = ns("deMainTabSet"),
             tabPanel(title = "Table",
                      htmlOutput(ns("helpDEInfo")),
-                     DT::dataTableOutput(ns("dgeTable"))),
+                     DT::dataTableOutput(ns("dgeTable")),
+                     conditionalPanel(condition = "input.dgeButton > 0",
+                                      ns = ns,
+
+                                      downloadButton(ns("deDownload"), "Download Table")
+
+                     )
+
+                     ),
             tabPanel(
               title = "Plot",
               value = "dePlotTab",
 
               plotOutput(ns("dgePlot"), width = "800px", height = "500px"),
-              downloadButton(ns("downloaddgePlot"), "Download Curret Plot")
+              downloadButton(ns("downloaddgePlot"), "Download Plot")
             )
           )))
 }
@@ -129,7 +135,7 @@ sc_deUI <- function(id) {
 #' @param finData Reactive value containing a seurat object with clustered data
 #'
 #' @export
-#' @return Diffenretial Expression data
+#' @return  Returns Diffenretial Expression data
 sc_de <- function(input, output, session, finData) {
   de <- reactiveValues()
 
@@ -139,11 +145,15 @@ sc_de <- function(input, output, session, finData) {
         "<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
 
-        <p style='text-align: center'><b>This tab enables DE analysis of clustering results.</b> </p> <br>
-        To indentify Marker Genes for each cluster, proceed first by selecting the preferred DE method. <br>
+        <p style='text-align: center'>
+        <b>This tab enables DE analysis of clustering results.</b> </p> <br>
+        To indentify Marker Genes for each cluster,
+        proceed first by selecting the preferred DE method. <br>
         Then specify pre-filter options according to: <br>
-        Fold-change, adj. P-value threshold, and genes expressed in a minimum fraction of cells. <br> <br>
-        <i>Note: MAST was shown to be among the best scRNA-Seq DE methods (Soneson & Robinson, 2018),
+        Fold-change, adj. P-value threshold,
+        and genes expressed in a minimum fraction of cells. <br> <br>
+        <i>Note: MAST was shown to be among
+        the best scRNA-Seq DE methods (Soneson & Robinson, 2018),
         as such it is likely the best option here. </i> </div>"
       )
     } else {
@@ -153,7 +163,6 @@ sc_de <- function(input, output, session, finData) {
 
   ## Generate DE Data
   observeEvent(input$dgeButton, {
-    # if(!is.null(finData$finalData)){
     show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
 
     if(input$dgeTestCombo == "DESeq2"){
@@ -174,7 +183,10 @@ sc_de <- function(input, output, session, finData) {
 
     hide_waiter()
 
-    # write.csv(de$markers, file="output/AllMarkerGenes.csv", row.names = FALSE)
+    write.csv(de$markers, file=paste0(tempdir(),
+                                      "/AllMarkerGenes_",
+                                      input$dgeTestCombo,
+                                      ".csv"), row.names = FALSE)
 
     output$dgeTable <-
       DT::renderDataTable(if (input$dgeClusterCheck) {
@@ -184,8 +196,6 @@ sc_de <- function(input, output, session, finData) {
         de$markers[de$markers$cluster == input$dgeClustInput, 1:(ncol(de$markers)-1)] %>% datatable() %>%
           formatSignif(columns = c(1:2, 5), digits = 4)
       }, options = list(pageLength = 10))
-    # }
-
   })
 
 
@@ -266,6 +276,17 @@ sc_de <- function(input, output, session, finData) {
     }
   )
 
+  output$deDownload <- downloadHandler(
+    filename = function() {
+      paste(format(Sys.time(), "%y-%m-%d_%H-%M"), "_deResults" , ".csv", sep = "")
+    },
+    content = function(file) {
+      data <- de$markers
+
+      write.csv(data, file)
+    }
+  )
+
   return(de)
 }
 
@@ -279,7 +300,7 @@ sc_de <- function(input, output, session, finData) {
 #' @param geneNo Number of genes to be displayed
 #'
 #' @export
-#' @return Diffenretial Expression data
+#' @return Returns DE Heatmap
 getClusterHeatmap <- function(s_object, markers, geneNo) {
   topMarkers <-
     markers %>% group_by(cluster) %>% top_n(n = geneNo, wt = avg_logFC)
@@ -299,7 +320,7 @@ getClusterHeatmap <- function(s_object, markers, geneNo) {
 #'
 #'
 #' @export
-#' @return Diffenretial Expression data
+#' @return Returns DE Gene Plots
 genePlot <- function(finalData, plotType, geneName, session) {
   out <- tryCatch(
     {
@@ -307,7 +328,7 @@ genePlot <- function(finalData, plotType, geneName, session) {
         VlnPlot(finalData, features = geneName)
 
       } else if (plotType == 2) {
-        FeaturePlot(finalData, features = geneName)
+        FeaturePlot(finalData, features = geneName, pt.size = 1.5)
 
       } else if (plotType == 3) {
         RidgePlot(finalData, features = as.character(geneName))
@@ -322,7 +343,7 @@ genePlot <- function(finalData, plotType, geneName, session) {
           type = "error"
       )
 
-      return(NA)      # Choose a return value in case of error
+      return(NA)
     }
   )
   return(out)
