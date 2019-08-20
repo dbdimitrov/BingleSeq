@@ -12,7 +12,7 @@ plotPCA(data, expressionColumns)
 \item{expressionColumns}{The columns with the Normalized Counts}
 }
 \value{
-the PCA plot
+Returns a PCA plot
 }
 \description{
 Uses factoextra package to plot a PCA plot

@@ -19,7 +19,7 @@ dePipelineCaller(filteredCounts, conditionNo, replicateNo, selectedPackage,
 \item{readCounts}{The filtered CountTable}
 }
 \value{
-The results of the appropriate DE pipeline
+Returns the results of the appropriate DE pipeline
 }
 \description{
 Function that calls the appropriate DGE pipeline

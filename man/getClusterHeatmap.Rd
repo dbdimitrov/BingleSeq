@@ -14,7 +14,7 @@ getClusterHeatmap(s_object, markers, geneNo)
 \item{geneNo}{Number of genes to be displayed}
 }
 \value{
-Diffenretial Expression data
+Returns DE Heatmap
 }
 \description{
 Heatmap generated with Suerat

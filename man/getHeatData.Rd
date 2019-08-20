@@ -27,7 +27,7 @@ getHeatData(data, offset, replicates, geneNo, type, pvalue, fchange,
 \item{names}{Boolean - whether to show names or not}
 }
 \value{
-table The data that corresponds to the displayed heatmap
+Returns the data that corresponds to the displayed heatmap
 }
 \description{
 Returns Heatmap data

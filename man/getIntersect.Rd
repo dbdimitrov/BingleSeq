@@ -12,7 +12,7 @@ getIntersect(xlist, intersectID)
 \item{intersectID}{The corresponding number of the intersect of interest}
 }
 \value{
-The names of the genes within that intersect
+Returns the names of the genes within that intersect
 }
 \description{
 Returns the Genes of a given intersect within the Venn Diagram

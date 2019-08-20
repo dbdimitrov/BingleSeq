@@ -12,7 +12,7 @@ goInfo(goID, session)
 \item{session}{Current R session}
 }
 \value{
-The concatinated GO TERM information
+Returns the concatinated GO TERM information
 }
 \description{
 Calls GOTERM function and concatinates output

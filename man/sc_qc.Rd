@@ -10,7 +10,7 @@ sc_qc(input, output, session, countsT)
 \item{countsT}{countTable loaded by loadTab}
 }
 \value{
-A reactive value contaning the filtered data
+Returns a reactive value contaning the filtered data
 }
 \description{
 Single Cell Quality Control UI

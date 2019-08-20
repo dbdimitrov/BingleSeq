@@ -10,7 +10,7 @@ plotAllVenn(xlist)
 \item{xlist}{A list with DE genes according to the different packages}
 }
 \value{
-A Venn Diagram
+Returns a Venn Diagram
 }
 \description{
 Visual representation of Package Agreement/Disagreement

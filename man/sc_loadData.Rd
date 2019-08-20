@@ -7,7 +7,7 @@
 sc_loadData(input, output, session)
 }
 \value{
-counts - The count table to be used in the sc analysis
+Returns a count table to be used in the sc analysis
 }
 \description{
 Enables the upload of two types of data: 10x Genomics and Count data

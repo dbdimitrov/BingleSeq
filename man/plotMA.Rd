@@ -18,7 +18,7 @@ plotMA(data, expColumns, fcColumn, fcValue, pValue)
 \item{pValue}{P-value threshold}
 }
 \value{
-The MA plot
+Returns a MA plot
 }
 \description{
 Generate an MA plot

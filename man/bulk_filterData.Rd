@@ -10,7 +10,7 @@ bulk_filterData(input, output, session, counts)
 \item{counts}{The loaded Count Table}
 }
 \value{
-filt A reactive value with the filtered Count Table
+Returns a reactive value with the filtered Count Table
 }
 \description{
 Bulk Filter Tab Server

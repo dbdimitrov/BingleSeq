@@ -10,7 +10,7 @@ sc_de(input, output, session, finData)
 \item{finData}{Reactive value containing a seurat object with clustered data}
 }
 \value{
-Diffenretial Expression data
+Returns Diffenretial Expression data
 }
 \description{
 Single Cell Differential Expession Tab Server

@@ -10,7 +10,7 @@ sc_norm(input, output, session, filtData)
 \item{filtData}{Reactive value containing the suerat Object with filtered data}
 }
 \value{
-Reactive value containing Seurat object with normalized data
+Returns a reactive value containing Seurat object with normalized data
 }
 \description{
 Single Cell Normalize Tab Server

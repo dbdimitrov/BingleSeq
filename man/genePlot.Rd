@@ -14,7 +14,7 @@ genePlot(finalData, plotType, geneName, session)
 \item{geneName}{The name/symbol of the gene of interest}
 }
 \value{
-Diffenretial Expression data
+Returns DE Gene Plots
 }
 \description{
 Function with exception handling that enables comparison of genes

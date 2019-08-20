@@ -18,7 +18,7 @@ normalizeSeurat(s_object, normalizeMet, scaleF, varianceMet, nfeat)
 \item{nfeat}{The number of features to be used in estimating variance}
 }
 \value{
-Seurat object with normalized data
+Returns a Seurat object with normalized data
 }
 \description{
 Single Cell Normalize function

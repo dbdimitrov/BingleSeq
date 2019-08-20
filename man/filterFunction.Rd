@@ -4,7 +4,7 @@
 \alias{filterFunction}
 \title{Filter Function}
 \usage{
-filterFunction(data, method, value)
+filterFunction(data, method, value, sampleNo)
 }
 \arguments{
 \item{method}{Filter Option (CPM, MAX, Median)}
@@ -14,7 +14,7 @@ filterFunction(data, method, value)
 \item{countTable}{The loaded Count Table}
 }
 \value{
-countTable The filtered Count Table
+Returns the filtered Count Table
 }
 \description{
 Filter Function

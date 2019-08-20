@@ -16,7 +16,7 @@ sc_getAllDE(data, mPCT, fc, pValue)
 \item{pValue}{p-value threshold}
 }
 \value{
-A list with DE genes according to the different methods
+Returns a list with DE genes according to the different methods
 }
 \description{
 SC Generate Data required to compare DE Method Results

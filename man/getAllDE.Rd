@@ -14,7 +14,7 @@ getAllDE(readCounts, conditionNo, replicateNo)
 \item{replicateNo}{Number of Replicates}
 }
 \value{
-A list with DE genes according to the different packages
+Returns a list with DE genes according to the different packages
 }
 \description{
 Bulk Generate Data required to compare DE Package Results

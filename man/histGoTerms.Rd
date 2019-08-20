@@ -12,7 +12,7 @@ histGoTerms(data, gof, session)
 \item{gof}{Boolean to use GO:Terms or GO:ID}
 }
 \value{
-p The histogram
+Returns a top 10 GO terms histogram
 }
 \description{
 Creates a GO Histogram with GO terms or GO IDs

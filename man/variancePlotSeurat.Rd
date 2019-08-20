@@ -10,7 +10,7 @@ variancePlotSeurat(s_object)
 \item{s_object}{Suerat Object with filtered data}
 }
 \value{
-Variance estimation plot with the ten most variable genes
+Returns a variance estimation plot
 }
 \description{
 Single Cell Plot Variance Function

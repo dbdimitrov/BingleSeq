@@ -9,6 +9,9 @@ load10xData(path, session)
 \arguments{
 \item{path}{The directory containing the 10X genomics data}
 }
+\value{
+Returns 10x Genomics Data
+}
 \description{
 Simply adds TryCatch statement to the function supplied by Seurat
 }

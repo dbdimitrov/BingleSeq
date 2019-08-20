@@ -18,7 +18,7 @@ sc_getDEgenes(data, type, pvalue, fchange, byClust, clusterNo)
 \item{condition}{Filters by a given condition (AvB, BvC, etc.)}
 }
 \value{
-gene.vector a vector with DE gene names
+Returns a vector with DE gene names
 }
 \description{
 Filters the DE results table and returns the names of the DE genes

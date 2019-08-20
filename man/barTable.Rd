@@ -16,7 +16,7 @@ barTable(data, conditionNo, pvalue, fchange)
 \item{fchange}{Fold-Change threshold}
 }
 \value{
-df The table to be used in the Barchart
+Returns the table to be used in the Barchart
 }
 \description{
 Generate the corresponding table of the Barchart

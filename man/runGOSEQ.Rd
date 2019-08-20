@@ -2,7 +2,7 @@
 % Please edit documentation in R/bulk_goDataTab.R
 \name{runGOSEQ}
 \alias{runGOSEQ}
-\title{Functional Annotation Pipeline (Bulk)}
+\title{Functional Annotation Pipeline (Both pipelines)}
 \usage{
 runGOSEQ(deGenes, data, genome, symbol, testType, pCorrect, pValue, appNum,
   session)
@@ -25,7 +25,7 @@ runGOSEQ(deGenes, data, genome, symbol, testType, pCorrect, pValue, appNum,
 \item{appNum}{Format entered data appropriately to the app launched}
 }
 \value{
-GO.wall A dataframe with Functional Annotation Results
+Returns a dataframe with Functional Annotation Results
 }
 \description{
 Runs the GO pipeline according to the users preferences

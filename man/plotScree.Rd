@@ -12,7 +12,7 @@ plotScree(data, expressionColumns)
 \item{expressionColumns}{The columns with the Normalized Counts}
 }
 \value{
-the Scree plot
+Returns a Scree plot
 }
 \description{
 Uses factoextra package to plot a Scree plot

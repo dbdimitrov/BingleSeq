@@ -16,7 +16,7 @@ seuratQC(seurat_object, minF, maxF, session)
 \item{session}{Current R session supplied by the server}
 }
 \value{
-A Seurat_object with the filtered data
+Returns A Seurat_object with the filtered data
 }
 \description{
 Performs QC on Seurat object, which serves as a backbone for the sc pipeline

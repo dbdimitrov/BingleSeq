@@ -10,7 +10,7 @@ bulk_deData(input, output, session, fCounts)
 \item{fCounts}{The reactive value containing the filtered counts}
 }
 \value{
-A reactive value with differential expression results
+Returns a reactive value with differential expression results
 }
 \description{
 Differential Expression Tab Server

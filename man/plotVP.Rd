@@ -16,7 +16,7 @@ plotVP(data, fcColumn, fcValue, pValue)
 \item{pValue}{P-value threshold}
 }
 \value{
-The Volcano plot
+Retusn a Volcano plot
 }
 \description{
 Generate a Volcano plot

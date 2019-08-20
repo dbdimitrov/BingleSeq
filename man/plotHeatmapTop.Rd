@@ -5,7 +5,7 @@
 \title{Generate a Heatmap}
 \usage{
 plotHeatmapTop(data, offset, replicates, geneNo, type, pvalue, fchange,
-  conditionFC, names)
+  conditionFC, names, session)
 }
 \arguments{
 \item{data}{Differential Expression results (deTable)}
@@ -25,9 +25,11 @@ plotHeatmapTop(data, offset, replicates, geneNo, type, pvalue, fchange,
 \item{conditionFC}{The Fold-change column of the condition of interest}
 
 \item{names}{Boolean - whether to show names or not}
+
+\item{session}{Current R session}
 }
 \value{
-The heatmap
+Returns a heatmap
 }
 \description{
 Generate a Heatmap

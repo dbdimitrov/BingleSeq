@@ -14,7 +14,7 @@ plotContrastVenn(data, pvalue, fchange)
 \item{fchange}{Fold-Change threshold}
 }
 \value{
-The Venn Diagram
+Returns a Venn Diagram
 }
 \description{
 Creates a Venn diagram of the DE genes between the different conditions
