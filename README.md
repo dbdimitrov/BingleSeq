@@ -11,7 +11,7 @@ BingleSeq provides a comprehesnive solution to both Bulk and scRNA-Seq, as such 
 ### Bulk RNA-Seq
 The Bulk RNA-Seq part follows a typical pipeline used for the DE analysis of Bulk RNA-Seq count data and it makes use of differential expression packages DESeq2 (Love, Huber, and Anders, 2014), edgeR (Robinson et al., 2010), and Limma (Ritchie et al., 2015).
 
-![Kiku](figures\Bulk.jpg)
+![BingleSeq Bulk RNA-Seq pipeline](\\figures\Bulk.jpg)
 
 
 ### scRNA-Seq
