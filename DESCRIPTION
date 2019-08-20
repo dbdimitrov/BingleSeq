@@ -1,60 +1,26 @@
 Package: BingleSeq
 Type: Package
-Title: User-friendly R package for Bulk-RNA-Seq and sc-RNA-Seq analyses
-Version: 0.1.3
+Title: BingleSeq: A user-friendly R package for Bulk and Single-cell
+        RNA-Seq Data Analysis
+Version: 0.2.0
 Author: Daniel Dimitrov
 Maintainer: Daniel Dimitrov <2412499d@student.gla.ac.uk>
 Description: 
 License: MIT
 Encoding: UTF-8
 LazyData: true
-biocViews: 
-Imports: dplyr,
-    shiny,
-    shinyjs,
-    shinyFiles,
-    shinyWidgets,
-    waiter,
-    V8,
-    DT,
-    grDevices,
-    ggplot2,
-    VennDiagram,
-    factoextra,
-    fastcluster,
-    gridExtra,
-    ggrepel,
-    DESeq2,
-    edgeR,
-    limma,
-    ALDEx2,
-    MAST,
-    monocle,
-    Seurat,
-    scran,
-    SC3,
-    GenomeInfoDbData,
-    geneLenDataBase,
-    org.Mm.eg.db,
-    org.Hs.eg.db,
-    GO.db,
-    goseq
-Suggests: 
+biocViews:
+Imports: dplyr, shiny, shinyjs, shinyFiles, shinyWidgets, waiter, DT,
+        grDevices, ggplot2, VennDiagram, factoextra, fastcluster,
+        gridExtra, ggrepel, DESeq2, edgeR, limma, MAST,
+        monocle, Seurat, scran, SC3, GenomeInfoDbData, geneLenDataBase,
+        org.Mm.eg.db, org.Hs.eg.db, GO.db, goseq
+Suggests:
 RoxygenNote: 6.1.1
-Collate: 
-    'bulk_compDataTab.R'
-    'bulk_deDataTab.R'
-    'bulk_filterDataTab.R'
-    'bulk_goDataTab.R'
-    'bulk_loadDataTab.R'
-    'bulk_plotDataTab.R'
-    'sc_clustTab.R'
-    'sc_compTab.R'
-    'sc_deTab.R'
-    'sc_goTab.R'
-    'sc_loadDataTab.R'
-    'sc_normTab.R'
-    'sc_qcTab.R'
-    'server.R'
-    'ui.R'
-    'startApp.R'
+Collate: 'bulk_compDataTab.R' 'bulk_deDataTab.R' 'bulk_filterDataTab.R'
+        'bulk_goDataTab.R' 'bulk_loadDataTab.R' 'bulk_plotDataTab.R'
+        'sc_clustTab.R' 'sc_compTab.R' 'sc_deTab.R' 'sc_goTab.R'
+        'sc_loadDataTab.R' 'sc_normTab.R' 'sc_qcTab.R' 'server.R'
+        'ui.R' 'startApp.R'
+NeedsCompilation: no
+Packaged: 2019-08-17 08:54:51 UTC; Daniel
