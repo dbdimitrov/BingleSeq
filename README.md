@@ -3,7 +3,7 @@ BingleSeq - A user-friendly R package for Bulk and Single-cell RNA-Seq data anal
 
 
 ## About
-BingleSeq provides a comprehesnive solution to both Bulk and scRNA-Seq, as such it is best to look at BingleSeq as two separate parts.
+BingleSeq provides a comprehesnive solution to both Bulk and scRNA-Seq analyses, as such it is best to look at BingleSeq as two separate parts.
 
 
 
@@ -13,13 +13,25 @@ The Bulk RNA-Seq part follows a typical pipeline used for the DE analysis of Bul
 
 ![BingleSeq Bulk RNA-Seq pipeline](/figures/Bulk.jpg)
 
+#### Input
+
+BingleSeq's Bulk RNA-Seq pipeline accepts count tables in the following format:
+
+![BingleSeq Bulk RNA-Seq format](/figures/Bulk_format.jpg)
+
 
 ### scRNA-Seq
 The scRNA-Seq part is based on Seurat’s pipeline (Satija et al., 2015) and follows a typical scRNA-Seq pipeline. Nonetheless, clustering can also be performed with monocle and SC3 packages (Trapnell et al., 2014; Kiselev et al., 2017). 
 
-
 ![BingleSeq Single-Cell RNA-Seq pipeline](/figures/sc.jpg)
 
+
+
+#### Input
+
+BingleSeq's scRNA-Seq pipeline accepts 10x genomics data as well as count tables in the following format:
+
+![BingleSeq Bulk RNA-Seq format](/figures/sc_format.jpg)
 
 
 ### Prerequisites
