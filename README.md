@@ -165,6 +165,7 @@ Following normalization, the ‘Clustering’ tab is generated which implements 
 ![BingleSeq Bulk RNA-Seq sc clustEblow](/figures/sc_clustElbow.PNG)
 
 In addition to the Elbow plot, BingleSeq also implements Seurat's PC heatmaps, as a confirmation option available after clustering.
+  
 ![BingleSeq Bulk RNA-Seq sc clustHeat](/figures/sc_clustHeat.PNG)
 
 Once the count data is scaled and linear dimensionality reduction performed, users can proceed to unsupervised clustering with Seurat, SC3, and monocle. When using Seurat for unsupervised clustering, users must specify the number of PCs to be included in the analysis as well as the value of its ‘Resolution’ parameter. The latter parameter is used to set the ‘granularity’ of the clustering and as such it controls the number of clusters. The authors suggest that the optimal Resolution for datasets with ~3000 cells is 0.6-1.2 and it is typically higher for larger datasets. Users can also choose from Seurat’s inbuilt clustering algorithms including Louvain and SLM algorithms.
