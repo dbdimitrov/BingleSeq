@@ -222,7 +222,7 @@ The scRNA-Seq part of BingleSeq incorporates functional annotation in an analogo
 #### 7.	DE Method Comparison
 The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to the ‘DE Package Comparison’ tab in Bulk RNA-Seq. The only differences are that scRNA-Seq Overlap functionality enables filtering according to the same parameters used in marker gene identification. Furthermore, rather than comparing the different packages, it compares the DE Methods implemented within Seurat. These include: DE testing with MAST, Wilcoxon Rank Sum Test, and Student’s T test.
 
-
+*Also, note that Rank-based consensus is yet to be implemented for the scRNA-Seq pipeline*
 
 
 ## Built With
