@@ -208,7 +208,7 @@ Prior to running the DE analysis, users are prompted to enter the following filt
 
 Furthermore, by using Seurat’s inbuilt visualization options, BingleSeq provides tools for the exploration of DE results. These tools include cluster heatmap with user-specified gene number as well as exploration of specific genes via Violin, Feature, and Ridge plots.
 
-![BingleSeq Bulk RNA-Seq sc deTab](/figures/sc_deFigs.PNG)
+![BingleSeq Bulk RNA-Seq sc deFigs](/figures/sc_deFigs.PNG)
 
 *A) Heatmap showing the top 10 genes for each cluster in the 2700 PBMCs dataset, while Violin B), Feature C), and Ridge D) plots are shown for MS4A1 gene – a biomarker of B lymphocytes*
 
