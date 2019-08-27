@@ -89,11 +89,11 @@ Subsequent to filtering is the ‘Differential Expression’ tab, where the user
 
 
 #### 4.	Visualization
-In a typical DE analysis workflow, the next stage following DE analysis would be to proceed to the various visualization techniques. BingleSeq offers this functionality within the ‘Visualize Data’ tab, which allows users to pick from several key plotting techniques including a PCA plot (A), Scree plot (B), Barchart (C), Volcano plot (D), MA plot (E), Venn Diagram (F), and a Heatmap (G). *The Venn Diagram was generated using a three-group simulated dataset.*
+In a typical DE analysis workflow, the next stage following DE analysis would be to proceed to the various visualization techniques. BingleSeq offers this functionality within the ‘Visualize Data’ tab, which allows users to pick from several key plotting techniques including a PCA plot (A), Scree plot (B), Barchart (C), Volcano plot (D), MA plot (E), Venn Diagram (F), and a Heatmap (G). *Note that the Venn Diagram was generated using a three-group simulated dataset.*
 
 ![BingleSeq Bulk RNA-Seq de Data](/figures/bulk_visData.PNG)
 
-*Note that these visualization techniques were implemented with customization in mind, as users can specify parameters such as p-value threshold, fold-change threshold, and contrast of interest. Due to their broad usability, heatmaps (G) were designed as BingleSeq’s most customizable plotting component. Furthemore, users can download the genes displayed in the heatmap.*
+BingleSeq's visualization techniques were implemented with customization in mind, as users can specify parameters such as p-value threshold, fold-change threshold, and contrast of interest. Due to their broad usability, heatmaps (G) were designed as BingleSeq’s most customizable plotting component. Furthemore, users can download the genes displayed in the heatmap.
 
 ![BingleSeq Bulk RNA-Seq heat Data](/figures/bulk_heatmap.PNG)
 
