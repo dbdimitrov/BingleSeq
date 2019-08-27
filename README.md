@@ -135,15 +135,18 @@ Furthermore, the DE results from the same packages are used to generate a **Rank
 
 #### 0. Data used
 For the purpose of representation, a 10x genomics dataset was utilized (https://bit.ly/2Z3IUUk), which is also used in the Seurat package tutorial (https://bit.ly/2HlBfKx).
-
+  
+  
 #### 1.	Load Count Data
 To begin the analysis of scRNA-Seq data, users can supply gene count data in two input types. The first input type is ‘10x Genomics data’ in the form of a directory containing 10x Genomics protocol output files. These files include a matrix.mtx, barcodes.tsv, and genes.tsv files which represent the expression matrix, cell barcodes, and gene symbols, respectively. The second input type is a count table which must follow a specific format (shown above).
-
+  
+  
 #### 2.	Quality Control
 Once the data is loaded, the ‘Quality Control’ tab is generated which enables users to filter unwanted cells and features. Users can filter genes detected below a certain number of cells and cells with less than a certain number of expressed genes. These parameters are used when creating the initial Seurat object. Cell outliers can then be filtered according to the number of expressed features per cell. Visual aid is provided for filtering in terms of Violin plots which represent the genes per cell and the number of UMIs.
 
 ![BingleSeq Bulk RNA-Seq sc qcData](/figures/sc_qcData.PNG)
-
+  
+  
 #### 3.	Normalization
 After excluding unwanted cells and features from the dataset, the next step is to normalize the data. BingleSeq provides two Seurat-supplied global-scaling normalization options. The first one is the “LogNormalize” method in which gene counts for each cell are divided by the total counts for that cell, multiplied by a ‘scale factor’, and then natural-log transformed. The second method is “Relative Counts” which follows the same procedure without the log transformation. Seurat's authors recommend using the former method when working with integer counts and the latter when working with relative counts. 10e4 is the recommended and default scale factor option, but when using CPM values the scale factor should be set to 10e6.
 
@@ -163,23 +166,29 @@ Once normalization and feature selection methods are complete, a Variable Featur
 Following normalization, the ‘Clustering’ tab is generated which implements functionality for scaling of the data, dimensionality reduction with PCA, PC selection, and unsupervised clustering. The former three are done simultaneously and Seurat’s ‘PCElbowPlot’ is used to generate and return an elbow plot. The returned elbow plot provides an ad hoc method for determining the true dimensionality of the dataset (i.e. PC Selection). Selecting which PCs to include in Seurat and monocle clustering methods is an essential step as it enables a large portion of technical noise to be excluded.
 
 ![BingleSeq Bulk RNA-Seq sc clustEblow](/figures/sc_clustElbow.PNG)
-
+  
+  
 In addition to the Elbow plot, BingleSeq also implements Seurat's PC heatmaps, as a confirmation option available after clustering.
   
 ![BingleSeq Bulk RNA-Seq sc clustHeat](/figures/sc_clustHeat.PNG)
+*A) represents the 1st PC Heatmap with the top 10 most variable Genes and it is very likely to represent the true dimensionality of the dataset. In contrast, B) represents the 15th PC Heatmap and it seems unlikely to represent true dimensionality.*
+
 
 Once the count data is scaled and linear dimensionality reduction performed, users can proceed to unsupervised clustering with Seurat, SC3, and monocle. When using Seurat for unsupervised clustering, users must specify the number of PCs to be included in the analysis as well as the value of its ‘Resolution’ parameter. The latter parameter is used to set the ‘granularity’ of the clustering and as such it controls the number of clusters. The authors suggest that the optimal Resolution for datasets with ~3000 cells is 0.6-1.2 and it is typically higher for larger datasets. Users can also choose from Seurat’s inbuilt clustering algorithms including Louvain and SLM algorithms.
 
 ![BingleSeq Bulk RNA-Seq sc clustSeurat](/figures/sc_clustSeurat.PNG)
 *tSNE plot produced using 0.5 as granularity parameter and the first 10 PCs*
-
+  
+  
 When clustering with monocle, users are requested to specify the number of PCs to be included in the analysis. Also, if required users can further minimize noise by filtering the gene counts according to the minimum expression level prior to clustering via the ‘Lower Detection Parameter’. Users can also pick from monocle’s inbuilt clustering algorithms, which include Density Peak and Louvain algorithms. Furthermore, users can choose whether to explicitly specify the number of clusters or use monocle to estimate the number of clusters.
-
+  
+  
 ![BingleSeq Bulk RNA-Seq sc clustMono](/figures/sc_clustMonocle.PNG)
 *tSNE plot produced by explicitly setting the number of clusters to 9 and using the first 10 PCs*
 
 
 Unsupervised clustering with SC3 enables users to specify the number of random datasets used in clustering, as such it is used to control the clustering complexity and hence computational time. By default, this parameter is set to 1000 when working with less than 2000 cells and to 50 when working with more than 2000 cells. Users can also use SC3’s inbuilt filtering options to further reduce noise by filtering out genes below and above certain dropout (zero value) percentage thresholds. Similarly to monocle, the number of clusters can be supplied by users or estimated with SC3.
+
 ![BingleSeq Bulk RNA-Seq sc clustSC3](/figures/sc_clustSC3.PNG)
 *tSNE plot produced by explicitly setting the number of clusters to 9 and 50 random datsets (nStart)*
   
@@ -189,14 +198,24 @@ Unsupervised clustering with SC3 enables users to specify the number of random d
 
 #### 5.	Differential Expression
 Following clustering, DE analysis can be conducted using Seurat’s inbuilt functionality to identify marker genes. Users can perform marker gene identification by using the following inbuilt DE testing methods: Student’s T test, Wilcoxon Rank Sum test, and Logistic regression. Additionally, DE analysis can also be performed with DESEq2 and MAST packages (Love, Huber, and Anders, 2014; Finak et al., 2015). Note that some of Seurat’s inbuilt DE testing methods were removed as their result formats were inconsistent with downstream analyses. Also, DESeq2 is magnitudes slower than other DE tests; thus, making it impractical when working with large datasets.
-Prior to running the DE analysis, users are prompted to enter the following filtering parameters: genes expressed in a minimum fraction of cells, fold-change, and adjusted p-value. 
+Prior to running the DE analysis, users are prompted to enter the following filtering parameters: genes expressed in a minimum fraction of cells, fold-change, and adjusted p-value.
+
+![BingleSeq Bulk RNA-Seq sc deTab](/figures/sc_deTab.PNG)
+
 Furthermore, by using Seurat’s inbuilt visualization options, BingleSeq provides tools for the exploration of DE results. These tools include cluster heatmap with user-specified gene number as well as exploration of specific genes via Violin, Feature, and Ridge plots.
+
+![BingleSeq Bulk RNA-Seq sc deTab](/figures/sc_deFigs.PNG)
+
+*A) Heatmap showing the top 10 genes for each cluster in the 2700 PBMCs dataset, while Violin B), Feature C), and Ridge D) plots are shown for MS4A1 gene – a biomarker of B lymphocytes*
+
 
 #### 6.	Functional Annotation
 The scRNA-Seq part of BingleSeq incorporates functional annotation in an analogous manner to its Bulk RNA-Seq counterpart. The only difference is that the subsets of DEGs to be used in the GOseq pipeline can be filtered according to the cluster they belong to; thus, allowing users to assess each cluster independently. 
-
+  
+  
 #### 7.	DE Method Comparison
-The scRNA-Seq part also implements a ‘DE Method Comparison’ tab which is analogous to the ‘DE Package Comparison’ tab in Bulk RNA-Seq. The differences are that scRNA-Seq Overlap functionality enables filtering according to the same parameters used in marker gene identification. Furthermore, rather than comparing the different packages, it compares the DE tests implemented within Seurat. These include: DE testing with MAST, Wilcoxon Rank Sum Test, and Student’s T test.
+The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to the ‘DE Package Comparison’ tab in Bulk RNA-Seq. The only differences are that scRNA-Seq Overlap functionality enables filtering according to the same parameters used in marker gene identification. Furthermore, rather than comparing the different packages, it compares the DE Methods implemented within Seurat. These include: DE testing with MAST, Wilcoxon Rank Sum Test, and Student’s T test.
+
 
 
 
@@ -208,6 +227,8 @@ The scRNA-Seq part also implements a ‘DE Method Comparison’ tab which is ana
 
 ## References
 Carlson, M. Falcon, S., Pages, H., Li, N., 2019. GO.db: A set of annotation maps describing the entire Gene Ontology. R package version 3.8.2.
+
+Finak, G., McDavid, A., Yajima, M., Deng, J., Gersuk, V., Shalek, A.K., Slichter, C.K., Miller, H.W., McElrath, M.J., Prlic, M. and Linsley, P.S., 2015. MAST: a flexible statistical framework for assessing transcriptional changes and characterizing heterogeneity in single-cell RNA sequencing data. Genome biology, 16(278) doi: 10.1186/s13059-015-0844-5.
 
 Kiselev, V.Y., Kirschner, K., Schaub, M.T., Andrews, T., Yiu, A., Chandra, T., Natarajan, K.N., Reik, W., Barahona, M., Green, A.R. and Hemberg, M., 2017. SC3: consensus clustering of single-cell RNA-seq data. Nature methods, 14(5), pp. 483–486.
 
