@@ -106,7 +106,7 @@ Following DE analysis, BingleSeq enables the Functional Annotation analysis of D
 Once the GOseq pipeline is run and completed, a table with results is returned.
 
 ![BingleSeq Bulk RNA-Seq bulkGO Results](/figures/bulk_GOresults.PNG)
-*Note that these results were obtained with real data taken from McFarlane et al., 2019*
+*Note that these results were generated using real data taken from McFarlane et al., 2019*
 
 
 Users can also generate GO term histograms with the top 10 GO terms and to choose whether to display their GO identifiers (GO:IDs) or their corresponding terms.
@@ -136,6 +136,8 @@ Furthermore, the DE results from the same packages are used to generate a Rank-b
 
 
 ## References
+Carlson, M. Falcon, S., Pages, H., Li, N., 2019. GO.db: A set of annotation maps describing the entire Gene Ontology. R package version 3.8.2.
+
 Kiselev, V.Y., Kirschner, K., Schaub, M.T., Andrews, T., Yiu, A., Chandra, T., Natarajan, K.N., Reik, W., Barahona, M., Green, A.R. and Hemberg, M., 2017. SC3: consensus clustering of single-cell RNA-seq data. Nature methods, 14(5), pp. 483–486.
 
 Love, M.I., Huber, W. and Anders, S., 2014. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome biology, 15(12). doi:10.1186/s13059-014-0550-8
