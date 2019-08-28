@@ -115,12 +115,13 @@ Users can also generate GO term histograms with the top 10 GO terms and to choos
 
 ![BingleSeq Bulk RNA-Seq bulkGO hist](/figures/bulk_GOhist.PNG)
 
-Moreover, users can obtain further information about a given GO term by querying its GO:ID using the ‘GO.db’ package (Carlson et al., 2019). Note that in the current state of BingleSeq, only Mouse and Human genomes are supported (Carlson, 2019A; Carlson, 2019B).
+Moreover, users can obtain further information about a given GO term by querying its GO:ID using the ‘GO.db’ package (Carlson et al., 2019). 
 
 ![BingleSeq Bulk RNA-Seq bulkGO query](/figures/bulk_GOquery.PNG)
-
-
-
+  
+Note that in the current state of BingleSeq, only Mouse and Human genomes are supported.
+  
+  
 #### 6.	DE Package Comparison
 BingleSeq supplies users with an option to assess the agreement between the different DE analysis packages. This is done using a Venn diagram which represents the overlap of DE analysis results obtained using DESeq2, edgeR, and limma on the same dataset. Moreover, users can download the genes from the different intersects of the Venn Diagram. 
 
