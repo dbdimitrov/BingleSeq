@@ -145,7 +145,7 @@ To begin the analysis of scRNA-Seq data, users can supply gene count data in two
   
   
 #### 2.	Quality Control
-Once the data is loaded, the ‘Quality Control’ tab is generated which enables users to filter unwanted cells and features. Users can filter genes detected below a certain number of cells and cells with less than a certain number of expressed genes. These parameters are used when creating the initial Seurat object. Cell outliers can then be filtered according to the number of expressed features per cell. Visual aid is provided for filtering in terms of Violin plots which represent the genes per cell and the number of UMIs.
+Once the data is loaded, the ‘Quality Control’ tab is generated which enables users to filter unwanted cells and features. Users can filter genes detected below a certain number of cells and cells with less than a certain number of expressed genes. These parameters are used when creating the initial Seurat object. Cell outliers can then be filtered according to the number of expressed features per cell. Visual aid is provided for filtering in terms of Violin plots which represent the genes per cell and the number of unique molecules.
 
 ![BingleSeq Bulk RNA-Seq sc qcData](/figures/sc_qcData.PNG)
   
