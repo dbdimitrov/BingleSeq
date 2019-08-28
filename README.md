@@ -108,7 +108,7 @@ Following DE analysis, BingleSeq enables the Functional Annotation analysis of D
 Once the GOseq pipeline is run and completed, a table with results is returned.
 
 ![BingleSeq Bulk RNA-Seq bulkGO Results](/figures/bulk_GOresults.PNG)
-*Note that these results were generated using real data taken from McFarlane et al., 2019*
+*Note that these results were generated using real data taken from McFarlane et al., 2019.*
 
 
 Users can also generate GO term histograms with the top 10 GO terms and to choose whether to display their GO identifiers (GO:IDs) or their corresponding terms.
@@ -160,7 +160,7 @@ Simultaneously with normalization, the highly variable features within the datas
 Once normalization and feature selection methods are complete, a Variable Features plot is returned and displayed. Seurat’s ‘Feature Selection’ methods include “VST”, “Mean Variance Plot”, and “Dispersion”.
 
 ![BingleSeq Bulk RNA-Seq sc varPlot](/figures/sc_variancePlot.PNG)
-*This plot was genered using the recommended/default settings and the "VST" variance estimation method*
+*This plot was genered using the recommended/default settings and the "VST" variance estimation method.*
   
 *Note that ‘Feature selection’ does not apply to monocle and SC3 clustering approaches and hence their inbuilt pre-clustering filter procedures were implemented. These procedures have a similar purpose to Seurat’s ‘Feature Selection’, as they can be used to filter out unwanted noise.*
   
@@ -182,7 +182,7 @@ Once the count data is scaled and linear dimensionality reduction performed, use
 
 ![BingleSeq Bulk RNA-Seq sc clustSeurat](/figures/sc_clustSeurat.PNG)
 
-*tSNE plot produced using 0.5 as granularity parameter and the first 10 PCs*
+*tSNE plot produced using 0.5 as granularity parameter and the first 10 PCs.*
   
   
 When clustering with monocle, users are requested to specify the number of PCs to be included in the analysis. Also, if required users can further minimize noise by filtering the gene counts according to the minimum expression level prior to clustering via the ‘Lower Detection Parameter’. Users can also pick from monocle’s inbuilt clustering algorithms, which include Density Peak and Louvain algorithms. Furthermore, users can choose whether to explicitly specify the number of clusters or use monocle to estimate the number of clusters.
@@ -190,14 +190,14 @@ When clustering with monocle, users are requested to specify the number of PCs t
   
 ![BingleSeq Bulk RNA-Seq sc clustMono](/figures/sc_clustMonocle.PNG)
 
-*tSNE plot produced by explicitly setting the number of clusters to 9 and using the first 10 PCs (without any additional filtering)*
+*tSNE plot produced by explicitly setting the number of clusters to 9 and using the first 10 PCs (without any additional filtering).*
 
 
 Unsupervised clustering with SC3 enables users to specify the number of random datasets used in clustering, as such it is used to control the clustering complexity and hence computational time. By default, this parameter is set to 1000 when working with less than 2000 cells and to 50 when working with more than 2000 cells. Users can also use SC3’s inbuilt filtering options to further reduce noise by filtering out genes below and above certain dropout (zero value) percentage thresholds. Similarly to monocle, the number of clusters can be supplied by users or estimated with SC3.
 
 ![BingleSeq Bulk RNA-Seq sc clustSC3](/figures/sc_clustSC3.PNG)
 
-*tSNE plot produced by explicitly setting the number of clusters to 9 and 50 random datsets (nStart) (without any additional filtering)*
+*tSNE plot produced by explicitly setting the number of clusters to 9 and 50 random datsets (nStart) (without any additional filtering).*
   
   
 *Each tSNE plot in BingleSeq is generated using the package with which clustering was performed.
@@ -224,7 +224,7 @@ The scRNA-Seq part of BingleSeq incorporates functional annotation in an analogo
 #### 7.	DE Method Comparison
 The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to the ‘DE Package Comparison’ tab in Bulk RNA-Seq. The only differences are that scRNA-Seq Overlap functionality enables filtering according to the same parameters used in marker gene identification. Furthermore, rather than comparing the different packages, it compares the DE Methods implemented within Seurat. These include: DE testing with MAST, Wilcoxon Rank Sum Test, and Student’s T test.
 
-*Also, note that Rank-based consensus is yet to be implemented for the scRNA-Seq pipeline*
+*Also, note that Rank-based consensus is yet to be implemented for the scRNA-Seq pipeline.*
 
 
 ## Built With
