@@ -2,7 +2,7 @@ Package: BingleSeq
 Type: Package
 Title: BingleSeq: A user-friendly R package for Bulk and Single-cell
         RNA-Seq Data Analysis
-Version: 0.2.0
+Version: 0.2.1
 Author: Daniel Dimitrov
 Maintainer: Daniel Dimitrov <2412499d@student.gla.ac.uk>
 Description: 
@@ -14,7 +14,7 @@ Imports: dplyr, shiny, shinyjs, shinyFiles, shinyWidgets, waiter, DT,
         grDevices, ggplot2, VennDiagram, factoextra, fastcluster,
         gridExtra, ggrepel, DESeq2, edgeR, limma, MAST,
         monocle, Seurat, scran, SC3, GenomeInfoDbData, geneLenDataBase,
-        org.Mm.eg.db, org.Hs.eg.db, GO.db, goseq
+        org.Mm.eg.db, org.Hs.eg.db, GO.db, goseq, sva, Harman
 Suggests:
 RoxygenNote: 6.1.1
 Collate: 'bulk_compDataTab.R' 'bulk_deDataTab.R' 'bulk_filterDataTab.R'
