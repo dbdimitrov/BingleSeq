@@ -147,7 +147,6 @@ server <- function(input, output, session) {
         })
 
 
-
         # Differential Expression Markers ----
         markers <- callModule(sc_de, "deTab", finalData)
 
@@ -174,7 +173,6 @@ server <- function(input, output, session) {
                              levels(finalData$finalData@active.ident)
                            ))
               )
-
             })
           }
         })
@@ -182,7 +180,6 @@ server <- function(input, output, session) {
 
         # Functional Annotation ----
         callModule(sc_go, "goTab", markers, counts)
-
 
 
         # Compare DE Methods ----
@@ -218,10 +215,7 @@ server <- function(input, output, session) {
           filt = FALSE,
           de = FALSE)
 
-
         plotChoices = list(
-          "PCA plot" = "pca",
-          "Scree plot" = "scree",
           "Barchart" = "bar",
           "Volcano Plot" = "volcano",
           "MA Plot" = "MA",
@@ -246,7 +240,7 @@ server <- function(input, output, session) {
         counts <- callModule(bulk_loadData, "loadTab")
 
         observe({
-          if (!is.null(counts$countTable) && !tabs$counts) {
+          if (!is.null(counts$countTable) && !is.null(counts$metaTable) && !tabs$counts) {
             appendTab(
               inputId = "mainPage",
               tabPanel(

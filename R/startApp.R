@@ -18,6 +18,8 @@
 #' @import ggrepel
 #' @import GenomeInfoDbData
 #' @import geneLenDataBase
+#' @import sva
+#' @import Harman
 #' @import DESeq2
 #' @import edgeR
 #' @import limma
@@ -56,6 +58,9 @@ startBingleSeq <- function() {
     library(reshape2)
     library(gridExtra)
     library(ggrepel)
+
+    library(Harman)
+    library(sva)
 
     library(DESeq2)
     library(edgeR)

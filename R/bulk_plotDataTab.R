@@ -324,37 +324,6 @@ bulk_plotData <- function(input, output, session, rv) {
 }
 
 
-#' Plot PCA
-#'
-#' Uses factoextra package to plot a PCA plot
-#'
-#' @param data Differential Expression results (deTable)
-#' @param expressionColumns The columns with the Normalized Counts
-#' @export
-#' @return Returns a PCA plot
-plotPCA <- function(data, expressionColumns) {
-  countTable <- data[, expressionColumns]
-  countTable <- as.matrix(sapply(countTable, as.numeric))
-  xx <- prcomp(t(countTable))
-
-  return(fviz_pca_ind(xx, repel = TRUE))
-}
-
-#' Plot Scree
-#'
-#' Uses factoextra package to plot a Scree plot
-#'
-#' @param data Differential Expression results (deTable)
-#' @param expressionColumns The columns with the Normalized Counts
-#' @export
-#' @return Returns a Scree plot
-plotScree <- function(data, expressionColumns) {
-  x <- data[, expressionColumns]
-  x <- as.matrix(sapply(x, as.numeric))
-  xx <- prcomp(t(x))
-
-  return(fviz_eig(xx))
-}
 
 #' Generate the corresponding table of the Barchart
 #'
@@ -421,10 +390,9 @@ barTable <- function(data, conditionNo, pvalue, fchange) {
                             downCount.AC)
   }
 
-  df <-
-    data.frame(comparison, direction, number_of_sig_genes) # Merge vector into df
-
-  # write.csv(df, file="output/DEGperCondition.csv", row.names = FALSE)
+  df <- data.frame(comparison,
+                   direction,
+                   number_of_sig_genes) # Merge vector into df
 
   return(df)
 }

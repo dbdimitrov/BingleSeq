@@ -23,7 +23,7 @@ bulk_loadDataUI <- function(id) {
         )
       ),
 
-      checkboxInput(ns("header"), tags$b("Header"), FALSE),
+      checkboxInput(ns("header"), tags$b("Header"), TRUE),
 
       radioButtons(
         ns("sep"),
@@ -89,7 +89,6 @@ bulk_loadDataUI <- function(id) {
 #' @return counts the loaded Count Table
 bulk_loadData <- function(input, output, session) {
   counts <- reactiveValues()
-
 
   output$helpLoadInfo <- renderUI({
     if(is.null(counts$countTable)){

@@ -21,8 +21,6 @@ bulk_filterDataUI <- function(id) {
         selected = 1
       ),
 
-      tags$hr(),
-
       numericInput(ns("filterValue"), label = "Filter Genes with CPM below", value = 1),
 
       conditionalPanel(
@@ -32,42 +30,78 @@ bulk_filterDataUI <- function(id) {
 
       ),
 
-      hr(),
-
       fluidRow(column(3, verbatimTextOutput(
         ns("filterValue")
       ))),
 
-      actionButton(ns("filterButton"), label = "Filter Data")
+      actionButton(ns("filterButton"), label = "Filter Data"),
 
+      tags$hr(),
+
+      conditionalPanel(
+        condition = "input.filterButton > 0",
+        ns = ns,
+
+        h4("Batch Effect Correction"),
+
+        selectInput(
+          ns("selectBatchMethod"),
+          label = "Select Method",
+          choices = list("Harman" = 1, "ComBat" = 2)
+        ),
+
+        actionButton(ns("batchButton"), label = "Correct Batch Effect")
+      )
     ),
 
     # Main panel for displaying outputs ----
-    mainPanel(fluidRow(
-      column(
-        width = 4,
-        offset = 0,
-        tags$h4("Raw Data Summary"),
-        DT::dataTableOutput(ns("prefilterTable"))
+    mainPanel(tabsetPanel(
+      id = ns("qcTabSet"),
 
+      tabPanel(title = "Filter Data",
+          fluidRow(
+          column(
+            width = 4,
+            offset = 0,
+            tags$h4("Raw Data Summary"),
+            DT::dataTableOutput(ns("prefilterTable"))
+
+          ),
+
+          column(
+            width = 4,
+            offset = 0,
+            tags$h4("Filtered Data Summary"),
+            DT::dataTableOutput(ns("postfilterTable"))
+
+          )
+        ),
+
+        fluidRow(
+          column(width = 4,
+                 offset = 0,
+                 plotOutput(ns("preFiltHist"))),
+
+          column(width = 4,
+                 offset = 0,
+                 plotOutput(ns("postFiltHist")))
+        )
       ),
 
-      column(
-        width = 4,
-        offset = 0,
-        tags$h4("Filtered Data Summary"),
-        DT::dataTableOutput(ns("postfilterTable"))
+      tabPanel(title = "Batch Effect Correction",
+               value = "batchTab",
+               htmlOutput(ns("preBatchHelp")),
+               plotOutput(ns("preBatchPCA"), width = "800px", height = "500px"),
 
+               conditionalPanel(
+                     condition = "input.filterButton > 0",
+                     ns = ns,
+                     tags$hr(),
+
+                     htmlOutput(ns("postBatchHelp")),
+                     plotOutput(ns("postBatchPCA"), width = "800px", height = "500px")
+               )
       )
-    ),
-    fluidRow(
-      column(width = 4,
-             offset = 0,
-             plotOutput(ns("preFiltHist"))),
-
-      column(width = 4,
-             offset = 0,
-             plotOutput(ns("postFiltHist")))
     ))
   )
 }
@@ -101,12 +135,22 @@ bulk_filterData <- function(input, output, session, counts) {
       qcHist(filt$filteredCounts)
     })
 
+    output$preBatchHelp <- renderUI({
+      HTML("<h4 style='padding-top: 8px'>Uncorrected Batch Samples PCA</h4>
+             <p style='padding-bot: 8px;'><i>
+              Samples are coloured by their Batch Groups.</i></p>")
+    })
+
+    output$preBatchPCA <- renderPlot({
+      plotPCA(filt$filteredCounts, 1, counts$metaTable)
+    })
+
     # Used to generate DE Tab only when generateSummary is OK
     filt$correctFormat <- TRUE
   })
 
 
-  observeEvent (input$selectFilter , {
+  observeEvent(input$selectFilter , {
     if (input$selectFilter == 1) {
       updateNumericInput(session,
                          "filterValue",
@@ -124,6 +168,33 @@ bulk_filterData <- function(input, output, session, counts) {
                          value = 10)
     }
   })
+
+
+  observeEvent (input$batchButton, {
+    if (input$selectBatchMethod == 1) {
+      filt$batchCorrected <- batchHarman(filt$filteredCounts, counts$metaTable)
+    } else if (input$selectBatchMethod == 2) {
+      filt$batchCorrected <- batchComBat(filt$filteredCounts, counts$metaTable)
+    }
+
+    if(!is.null(filt$batchCorrected)){
+
+      output$postBatchHelp <- renderUI({
+        HTML("<h4 style='padding-top: 8px'>Corrected Batch Samples PCA</h4>
+             <p style='padding-bot: 8px;'><i>
+              Samples are coloured by their Batch Groups.</i></p>")
+      })
+
+      output$postBatchPCA <- renderPlot({
+        plotPCA(filt$batchCorrected, 0, counts$metaTable)
+      })
+
+      updateTabsetPanel(session,
+                        "qcTabSet",
+                        selected = "batchTab")
+    }
+  })
+
 
   return(filt)
 }
@@ -191,4 +262,96 @@ qcHist <- function(data) {
     )
 
   return(p)
+}
+
+
+#' Harman Batch Effect Correction
+#'
+#' @param counts, Filtered Count Table
+#' @param meta, Metadata Table
+#'
+#' @export
+#' @return Returns batch-effect corrected table
+batchHarman <- function(counts, meta){
+
+  countTable  <- counts[, -1]
+  rownames(countTable) <- counts[, 1]
+
+  harman_results <- harman(countTable, meta$treatment, meta$batch, limit=0.95)
+
+  harman_corr <- reconstructData(harman_results)
+  harman_corr[harman_corr<0] <- 0
+
+
+  return(harman_corr)
+}
+
+
+#' ComBat Batch Effect Correction
+#'
+#' @param counts, Filtered Count Table
+#' @param meta, Metadata Table
+#'
+#' @export
+#' @return Returns batch-effect corrected table
+batchComBat <- function(counts, meta){
+
+  countTable  <- counts[, -1]
+  rownames(countTable) <- counts[, 1]
+
+  design <- model.matrix(~as.factor(treatment), data=meta)
+  combat_data = ComBat(as.matrix(countTable), batch=meta$batch, mod=design)
+
+  return(combat_data)
+}
+
+
+
+#' Plot PCA
+#'
+#' Uses factoextra package to plot a PCA plot
+#'
+#' @param data Differential Expression results (deTable)
+#' @param expressionColumns, 1 if gene IDs are a column
+#' @export
+#' @return Returns a PCA plot
+plotPCA <- function(data, expressionColumns, meta) {
+
+  if(expressionColumns == 1){
+    countTable  <- data[, -1]
+    rownames(countTable) <- data[, 1]
+  } else {
+    countTable <- data
+  }
+
+  if(is.data.frame(data)){
+    countTable <- as.matrix(sapply(countTable, as.numeric))
+  }
+
+  xx <- prcomp(t(countTable))
+
+  return(fviz_pca_ind(xx,
+                      repel = FALSE,
+                      habillage=meta$batch,
+                      title = "",
+                      axes.linetype=NA
+                      ) +
+           theme(panel.grid.minor=element_blank()))
+}
+
+
+#' Plot Scree
+#'
+#' Uses factoextra package to plot a Scree plot
+#'
+#' @param data Differential Expression results (deTable)
+#' @param expressionColumns The columns with the Normalized Counts
+#' @export
+#' @return Returns a Scree plot
+plotScree <- function(data, expressionColumns) {
+  x <- data[, expressionColumns]
+  x <- as.matrix(sapply(x, as.numeric))
+  xx <- prcomp(t(x))
+
+  return(fviz_eig(xx))
 }
