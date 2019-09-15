@@ -23,9 +23,7 @@ bulk_loadDataUI <- function(id) {
         )
       ),
 
-      tags$hr(),
-
-      checkboxInput(ns("header"), "Header", FALSE),
+      checkboxInput(ns("header"), tags$b("Header"), FALSE),
 
       radioButtons(
         ns("sep"),
@@ -38,14 +36,48 @@ bulk_loadDataUI <- function(id) {
         ),
 
         selected = ","
+      ),
+
+      tags$hr(),
+
+      ######################
+      h4("Load Meta Data"),
+
+      # Input: Select a metadata file ----
+      fileInput(
+        ns("metaFile1"),
+        "Choose Counts File",
+        multiple = FALSE,
+        accept = c(
+          "text/csv",
+          "text/comma-separated-values,text/plain",
+          ".csv"
+        )
+      ),
+
+      radioButtons(
+        ns("metaSep"),
+        "Separator",
+        choices = c(
+          Comma = ",",
+          Space = " ",
+          Tab = "\t",
+          Semicolumn = ";"
+        ),
+
+        selected = ","
       )
+
 
     ),
 
     # Main panel for displaying outputs ----
     mainPanel(
               htmlOutput(ns("helpLoadInfo")),
-              DT::dataTableOutput(ns("dto")))
+              DT::dataTableOutput(ns("dto")),
+              tags$br(),
+              htmlOutput(ns("metaInfo")),
+              DT::dataTableOutput(ns("metaTable")))
   )
 }
 
@@ -77,13 +109,33 @@ bulk_loadData <- function(input, output, session) {
     }
   })
 
-  # Load File ----
+
+
+  # Load Counts File ----
   observeEvent(input$file1, {
     counts$countTable <- read.csv(input$file1$datapath,
                                   header = input$header,
                                   sep = input$sep)
 
     output$dto <- DT::renderDataTable(DT::datatable(counts$countTable, options = list(pageLength = 10)))
+
+  })
+
+  observeEvent(input$metaFile1, {
+
+    if(!is.null(counts$countTable)){
+      output$metaInfo <- renderUI({
+          HTML("<h4 style='padding-top: 8px'>Preview Meta Data</h4>
+             <p style='padding-bot: 8px;'><i>Please ensure
+             that the table is formatted appropraitely.</i></p>")
+        })
+    }
+
+    counts$metaTable <- read.csv(input$metaFile1$datapath,
+                                  header = TRUE,
+                                  sep = input$metaSep)
+
+    output$metaTable <- DT::renderDataTable(DT::datatable(counts$metaTable, options = list(pageLength = 10)))
 
   })
 
