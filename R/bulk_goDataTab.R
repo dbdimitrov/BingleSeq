@@ -457,12 +457,11 @@ histGoTerms <- function(data, gof, session) {
       out <- transform(data, goVector = unlist(goVector))
       data$category <- as.factor(out$goVector)
       levels(data$category) <-
-        gsub("(.{20,}?)\\s", "\\1\n", levels(data$category))
+        gsub("(.{18,}?)\\s", "\\1\n", levels(data$category))
     }
 
-
     plot <-
-      ggplot(data, aes(category, -log2(over_represented_pvalue))) +
+      ggplot(data, aes(reorder(category, log2(over_represented_pvalue)), -log2(over_represented_pvalue))) +
       geom_col(color = "black") +
       theme_bw() +
       labs(y = "-log2(p-value)", x = "") +
