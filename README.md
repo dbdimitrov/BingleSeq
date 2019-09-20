@@ -79,7 +79,7 @@ To begin DE analysis of Bulk RNA-Seq data, first a count table with a specific f
 
 ![BingleSeq Bulk RNA-Seq Load Data](/figures/bulk_loadData.PNG)
 
-Similarly, a metadata table is also required that also requires a specific format ()
+Similarly, a metadata table is also required that also requires a specific format.
 
 
 #### 2.	Quality Control
@@ -90,7 +90,7 @@ When a count table is uploaded the ‘Quality Control’ tab is generated. This 
 Moreover, if required Batch effect correction is also available with Harman and ComBat (Leek et al. 2016; Oytam et al., 2019).
 
 ![BingleSeq Bulk RNA-Seq Batch Correction](/figures/batchCorrected.jpg)
-
+*Batch effect corrected using Harman package on example data acquired from HarmanData package (Bowden , Ross, Oytam, 2019)*
 
 
 #### 3.	Differential Expression 
@@ -248,6 +248,8 @@ The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to
 
 
 ## References
+Bowden J, Ross J, Oytam Y (2019). HarmanData: Data for the Harman package. R package version 1.12.0, http://www.bioinformatics.csiro.au/harman/.
+
 Carlson, M. Falcon, S., Pages, H., Li, N., 2019. GO.db: A set of annotation maps describing the entire Gene Ontology. R package version 3.8.2.
 
 Finak, G., McDavid, A., Yajima, M., Deng, J., Gersuk, V., Shalek, A.K., Slichter, C.K., Miller, H.W., McElrath, M.J., Prlic, M. and Linsley, P.S., 2015. MAST: a flexible statistical framework for assessing transcriptional changes and characterizing heterogeneity in single-cell RNA sequencing data. Genome biology, 16(278) doi: 10.1186/s13059-015-0844-5.
