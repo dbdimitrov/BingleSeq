@@ -19,6 +19,7 @@ BingleSeq's Bulk RNA-Seq pipeline accepts count tables in the following format:
 
 ![BingleSeq Bulk RNA-Seq format](/figures/Bulk_format.jpg)
 
+**Note that a metadata table must also be provided for the Bulk RNA-Seq pipeline**
 
 ### scRNA-Seq
 The scRNA-Seq part is based on Seurat’s pipeline (Satija et al., 2015) and follows a typical scRNA-Seq pipeline. Nonetheless, clustering can also be performed with monocle and SC3 packages (Trapnell et al., 2014; Kiselev et al., 2017). 
@@ -33,6 +34,13 @@ BingleSeq's scRNA-Seq pipeline accepts 10x genomics data as well as count tables
 
 ![BingleSeq Bulk RNA-Seq format](/figures/sc_format.jpg)
 
+
+### Metadata table format
+Metadata tables also follow a specific format:
+
+![BingleSeq Bulk meta format](/figures/meta_format.jpg)
+
+*It is essential to provide a metatable with an appropriate format as it is essential for the acquisition of correct results using the Bulk RNA-Seq part of the application.*
 
 ### Prerequisites
 
@@ -50,7 +58,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 setwd("*Folder Containing BingleSeq's zip file*")
 d <- getwd()
 
-untar(file.path(d, "BingleSeq_0.2.0.tar.gz"), exdir=d)
+untar(file.path(d, "BingleSeq_0.3.0.tar.gz"), exdir=d)
 devtools::install(file.path(d, "BingleSeq"), dependencies=TRUE,
                   repos=BiocManager::repositories())
 
@@ -66,11 +74,12 @@ BingleSeq::startBingleSeq()  # Starts the application
 #### 0. Data used
 For the purpose of representation, a simulated two-group dataset with 4 replicates was generated with compcodeR package (Soneson, 2014).
 
-#### 1.	Load Count Table
-To begin DE analysis of Bulk RNA-Seq data, first a count table with a specific format (shown above) must be loaded. BingleSeq allows some flexibility in terms of the ‘separator’ used. Once a count table is loaded, it is displayed to allow the user to check whether it was loaded appropriately. 
+#### 1.	Load Count Table and Metadata Table
+To begin DE analysis of Bulk RNA-Seq data, first a count table with a specific format (shown above) must be loaded. BingleSeq allows some flexibility in terms of the ‘separator’ used. Once a count table is loaded, it is displayed to allow the user to check whether it was loaded appropriately.
 
 ![BingleSeq Bulk RNA-Seq Load Data](/figures/bulk_loadData.PNG)
 
+Similarly, a metadata table is also required that also requires a specific format ()
 
 
 #### 2.	Quality Control
