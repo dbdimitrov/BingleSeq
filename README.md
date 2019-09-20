@@ -36,11 +36,12 @@ BingleSeq's scRNA-Seq pipeline accepts 10x genomics data as well as count tables
 
 
 ### Metadata table format
-Metadata tables must also follow a specific format:
+A metadata table is also required and its appropriate formating is key for the acquisition of correct results using the Bulk RNA-Seq part of the application. Metadata tables must be in this specific format:
 
 ![BingleSeq Bulk meta format](/figures/meta_format.jpg)
 
-*It is essential to provide a metatable with an appropriate format as it is essential for the acquisition of correct results using the Bulk RNA-Seq part of the application.*
+*Note that Metadata tables were insipired by similar applications preceding BingleSeq - DEapp and DEBrowser (Li and Andrade, 2017; Kucukural et al., 2019).*
+
 
 ### Prerequisites
 
@@ -256,7 +257,11 @@ Finak, G., McDavid, A., Yajima, M., Deng, J., Gersuk, V., Shalek, A.K., Slichter
 
 Kiselev, V.Y., Kirschner, K., Schaub, M.T., Andrews, T., Yiu, A., Chandra, T., Natarajan, K.N., Reik, W., Barahona, M., Green, A.R. and Hemberg, M., 2017. SC3: consensus clustering of single-cell RNA-seq data. Nature methods, 14(5), pp. 483–486.
 
+Kucukural, A., Yukselen, O., Ozata, D.M., Moore, M.J. and Garber, M., 2019. DEBrowser: interactive differential expression analysis and visualization tool for count data. BMC genomics, 20(6). DOI: https://doi.org/10.1186/s12864-018-5362-x
+
 Leek JT, Johnson WE, Parker HS, Fertig EJ, Jaffe AE, Storey JD, Zhang Y, Torres LC (2019). sva: Surrogate Variable Analysis. R package version 3.32.1.
+
+Li, Y. and Andrade, J., 2017. DEApp: an interactive web interface for differential expression analysis of next generation sequence data. Source code for biology and medicine, 12(2), doi: 10.1186/s13029-017-0063-4
 
 Love, M.I., Huber, W. and Anders, S., 2014. Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome biology, 15(12). doi:10.1186/s13059-014-0550-8
 
