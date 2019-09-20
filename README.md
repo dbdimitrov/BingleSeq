@@ -128,7 +128,7 @@ Once the GOseq pipeline is run and completed, a table with results is returned.
 
 Users can also generate GO term histograms with the top 10 GO terms and to choose whether to display their GO identifiers (GO:IDs) or their corresponding terms.
 
-![BingleSeq Bulk RNA-Seq bulkGO hist](/figures/bulk_GOhist.PNG)
+![BingleSeq Bulk RNA-Seq bulkGO hist](/figures/bulk_GOhist.jpg)
 
 Moreover, users can obtain further information about a given GO term by querying its GO:ID using the ‘GO.db’ package (Carlson et al., 2019). 
 
