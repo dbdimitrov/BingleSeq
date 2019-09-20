@@ -4,14 +4,21 @@
 \alias{batchHarman}
 \title{Harman Batch Effect Correction}
 \usage{
-batchHarman(counts, meta)
+batchHarman(counts, meta, session)
 }
 \arguments{
 \item{counts, }{Filtered Count Table}
 
 \item{meta, }{Metadata Table}
+
+\item{counts, }{Filtered Count Table}
+
+\item{meta, }{Metadata Table}
 }
 \value{
+Returns batch-effect corrected table
+Harman Batch Effect Correction
+
 Returns batch-effect corrected table
 }
 \description{

@@ -9,7 +9,7 @@ bulk_compData(input, output, session, rv, de)
 \arguments{
 \item{rv}{filtered counts}
 
-\item{de}{DE results and replicates/conditions info}
+\item{de}{DE results and meta}
 }
 \value{
 None

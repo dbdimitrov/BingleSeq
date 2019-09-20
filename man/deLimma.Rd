@@ -4,14 +4,16 @@
 \alias{deLimma}
 \title{Limma Differential Expression Pipeline}
 \usage{
-deLimma(readCounts, conditionNo, replicateNo)
+deLimma(readCounts, meta, normMethod, useBatch)
 }
 \arguments{
 \item{readCounts}{The filtered CountTable}
 
-\item{conditionNo}{The number of Conditions}
+\item{meta}{Metadata table}
 
-\item{replicateNo}{The number of Replicates}
+\item{useBatch}{If FALSE reasigns IDs to row.names}
+
+\item{fitType}{The test method to be used}
 }
 \value{
 Returns limma DE pipeline results

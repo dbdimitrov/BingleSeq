@@ -4,15 +4,10 @@
 \alias{plotHeatmapTop}
 \title{Generate a Heatmap}
 \usage{
-plotHeatmapTop(data, offset, replicates, geneNo, type, pvalue, fchange,
-  conditionFC, names, session)
+plotHeatmapTop(data, geneNo, type, pvalue, fchange, names, session)
 }
 \arguments{
 \item{data}{Differential Expression results (deTable)}
-
-\item{offset}{The last column of DE results}
-
-\item{replicates}{The number of replicates}
 
 \item{geneNo}{The number of genes to be displayed}
 
@@ -21,8 +16,6 @@ plotHeatmapTop(data, offset, replicates, geneNo, type, pvalue, fchange,
 \item{pvalue}{P-value threshold}
 
 \item{fchange}{Fold-Change threshold}
-
-\item{conditionFC}{The Fold-change column of the condition of interest}
 
 \item{names}{Boolean - whether to show names or not}
 

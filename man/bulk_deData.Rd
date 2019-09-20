@@ -4,13 +4,16 @@
 \alias{bulk_deData}
 \title{Differential Expression Tab Server}
 \usage{
-bulk_deData(input, output, session, fCounts)
+bulk_deData(input, output, session, fCounts, unfCounts)
 }
 \arguments{
 \item{fCounts}{The reactive value containing the filtered counts}
 }
 \value{
-Returns a reactive value with differential expression results
+Returns a reactive value with differential expression results as a list.
+The first element of the list is the DE results
+The second element is the normalized counts data
+The third element is the metadata table
 }
 \description{
 Differential Expression Tab Server

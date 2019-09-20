@@ -4,19 +4,17 @@
 \alias{plotVP}
 \title{Generate a Volcano plot}
 \usage{
-plotVP(data, fcColumn, fcValue, pValue)
+plotVP(data, fcValue, pValue)
 }
 \arguments{
 \item{data}{Differential Expression results (deTable)}
-
-\item{fcColumn}{The Fold-change column of the condition of interest}
 
 \item{fcValue}{Fold-Change threshold}
 
 \item{pValue}{P-value threshold}
 }
 \value{
-Retusn a Volcano plot
+Returns a Volcano plot
 }
 \description{
 Generate a Volcano plot

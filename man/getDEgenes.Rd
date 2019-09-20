@@ -4,7 +4,7 @@
 \alias{getDEgenes}
 \title{Get Differentially Expressed Genes (Bulk)}
 \usage{
-getDEgenes(data, type, pvalue, fchange, condition)
+getDEgenes(data, type, pvalue, fchange)
 }
 \arguments{
 \item{data}{Differential Expression Reslts Table}
@@ -14,8 +14,6 @@ getDEgenes(data, type, pvalue, fchange, condition)
 \item{pvalue}{P-value threshold}
 
 \item{fchange}{Fold-Change threshold}
-
-\item{condition}{Filters by a given condition (AvB, BvC, etc.)}
 }
 \value{
 Returns a vector with DE gene names

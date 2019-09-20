@@ -4,14 +4,10 @@
 \alias{plotMA}
 \title{Generate an MA plot}
 \usage{
-plotMA(data, expColumns, fcColumn, fcValue, pValue)
+plotMA(data, fcValue, pValue)
 }
 \arguments{
 \item{data}{Differential Expression results (deTable)}
-
-\item{expColumns}{normalized count columns of condition of interest}
-
-\item{fcColumn}{The Fold-change column of the condition of interest}
 
 \item{fcValue}{Fold-Change threshold}
 

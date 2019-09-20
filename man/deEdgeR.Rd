@@ -4,14 +4,18 @@
 \alias{deEdgeR}
 \title{EdgeR Differential Expression Pipeline}
 \usage{
-deEdgeR(readCounts, conditionNo, replicateNo)
+deEdgeR(readCounts, meta, testType, normMethod, useBatch)
 }
 \arguments{
 \item{readCounts}{The filtered CountTable}
 
-\item{conditionNo}{The number of Conditions}
+\item{meta}{Metadata table}
 
-\item{replicateNo}{The number of Replicates}
+\item{testType}{The type of test to be used}
+
+\item{useBatch}{If FALSE reasigns IDs to row.names}
+
+\item{fitType}{The test method to be used}
 }
 \value{
 EdgeR DE pipeline results

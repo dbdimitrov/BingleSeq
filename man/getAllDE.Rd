@@ -4,14 +4,14 @@
 \alias{getAllDE}
 \title{Bulk Generate Data required to compare DE Package Results}
 \usage{
-getAllDE(readCounts, conditionNo, replicateNo)
+getAllDE(readCounts, meta, batched)
 }
 \arguments{
 \item{readCounts}{Filtered Counts Table}
 
-\item{conditionNo}{Number of Conditions}
+\item{meta}{Metadata table}
 
-\item{replicateNo}{Number of Replicates}
+\item{batched, }{whether batch effect was applied to the tables}
 }
 \value{
 Returns a list with DE genes according to the different packages

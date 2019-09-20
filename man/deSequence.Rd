@@ -4,14 +4,18 @@
 \alias{deSequence}
 \title{DESeq2 Differential Expression Pipeline}
 \usage{
-deSequence(readCounts, conditionNo, replicateNo)
+deSequence(readCounts, meta, testType, fitType, useBatch)
 }
 \arguments{
 \item{readCounts}{The filtered CountTable}
 
-\item{conditionNo}{The number of Conditions}
+\item{meta}{Metadata table}
 
-\item{replicateNo}{The number of Replicates}
+\item{testType}{The type of test to be used}
+
+\item{fitType}{The type of fitType to be used}
+
+\item{useBatch}{If FALSE reasigns IDs to row.names}
 }
 \value{
 Returns DESeq2 DE pipeline results

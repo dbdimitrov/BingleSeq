@@ -4,13 +4,13 @@
 \alias{dePipelineCaller}
 \title{Differential Expression Pipeline Caller}
 \usage{
-dePipelineCaller(filteredCounts, conditionNo, replicateNo, selectedPackage,
-  session)
+dePipelineCaller(filteredCounts, metaData, testType, paramX,
+  selectedPackage, session, useBatch)
 }
 \arguments{
-\item{conditionNo}{The number of Conditions}
+\item{testType}{The type of test to be used}
 
-\item{replicateNo}{The number of Replicates}
+\item{paramX}{Fit type for DESeq2, and normalization method for limma and edgeR}
 
 \item{selectedPackage}{The package(pipeline) to be executed}
 

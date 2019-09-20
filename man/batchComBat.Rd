@@ -4,14 +4,21 @@
 \alias{batchComBat}
 \title{ComBat Batch Effect Correction}
 \usage{
-batchComBat(readCounts, meta)
+batchComBat(counts, meta, session)
 }
 \arguments{
+\item{counts, }{Filtered Count Table}
+
 \item{meta, }{Metadata Table}
 
 \item{counts, }{Filtered Count Table}
+
+\item{meta, }{Metadata Table}
 }
 \value{
+Returns batch-effect corrected table
+ComBat Batch Effect Correction
+
 Returns batch-effect corrected table
 }
 \description{

@@ -4,12 +4,10 @@
 \alias{barTable}
 \title{Generate the corresponding table of the Barchart}
 \usage{
-barTable(data, conditionNo, pvalue, fchange)
+barTable(data, pvalue, fchange)
 }
 \arguments{
 \item{data}{Differential Expression results (deTable)}
-
-\item{conditionNo}{The Fold-change column of the condition of interest}
 
 \item{pvalue}{P-value threshold}
 
