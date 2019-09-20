@@ -38,7 +38,7 @@ BingleSeq's scRNA-Seq pipeline accepts 10x genomics data as well as count tables
 ### Metadata table format
 Metadata tables also follow a specific format:
 
-![BingleSeq Bulk meta format](/figures/meta_format.png)
+![BingleSeq Bulk meta format](/figures/meta_format.jpg)
 
 *It is essential to provide a metatable with an appropriate format as it is essential for the acquisition of correct results using the Bulk RNA-Seq part of the application.*
 
