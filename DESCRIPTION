@@ -2,7 +2,7 @@ Package: BingleSeq
 Type: Package
 Title: BingleSeq: A user-friendly R package for Bulk and Single-cell
         RNA-Seq Data Analysis
-Version: 0.2.1
+Version: 0.3.0
 Author: Daniel Dimitrov
 Maintainer: Daniel Dimitrov <2412499d@student.gla.ac.uk>
 Description: 
