@@ -22,38 +22,38 @@ bulk_deDataUI <- function(id) {
         selected = 1
       ),
 
-      tags$hr(),
+      conditionalPanel(
+        condition = "input.selectPackage != 3",
+        ns = ns,
 
-      numericInput(
-        ns("conditionNo"),
-        label = "Number of Conditions",
-        value = 3,
-        min = 2,
-        max = 3
+        selectInput(
+          ns("selectTestType"),
+          label = "Select Test Type",
+          choices = list(
+            "Wald Test" = "Wald",
+            "Likelihood Ratio Test" = "LRT"
+          )
+        )
+
       ),
 
-      hr(),
-      fluidRow(column(3, verbatimTextOutput(
-        ns("conditionNo")
-      ))),
-
-      numericInput(
-        ns("replicateNo"),
-        label = "Number of Replicates",
-        value = 4,
-        min = 1
+      selectInput(
+        ns("selectParamX"),
+        label = "Select Fit Type",
+        choices = list(
+          "Parametric" = "parametric",
+          "Local" = "local",
+          "Mean" = "mean"
+        )
       ),
-
-      hr(),
-      fluidRow(column(3, verbatimTextOutput(
-        ns("replicateNo")
-      ))),
 
 
       actionButton(ns("dePackageButton"), label = "Run DE Analysis"),
 
       conditionalPanel(condition = "input.dePackageButton > 0",
                        ns = ns,
+
+                       hr(),
 
                        checkboxInput(ns("exploreDE"), label = ("Explore DE results"),
                                      value = FALSE),
@@ -96,8 +96,11 @@ bulk_deDataUI <- function(id) {
 #' @param fCounts The reactive value containing the filtered counts
 #'
 #' @export
-#' @return Returns a reactive value with differential expression results
-bulk_deData <- function(input, output, session, fCounts) {
+#' @return Returns a reactive value with differential expression results as a list.
+#' The first element of the list is the DE results
+#' The second element is the normalized counts data
+#' The third element is the metadata table
+bulk_deData <- function(input, output, session, fCounts, unfCounts) {
   de <- reactiveValues()
 
   output$helpDEInfo <- renderUI({
@@ -108,51 +111,65 @@ bulk_deData <- function(input, output, session, fCounts) {
       <b>This tab enables DE analysis using <i>DESeq2,
       edgeR,</i> and <i>limma</i> pipelines. </b> </p> <br>
 
-      Upon DE pipeline completion, a results table is displayed
-      that contains the log2 expression fold-change (logFC),
-      package specific test statistics, p-value,
-      multiple-testing adjusted p-value (FDR). <br> <br>
-
-      <i>Note: Diffrences among different samples are
-      accounted for using the package-specific methods.
-      Furthermore, only comparisons with up to 3
-      conditions with the same number of replicates across
-      each condition are implemented and the  appropriate
-           number of conditions and replicates must be provided. </i></div>")
+      <i> Please refer to the specific DE package manual
+           for further information regarding the available
+           test type, normalization methods, and fit type options. </i></div>")
     } else{
-      HTML("")
+      HTML("<h4 style='padding-top: 8px'>Preview DE results</h4>
+             <p style='padding-bot: 8px;'><i>
+              The resulting parameters represent: <br>
+              log2 expression fold-change (logFC);
+              package/test specific test statistics;
+              uncorrect p-value (Pvalue);
+              multiple-testing BH adjusted p-value (FDR).</i></p>")
     }
   })
 
   # Run DE ----
   observeEvent(input$dePackageButton, {
     # Save values to variables
-    de$selectedPackage <- as.numeric(input$selectPackage)
-    de$conditionNo <- as.numeric(input$conditionNo)
-    de$replicateNo <- as.numeric(input$replicateNo)
 
-    if (de$conditionNo == 2) {
-      de$offset <- 4
-    } else if (de$conditionNo == 3) {
-      de$offset <- 7
-    } else if (de$conditionNo == 4) {
-      de$offset <- 10
-    }
+    de$selectedPackage <- as.numeric(input$selectPackage)
+
 
     show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
 
-    de$deTable <- dePipelineCaller(fCounts$filteredCounts,
-                                   as.numeric(input$conditionNo),
-                                   as.numeric(input$replicateNo),
-                                   as.numeric(input$selectPackage),
-                                   session
-                                   )
+    if(!is.null(fCounts$batchCorrected)){
+
+      de$batched <- TRUE
+
+      de$deTable <- dePipelineCaller(fCounts$batchCorrected,
+                                     unfCounts$metaTable,
+                                     input$selectTestType,
+                                     input$selectParamX,
+                                     as.numeric(input$selectPackage),
+                                     session,
+                                     TRUE
+      )
+
+    } else{
+
+      de$batched <- FALSE
+
+      de$deTable <- dePipelineCaller(fCounts$filteredCounts,
+                                     unfCounts$metaTable,
+                                     input$selectTestType,
+                                     input$selectParamX,
+                                     as.numeric(input$selectPackage),
+                                     session,
+                                     FALSE
+      )
+
+      if(!is.null(de$deTable))
+        de$merged <- cbind(de$deTable[[1]],de$deTable[[2]])
+    }
+
     observe({
 
       output$deTable <-
         DT::renderDataTable(
-          de$deTable[, 1:(de$offset)] %>% datatable() %>%
-            formatSignif(columns = c(1:de$offset), digits = 4),
+          de$deTable[[1]] %>% datatable() %>%
+            formatSignif(columns = c(1:4), digits = 4),
           options = list(pageLength = 10)
         )
     })
@@ -161,12 +178,12 @@ bulk_deData <- function(input, output, session, fCounts) {
 
     observeEvent(input$exploreButton,{
       de$dispTable <-
-        subset(de$deTable, FDR < input$explorePvalue)
+        subset(de$deTable[[1]], FDR < input$explorePvalue)
 
       output$deTable <-
         DT::renderDataTable(
-          de$dispTable[, 1:(de$offset)] %>% datatable() %>%
-            formatSignif(columns = c(1:de$offset), digits = 4),
+          de$dispTable %>% datatable() %>%
+            formatSignif(columns = c(1:4), digits = 4),
           options = list(pageLength = 10)
         )
 
@@ -177,11 +194,49 @@ bulk_deData <- function(input, output, session, fCounts) {
         paste(format(Sys.time(), "%y-%m-%d_%H-%M"), "_deResults" , ".csv", sep = "")
       },
       content = function(file) {
-        data <- de$deTable
+        data <- de$merged
 
         write.csv(data, file)
       }
     )
+  })
+
+  # change UI choiceBoxes
+  observeEvent(input$selectPackage,{
+    if(as.numeric(input$selectPackage) == 1){
+      updateSelectInput(session,
+                        "selectTestType",
+                        choices = list(
+                          "Wald Test" = "Wald",
+                          "Likelihood Ratio Test" = "LRT"
+                        ))
+
+      updateSelectInput(session,
+                        "selectParamX",
+                        label = "Select Fit Type",
+                        choices = list(
+                          "Parametric" = "parametric",
+                          "Local" = "local",
+                          "Mean" = "mean"
+                        ))
+
+
+    }else if(as.numeric(input$selectPackage) != 1){
+      updateSelectInput(session,
+                        "selectTestType",
+                        choices = c("Exact Test" = "exact",
+                                    "General Linear Model" = "GLM"))
+
+      updateSelectInput(session,
+                        "selectParamX",
+                        label = "Select Normalization Method",
+                        choices = list("Trimmed mean of M values(TMM)" = "TMM",
+                                      "TMM with singleton pairing" = "TMMwsp",
+                                      "Relative log expression" = "RLE",
+                                      "Upper-quartile method" = "upperquartile",
+                                      "No normalization" = "none"))
+
+    }
   })
 
   return(de)
@@ -195,39 +250,51 @@ bulk_deData <- function(input, output, session, fCounts) {
 #' and provides exception handling
 #'
 #' @param readCounts The filtered CountTable
-#' @param conditionNo The number of Conditions
-#' @param replicateNo The number of Replicates
+#' @param testType The type of test to be used
+#' @param paramX Fit type for DESeq2, and normalization method for limma and edgeR
 #' @param selectedPackage The package(pipeline) to be executed
 #' @param session Current R session
 #'
 #'
 #' @export
 #' @return Returns the results of the appropriate DE pipeline
-dePipelineCaller <- function(filteredCounts, conditionNo, replicateNo, selectedPackage, session) {
+dePipelineCaller <- function(filteredCounts,
+                             metaData,
+                             testType,
+                             paramX,
+                             selectedPackage,
+                             session,
+                             useBatch) {
   out <- tryCatch(
     {
       if (selectedPackage == 1) {
+
         out <-
           deSequence(
             filteredCounts,
-            conditionNo,
-            replicateNo
+            metaData,
+            testType,
+            paramX,
+            useBatch
           )
 
       } else if (selectedPackage == 2) {
         out <-
           deEdgeR(
             filteredCounts,
-            conditionNo,
-            replicateNo
+            metaData,
+            testType,
+            paramX,
+            useBatch
           )
 
       } else if (selectedPackage == 3) {
         out <-
           deLimma(
             filteredCounts,
-            conditionNo,
-            replicateNo
+            metaData,
+            paramX,
+            useBatch
           )
       }
     },
@@ -235,7 +302,7 @@ dePipelineCaller <- function(filteredCounts, conditionNo, replicateNo, selectedP
       sendSweetAlert(
         session = session,
         title = "Data Format Error",
-        text = "Please ensure that the data was formatted and loaded correctly",
+        text = "Please ensure that the count and metadata tables were formatted and loaded correctly",
         type = "error"
       )
       return()
@@ -249,30 +316,32 @@ dePipelineCaller <- function(filteredCounts, conditionNo, replicateNo, selectedP
 #' DESeq2 Differential Expression Pipeline
 #'
 #' @param readCounts The filtered CountTable
-#' @param conditionNo The number of Conditions
-#' @param replicateNo The number of Replicates
+#' @param meta Metadata table
+#' @param testType The type of test to be used
+#' @param fitType The type of fitType to be used
+#' @param useBatch If FALSE reasigns IDs to row.names
 #'
 #' @export
 #' @return Returns DESeq2 DE pipeline results
-deSequence <- function(readCounts, conditionNo, replicateNo) {
+deSequence <- function(readCounts, meta, testType, fitType, useBatch){
 
-  output2 <- readCounts[, -1]
-  rownames(output2) <- readCounts[, 1]
-
-  if (conditionNo == 2) {
-    samplescondition <- c(rep("C1", replicateNo), rep("C2", replicateNo))
-
-  } else if (conditionNo == 3) {
-    samplescondition <-
-      c(rep("C1", replicateNo),
-        rep("C2", replicateNo),
-        rep("C3", replicateNo))
+  if(!useBatch){
+    output2 <- readCounts[, -1]
+    rownames(output2) <- readCounts[, 1]
+  } else{
+    output2 <- readCounts
   }
 
+  print(head(output2))
+
+  samplescondition <- meta$treatment
+
+  if(!is.integer(output2[1,2])){ # if !int round to nearest int
+    output2 <- apply(output2, 2, function(x) as.integer(round(x)))
+  }
 
   coldata <-
     data.frame(row.names = colnames(output2), samplescondition)
-
 
   dds <-
     DESeqDataSetFromMatrix(
@@ -282,134 +351,82 @@ deSequence <- function(readCounts, conditionNo, replicateNo) {
     )
 
 
-  if (conditionNo == 2) {
-    dds <- DESeq(dds)
-    res <-
-      results(dds, contrast = c("samplescondition", "C2", "C1"))
-
-    DEData <- data.frame(as.data.frame(res))
-
-
-    DEData.matching <- DEData[, c(2, 4:6)]
-
-    colnames(DEData.matching) <- c("logFC", "stat", "Pvalue", "FDR")
-
-  } else{
-    dds = DESeq(dds, test = "LRT", reduced =  ~ 1)
-
-    res <- results(dds)
-
-    AvB <-
-      results(dds,
-              contrast = c("samplescondition", "C2", "C1"),
-              test = "Wald")
-
-    BvC <-
-      results(dds,
-              contrast = c("samplescondition", "C3", "C2"),
-              test = "Wald")
-
-    res$log2FC_AvB <- AvB$log2FoldChange
-    res$log2FC_BvC <- BvC$log2FoldChange
-
-
-    DEData.matching <- res[, c(7, 8, 2:6)]
-    colnames(DEData.matching) <-
-      c("logFC_C2vC1",
-        "logFC_C3vC2",
-        "logFC_C3vC1",
-        "lfcSE",
-        "stat",
-        "Pvalue",
-        "FDR")
-
-    DEData.matching <- data.frame(as.data.frame(DEData.matching))
-
+  if(testType == "Wald"){
+    dds <- DESeq(dds, test = "Wald", fitType = fitType)
+  } else if(testType == "LRT"){
+    dds = DESeq(dds, test = "LRT", reduced =  ~ 1, fitType = fitType)
   }
 
-  resdata <- as.data.frame(counts(dds, normalized = TRUE))
+  res <-  results(dds)
+  DEData <- data.frame(as.data.frame(res))
 
-  masterFileDE <-
-    merge(DEData.matching, resdata, by = "row.names", all.x = TRUE)
+  DEData.matching <- DEData[, c(2, 4:6)]
+  colnames(DEData.matching) <- c("logFC", "stat", "Pvalue", "FDR")
 
-  format.data.frame(masterFileDE, digits = 4)
+  normCounts <- as.data.frame(counts(dds, normalized = TRUE))
 
-  countTable <- masterFileDE[, -1]
-  rownames(countTable) <- masterFileDE[, 1]
+  deList <- list(DEData.matching, normCounts, meta)
 
-  return(countTable)
+  return(deList)
 }
+
 
 #' EdgeR Differential Expression Pipeline
 #'
 #' @param readCounts The filtered CountTable
-#' @param conditionNo The number of Conditions
-#' @param replicateNo The number of Replicates
+#' @param meta Metadata table
+#' @param testType The type of test to be used
+#' @param fitType The test method to be used
+#' @param useBatch If FALSE reasigns IDs to row.names
 #'
 #' @export
 #' @return EdgeR DE pipeline results
-deEdgeR <- function(readCounts, conditionNo, replicateNo) {
-  ## 1. Load and Format Count dataframe
-  countTable  <- readCounts[, -1]
-  rownames(countTable) <- readCounts[, 1]
-
-
-  # 2. Create condition groups
-  if (conditionNo == 2) {
-    samplescondition <- c(rep("C1", replicateNo), rep("C2", replicateNo))
-
-  } else if (conditionNo == 3) {
-    samplescondition = factor(c(
-      rep("C1", replicateNo),
-      rep("C2", replicateNo),
-      rep("C3", replicateNo)
-    ))
-    my.contrasts <-
-      makeContrasts(
-        BvsA = C2 - C1,
-        CvsB = C3 - C2,
-        CvsA = C3 - C1,
-        levels = samplescondition
-      )
-    design <- model.matrix( ~ 0 + samplescondition) # without intercept
-    colnames(design) <- levels(samplescondition)
+deEdgeR <- function(readCounts, meta, testType, normMethod, useBatch){
+  ## 1. Load and Format Count dataframe (if !using batchCorr data)
+  if(!useBatch){
+    countTable  <- readCounts[, -1]
+    rownames(countTable) <- readCounts[, 1]
+  } else{
+    countTable<- readCounts
   }
 
+  ## 2. Assign Condition Groups
+  samplescondition <- factor(meta$treatment)
 
-  ## 3. Norm and DE
+  ## 3. Norm and Disp
   dge  <- DGEList(countTable, group = samplescondition)
 
   # Calculate normalization factors to scale the raw library sizes
-  dge = calcNormFactors(dge)
+  dge = calcNormFactors(dge, method = normMethod)
 
   # Estimate Common and Tagwise Dispersion
   dge = estimateCommonDisp(dge)
   dge = estimateTagwiseDisp(dge)
 
-  if (conditionNo == 2) {
-    de = exactTest(dge, pair = c("C1", "C2"))
-    tt = topTags(de, n = nrow(dge))
-
-  } else {
-    fit <- glmFit(dge, design)
-    lrt <- glmLRT(fit, contrast = my.contrasts)
-
-    tt = topTags(lrt, n = nrow(dge))
-    head(tt$table)
+  ## 4. DE
+  if(testType == "exact"){
+    de = exactTest(dge)
+  }else if(testType == "GLM"){
+    fit <- glmFit(dge)
+    de <- glmLRT(fit)
   }
 
-  ## 4.Extract normalized  CPMs
+  # 5. Extract DE results
+  tt = topTags(de, n = nrow(dge), adjust.method = "BH", sort.by	= "none")
+  if(ncol(tt$table)>4){
+    res <- tt$table[,-3]
+  } else{
+    res <- tt$table
+  }
+
+  ## 6.Extract normalized  CPMs
   nc = cpm(dge, normalized.lib.sizes = TRUE)
-  resdata <- as.data.frame(nc)
+  normCounts <- as.data.frame(nc)
 
+  ## 7. List with DE results and normalized counts
+  deList <- list(res, normCounts, meta)
 
-  ## 5. Format and create MF
-  masterFileDE <- merge(tt$table, resdata, by = "row.names", all.x = TRUE)
-
-  countTable <- masterFileDE[, -1]
-  rownames(countTable) <- masterFileDE[, 1]
-
-  return(countTable)
+  return(deList)
 }
 
 
@@ -417,84 +434,62 @@ deEdgeR <- function(readCounts, conditionNo, replicateNo) {
 #' Limma Differential Expression Pipeline
 #'
 #' @param readCounts The filtered CountTable
-#' @param conditionNo The number of Conditions
-#' @param replicateNo The number of Replicates
+#' @param meta Metadata table
+#' @param fitType The test method to be used
+#' @param useBatch If FALSE reasigns IDs to row.names
 #'
 #' @export
 #' @return Returns limma DE pipeline results
-deLimma <- function(readCounts, conditionNo, replicateNo) {
+deLimma <- function(readCounts, meta, normMethod, useBatch) {
 
-  countTable  <- readCounts[, -1]
-  rownames(countTable) <- readCounts[, 1]
-
-  # Create Name vectors for conditions and contrasts
-  if (conditionNo == 2) {
-    samplescondition <- c(rep("C1", replicateNo), rep("C2", replicateNo))
-    design = model.matrix(object = ~ samplescondition)
-    coef = 2
-
-  } else if (conditionNo == 3) {
-    samplescondition = factor(c(
-      rep("C1", replicateNo),
-      rep("C2", replicateNo),
-      rep("C3", replicateNo)
-    ))
-    my.contrasts <-
-      makeContrasts(
-        BvsA = C2 - C1,
-        CvsB = C3 - C2,
-        CvsA = C3 - C1,
-        levels = samplescondition
-      )
-    design <- model.matrix( ~ 0 + samplescondition)
-    colnames(design) <- levels(samplescondition)
-    coef = c(1:3)
+  if(!useBatch){
+    countTable  <- readCounts[, -1]
+    rownames(countTable) <- readCounts[, 1]
+  } else{
+    countTable<- readCounts
   }
 
+  samplescondition <- factor(meta$treatment)
   d  <- DGEList(countTable, group = samplescondition)
 
-  # TMM normalize
-  d <- calcNormFactors(d)
+  d <- calcNormFactors(d, method = normMethod)
+  v <- voom(d, plot = FALSE)
 
-  # Transform count data to logCPM
-  v <- voom(d, design = design, plot = FALSE)
+  fit <- lmFit(v)
+  ebayes.fit <- eBayes(fit)
 
-  fit <- lmFit(v, design)
-
-  if (conditionNo > 2) {
-    fit2 <- contrasts.fit(fit, my.contrasts)
-    ebayes.fit <- eBayes(fit2)
-  } else{
-    ebayes.fit <- eBayes(fit)
-  }
-
+  # if(length(levels(as.factor(meta$treatment))) == 2){
   tab <-
     topTable(
       ebayes.fit,
-      coef = coef ,
+      coef = 2,
       number = dim(ebayes.fit)[1],
       genelist = fit$genes$NAME,
       adjust = "fdr",
       sort.by = "none"
     )
 
-  head(tab, n = 100)
+  res <-data.frame(tab$logFC, tab$t, tab$P.Value, tab$adj.P.Val)
+  colnames(res) <- c("logFC", "t", "Pvalue", "FDR")
 
-  if (conditionNo == 2) {
-    DEData <- tab[, c(1, 3:5)]
+  # }else{
+  #   tab <-
+  #     topTable(
+  #       ebayes.fit,
+  #       coef = 1:length(levels(as.factor(meta$treatment))),
+  #       number = dim(ebayes.fit)[1],
+  #       genelist = fit$genes$NAME,
+  #       adjust = "BH",
+  #       sort.by = "none"
+  #     )
+  #
+  #   res <-data.frame(tab[,1], tab$F, tab$P.Value, tab$adj.P.Val)
+  #   colnames(res) <- c("logFC", "F", "Pvalue", "FDR")
+  # }
 
-    colnames(DEData)[4] <- "FDR"
-  } else if (conditionNo == 3) {
-    DEData <- tab[, c(1:7)]
-    colnames(DEData)[7] <- "FDR"
-  }
+  row.names(res) <- row.names(tab)
 
-  IDs <- rownames(tab)
-  masterFileDE <- cbind(IDs, DEData, v$E)
-  rownames(masterFileDE) <- NULL
+  deList <- list(res, v$E, meta)
 
-  countTable <- masterFileDE[, -1]
-  rownames(countTable) <- readCounts[, 1]
-
-  return(countTable)
+  return(deList)
 }

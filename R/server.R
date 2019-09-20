@@ -209,20 +209,10 @@ server <- function(input, output, session) {
       } else if (!is.null(globalRV$app) && globalRV$app == 2) {
       ### Bulk RNA-Seq Pipeline App ----
 
-
         tabs <- reactiveValues(# Used to restrict tab creation
           counts = FALSE,
           filt = FALSE,
           de = FALSE)
-
-        plotChoices = list(
-          "Barchart" = "bar",
-          "Volcano Plot" = "volcano",
-          "MA Plot" = "MA",
-          "Heatmap" = "heat"
-        )
-
-        vennChoice = list("Venn Diagram" = "venn")
 
 
         # Append Bulk Load Tab and Swap ----
@@ -292,7 +282,7 @@ server <- function(input, output, session) {
 
 
         # Differential Expression Data -----
-        de <- callModule(bulk_deData, "deTab", filt)
+        de <- callModule(bulk_deData, "deTab", filt, counts)
 
         observe({
           if (!is.null(de$deTable) && !tabs$de) {
@@ -327,33 +317,6 @@ server <- function(input, output, session) {
             )
 
             tabs$de = TRUE
-          }
-        })
-
-        # Dynamically show/hide condition options
-        observeEvent(req(input$mainPage) == "plotTab", {
-          if (!is.null(de$deTable) && de$conditionNo > 2) {
-            shinyjs::show("plotTab-selectConditionMA")
-            shinyjs::show("plotTab-selectConditionTHM")
-            shinyjs::show("plotTab-goGetCondition")
-
-            updateSelectInput(session,
-                              "plotTab-selectPlotCombo",
-                              choices = append(plotChoices, vennChoice))
-
-          } else if (!is.null(de$deTable) && de$conditionNo == 2) {
-            updateSelectInput(session, "plotTab-selectPlotCombo", choices = plotChoices)
-
-            print("resets")
-
-            updateSelectInput(session, "plotTab-selectConditionMA", selected = 1)
-            updateSelectInput(session, "plotTab-selectConditionTHM", selected = 1)
-            updateSelectInput(session, "goTab-goGetCondition", selected = 1)
-
-            shinyjs::hide("plotTab-selectConditionMA")
-            shinyjs::hide("plotTab-selectConditionTHM")
-            shinyjs::hide("goTab-goGetCondition")
-
           }
         })
 

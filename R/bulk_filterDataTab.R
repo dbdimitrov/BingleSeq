@@ -39,7 +39,7 @@ bulk_filterDataUI <- function(id) {
       tags$hr(),
 
       conditionalPanel(
-        condition = "input.filterButton > 0",
+        condition = "input.filterButton > 0 && output.panelStatus",
         ns = ns,
 
         h4("Batch Effect Correction"),
@@ -87,7 +87,6 @@ bulk_filterDataUI <- function(id) {
                  plotOutput(ns("postFiltHist")))
         )
       ),
-
       tabPanel(title = "Batch Effect Correction",
                value = "batchTab",
                htmlOutput(ns("preBatchHelp")),
@@ -115,6 +114,7 @@ bulk_filterDataUI <- function(id) {
 #' @return Returns a reactive value with the filtered Count Table
 bulk_filterData <- function(input, output, session, counts) {
   filt <- reactiveValues()
+  filt$batchCorrected <- NULL
 
   observeEvent(input$filterButton, {
     filt$filteredCounts <-
@@ -135,15 +135,35 @@ bulk_filterData <- function(input, output, session, counts) {
       qcHist(filt$filteredCounts)
     })
 
-    output$preBatchHelp <- renderUI({
-      HTML("<h4 style='padding-top: 8px'>Uncorrected Batch Samples PCA</h4>
+
+    # batch Effect is on only when more than 1 batch group
+    if(length(levels(as.factor(counts$metaTable$batch))) > 1){
+
+
+      output$preBatchHelp <- renderUI({
+        HTML("<h4 style='padding-top: 8px'>Uncorrected Batch Samples PCA</h4>
              <p style='padding-bot: 8px;'><i>
               Samples are coloured by their Batch Groups.</i></p>")
-    })
+      })
 
-    output$preBatchPCA <- renderPlot({
-      plotPCA(filt$filteredCounts, 1, counts$metaTable)
-    })
+      output$preBatchPCA <- renderPlot({
+        plotPCA(filt$filteredCounts, FALSE, counts$metaTable, "batch")
+      })
+
+      output$panelStatus <- reactive({
+        input$select1=="show"
+      })
+
+      outputOptions(output, "panelStatus", suspendWhenHidden = FALSE)
+    } else {
+
+      output$panelStatus <- reactive({
+        FALSE
+      })
+
+      outputOptions(output, "panelStatus", suspendWhenHidden = FALSE)
+    }
+
 
     # Used to generate DE Tab only when generateSummary is OK
     filt$correctFormat <- TRUE
@@ -172,9 +192,9 @@ bulk_filterData <- function(input, output, session, counts) {
 
   observeEvent (input$batchButton, {
     if (input$selectBatchMethod == 1) {
-      filt$batchCorrected <- batchHarman(filt$filteredCounts, counts$metaTable)
+      filt$batchCorrected <- batchHarman(filt$filteredCounts, counts$metaTable, session)
     } else if (input$selectBatchMethod == 2) {
-      filt$batchCorrected <- batchComBat(filt$filteredCounts, counts$metaTable)
+      filt$batchCorrected <- batchComBat(filt$filteredCounts, counts$metaTable, session)
     }
 
     if(!is.null(filt$batchCorrected)){
@@ -186,13 +206,14 @@ bulk_filterData <- function(input, output, session, counts) {
       })
 
       output$postBatchPCA <- renderPlot({
-        plotPCA(filt$batchCorrected, 0, counts$metaTable)
+        plotPCA(filt$batchCorrected, TRUE, counts$metaTable, "batch")
       })
 
       updateTabsetPanel(session,
                         "qcTabSet",
                         selected = "batchTab")
     }
+
   })
 
 
@@ -272,18 +293,43 @@ qcHist <- function(data) {
 #'
 #' @export
 #' @return Returns batch-effect corrected table
-batchHarman <- function(counts, meta){
+#' Harman Batch Effect Correction
+#'
+#' @param counts, Filtered Count Table
+#' @param meta, Metadata Table
+#'
+#' @export
+#' @return Returns batch-effect corrected table
+batchHarman <- function(counts, meta, session){
 
-  countTable  <- counts[, -1]
-  rownames(countTable) <- counts[, 1]
+  out <- tryCatch(
+    {
+      head(counts)
+      countTable  <- counts[, -1]
+      rownames(countTable) <- counts[, 1]
 
-  harman_results <- harman(countTable, meta$treatment, meta$batch, limit=0.95)
+      head(countTable)
 
-  harman_corr <- reconstructData(harman_results)
-  harman_corr[harman_corr<0] <- 0
+      harman_results <- harman(countTable, meta$treatment, meta$batch, limit=0.95)
 
+      harman_corr <- reconstructData(harman_results)
+      harman_corr[harman_corr<0] <- 0
+      out <- harman_corr
+    },
+    error=function(cond) {
 
-  return(harman_corr)
+      sendSweetAlert(
+        session = session,
+        title = "Batch Effect Correction Error",
+        text = "Please ensure that the metadata table is in the correct format.",
+        type = "error"
+      )
+
+      return(NA)
+    }
+  )
+
+  return(out)
 }
 
 
@@ -294,15 +340,37 @@ batchHarman <- function(counts, meta){
 #'
 #' @export
 #' @return Returns batch-effect corrected table
-batchComBat <- function(counts, meta){
+#' ComBat Batch Effect Correction
+#'
+#' @param counts, Filtered Count Table
+#' @param meta, Metadata Table
+#'
+#' @export
+#' @return Returns batch-effect corrected table
+batchComBat <- function(counts, meta, session){
 
-  countTable  <- counts[, -1]
-  rownames(countTable) <- counts[, 1]
+  out <- tryCatch(
+    {
+      countTable  <- counts[, -1]
+      rownames(countTable) <- counts[, 1]
 
-  design <- model.matrix(~as.factor(treatment), data=meta)
-  combat_data = ComBat(as.matrix(countTable), batch=meta$batch, mod=design)
+      design <- model.matrix(~as.factor(treatment), data=meta)
+      out = ComBat(as.matrix(countTable), batch=meta$batch, mod=design)
+    },
+    error=function(cond) {
 
-  return(combat_data)
+      sendSweetAlert(
+        session = session,
+        title = "Batch Effect Correction Error",
+        text = "Please ensure that the metadata table is in the correct format.",
+        type = "error"
+      )
+
+      return(NA)
+    }
+  )
+
+  return(out)
 }
 
 
@@ -312,12 +380,14 @@ batchComBat <- function(counts, meta){
 #' Uses factoextra package to plot a PCA plot
 #'
 #' @param data Differential Expression results (deTable)
-#' @param expressionColumns, 1 if gene IDs are a column
+#' @param rowNames, Boolean checking whether genes are row names or not
+#' @param meta, metadata table
+#' @param col, colour by batch or treatment
 #' @export
 #' @return Returns a PCA plot
-plotPCA <- function(data, expressionColumns, meta) {
+plotPCA <- function(data, rowNames, meta, col) {
 
-  if(expressionColumns == 1){
+  if(!rowNames){
     countTable  <- data[, -1]
     rownames(countTable) <- data[, 1]
   } else {
@@ -330,12 +400,20 @@ plotPCA <- function(data, expressionColumns, meta) {
 
   xx <- prcomp(t(countTable))
 
+  if(col == "batch"){
+    group <- meta$batch
+    leg <- "Batch"
+  } else if(col == "treatment"){
+    group <- meta$treatment
+    leg <- "Treatment"
+  }
+
   return(fviz_pca_ind(xx,
                       repel = FALSE,
-                      habillage=meta$batch,
+                      habillage=group,
                       title = "",
-                      axes.linetype=NA
-                      ) +
+                      legend.title = leg,
+                      axes.linetype=NA) +
            theme(panel.grid.minor=element_blank()))
 }
 
@@ -345,12 +423,11 @@ plotPCA <- function(data, expressionColumns, meta) {
 #' Uses factoextra package to plot a Scree plot
 #'
 #' @param data Differential Expression results (deTable)
-#' @param expressionColumns The columns with the Normalized Counts
 #' @export
 #' @return Returns a Scree plot
-plotScree <- function(data, expressionColumns) {
-  x <- data[, expressionColumns]
-  x <- as.matrix(sapply(x, as.numeric))
+plotScree <- function(data) {
+
+  x <- as.matrix(sapply(data, as.numeric))
   xx <- prcomp(t(x))
 
   return(fviz_eig(xx))

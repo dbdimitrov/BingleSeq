@@ -76,7 +76,7 @@ bulk_compDataUI <- function(id) {
 
 #' Bulk Compare Data Server
 #' @param rv filtered counts
-#' @param de DE results and replicates/conditions info
+#' @param de DE results and meta
 #' @export
 #' @return None
 bulk_compData <- function(input, output, session, rv, de) {
@@ -109,7 +109,7 @@ bulk_compData <- function(input, output, session, rv, de) {
   observeEvent(input$comparisonButton, {
     show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
 
-    rv$allDE <- getAllDE(rv$filteredCounts, de$conditionNo, de$replicateNo)
+    rv$allDE <- getAllDE(rv$filteredCounts, de$deTable[[3]], de$batched)
 
     hide_waiter()
   })
@@ -134,7 +134,7 @@ bulk_compData <- function(input, output, session, rv, de) {
 
   observeEvent(input$rankButton, {
 
-    rv$consensus <- rankConsesus(rv$allDE[[2]], rv$allDE[[3]], rv$allDE[[1]], 2)
+    rv$consensus <- rankConsesus(rv$allDE[[2]][[1]], rv$allDE[[3]][[1]], rv$allDE[[1]][[1]], 2)
 
     output$rankTable <-
       DT::renderDataTable(rv$consensus)
@@ -187,14 +187,14 @@ bulk_compData <- function(input, output, session, rv, de) {
 #' Bulk Generate Data required to compare DE Package Results
 #'
 #' @param readCounts Filtered Counts Table
-#' @param conditionNo Number of Conditions
-#' @param replicateNo Number of Replicates
+#' @param meta Metadata table
+#' @param batched, whether batch effect was applied to the tables
 #' @export
 #' @return Returns a list with DE genes according to the different packages
-getAllDE <- function(readCounts, conditionNo, replicateNo) {
-  x1 <- deSequence(readCounts, conditionNo, replicateNo)
-  x2 <- deEdgeR(readCounts, conditionNo, replicateNo)
-  x3 <- deLimma(readCounts, conditionNo, replicateNo)
+getAllDE <- function(readCounts, meta, batched){
+  x1 <- deSequence(readCounts, meta, "Wald", "parametric", batched)
+  x2 <- deEdgeR(readCounts, meta, "exact", "TMMwsp", batched)
+  x3 <- deLimma(readCounts, meta, "TMMwsp", batched)
 
   delist <- list(x1, x2, x3)
 
@@ -210,9 +210,9 @@ getAllDE <- function(readCounts, conditionNo, replicateNo) {
 #' @return Returns a list with DE genes according to the different packages
 generateIntersect <- function(deList) {
 
-  x1_sig <- subset(deList[[1]], FDR < 0.05)
-  x2_sig <- subset(deList[[2]], FDR < 0.05)
-  x3_sig <- subset(deList[[3]], FDR < 0.05)
+  x1_sig <- subset(deList[[1]][[1]], FDR < 0.05)
+  x2_sig <- subset(deList[[2]][[1]], FDR < 0.05)
+  x3_sig <- subset(deList[[3]][[1]], FDR < 0.05)
 
 
   DESeq_genes <- as.vector(rownames(x1_sig))

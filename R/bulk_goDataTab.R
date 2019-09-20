@@ -44,18 +44,6 @@ bulk_goDataUI <- function(id) {
                 )
               ),
 
-
-              radioButtons(
-                ns("goGetCondition"),
-                label = "Condition",
-                c(
-                  "All Conditions" = 0 ,
-                  "A vs B" = 1,
-                  "B vs C" = 2,
-                  "A vs C" = 3
-                )
-              ),
-
               actionButton(ns("goGetButton"), label = "Get DE genes")
 
             ),
@@ -157,7 +145,7 @@ bulk_goDataUI <- function(id) {
               tabPanel(
                 value = ("goHistTab"),
                 title = "GO Term Histogram",
-                plotOutput(ns("goHistPlot"), width = "800px", height = "500px")
+                plotOutput(ns("goHistPlot"), width = "800px", height = "700px")
               ),
 
               tabPanel(
@@ -211,23 +199,23 @@ bulk_goData <- function(input, output, session, counts, de) {
 
   # Functional Annotation ------
   observeEvent(input$goGetButton, {
+
+    print(head(de$merged))
+
     go$goGetGenes <-
       getDEgenes(
-        de$deTable,
+        de$merged,
         input$goGetType,
         input$goGetPvalue,
-        input$goGetFC,
-        as.numeric(input$goGetCondition)
+        input$goGetFC
       )
 
-    x <- as.data.frame(go$goGetGenes)
-
     output$goGenesTable <-
-      DT::renderDataTable(x, colnames = ("Differentially Expressed Genes"))
+      DT::renderDataTable(as.data.frame(go$goGetGenes), colnames = ("Differentially Expressed Genes"))
 
     output$goGenesText <-
       renderText({
-        paste("Number of DE genes:", nrow(as.data.frame(x)), sep = " ")
+        paste("Number of DE genes:", nrow(as.data.frame(go$goGetGenes)), sep = " ")
       })
 
     updateTabsetPanel(session, "goSideTabSet",
@@ -314,33 +302,27 @@ bulk_goData <- function(input, output, session, counts, de) {
 #' @param type Filters by abs. significant, upregulation or downregulation
 #' @param pvalue P-value threshold
 #' @param fchange Fold-Change threshold
-#' @param condition Filters by a given condition (AvB, BvC, etc.)
 #' @return Returns a vector with DE gene names
-getDEgenes <- function(data, type, pvalue, fchange, condition) {
-  table <- data
+getDEgenes <- function(data, type, pvalue, fchange) {
+  # table <- data
 
   fchange <- log2(fchange) # convert to log2
-
-  if (condition == 0) {
-    #to filter for all conditions
-    condition = c(1, 2, 3)
-  }
 
   #filter
   if (type == 1) {
     table <-
-      subset(table, FDR < pvalue &
-               abs(table[, condition]) > fchange) # absSig
+      subset(data, FDR < pvalue &
+               abs(logFC) > fchange) # absSig
 
   } else if (type == 2) {
     table <-
-      subset(table, FDR < pvalue &
-               table[, condition] > fchange) # upregSig
+      subset(data, FDR < pvalue &
+               logFC > fchange) # upregSig
 
   } else if (type == 3) {
     table <-
-      subset(table, FDR < pvalue &
-               table[, condition] < -fchange) # downreg Sig
+      subset(data, FDR < pvalue &
+               logFC < -fchange) # downreg Sig
 
   }
 
@@ -348,9 +330,9 @@ getDEgenes <- function(data, type, pvalue, fchange, condition) {
 
   gene.vector <- as.vector(row.names(table))
 
-
   return(gene.vector)
 }
+
 
 #' Functional Annotation Pipeline (Both pipelines)
 #'
