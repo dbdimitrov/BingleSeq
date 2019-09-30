@@ -76,11 +76,11 @@ BingleSeq::startBingleSeq()  # Starts the application
 For the purpose of representation, a simulated two-group dataset with 4 replicates was generated with compcodeR package (Soneson, 2014).
 
 #### 1.	Load Count Table and Metadata Table
-To begin DE analysis of Bulk RNA-Seq data, first a count table with a specific format (shown above) must be loaded. BingleSeq allows some flexibility in terms of the ‘separator’ used. Once a count table is loaded, it is displayed to allow the user to check whether it was loaded appropriately.
+To begin DE analysis of Bulk RNA-Seq data, first a count table with a specific format (shown above) must be loaded. BingleSeq allows some flexibility in terms of the ‘separator’ used. Once a count table is loaded, it is displayed to allow the user to check whether it was loaded appropriately. Similarly, a metadata table is also required that also requires a specific format (shown above).
 
 ![BingleSeq Bulk RNA-Seq Load Data](/figures/bulk_loadData.PNG)
 
-Similarly, a metadata table is also required that also requires a specific format.
+
 
 
 #### 2.	Quality Control
