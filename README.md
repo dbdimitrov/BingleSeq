@@ -50,7 +50,7 @@ BingleSeq requires R>= 3.5.3
 
 ### Installing
 
-To install BingleSeq on your machine simply type the following R code:
+To install BingleSeq on your machine simply copy the following R code:
 
 ```
 install.packages("devtools")
