@@ -159,7 +159,7 @@ Following normalization, the ‘Clustering’ tab is generated which implements 
 ![BingleSeq Bulk RNA-Seq sc clustEblow](/figures/sc_clustElbow.PNG)
   
   
-In addition to the Elbow plot, BingleSeq implements Seurat's PC heatmaps option - to be used as a complementary to the heuristic nature of the elbow plot.
+In addition to the Elbow plot, BingleSeq implements Seurat's PC heatmaps option - to be used as a complementary tool to the heuristic nature of the elbow plot.
   
 ![BingleSeq Bulk RNA-Seq sc clustHeat](/figures/sc_clustHeat.PNG)
 
