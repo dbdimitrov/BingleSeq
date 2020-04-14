@@ -83,7 +83,7 @@ In a typical DE analysis workflow, the next stage following DE analysis would be
 ![BingleSeq Bulk RNA-Seq de Data](/figures/bulk_visData.PNG)
 
 
-BingleSeq's visualization techniques were implemented with customization in mind, as users can specify parameters such as p-value threshold, fold-change threshold, and contrast of interest. Due to their broad usability, heatmaps were designed as BingleSeq’s most customizable plotting component. Furthemore, users can download the genes displayed in the heatmap.
+BingleSeq's visualization techniques were implemented with customization in mind, as users can specify parameters such as p-value threshold, fold-change threshold, and contrast of interest. Due to their versatility, heatmaps were designed as BingleSeq’s most customizable plotting component. Furthemore, users can download the genes displayed in the heatmap.
 
 ![BingleSeq Bulk RNA-Seq heat Data](/figures/bulk_heatmap.PNG)
 
