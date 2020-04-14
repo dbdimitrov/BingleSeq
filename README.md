@@ -13,6 +13,7 @@ The Bulk RNA-Seq part follows the structure of a typical pipeline used for the D
 
 ![BingleSeq Bulk RNA-Seq pipeline](/figures/Bulk.png)
 
+
 #### Input
 
 BingleSeq's Bulk RNA-Seq pipeline accepts count tables in the following format:
@@ -21,11 +22,11 @@ BingleSeq's Bulk RNA-Seq pipeline accepts count tables in the following format:
 
 **Note that a metadata table must also be provided for the Bulk RNA-Seq pipeline.**
 
+
 ### scRNA-Seq
 The scRNA-Seq part is based on Seurat’s pipeline (Satija et al., 2015) and follows a typical scRNA-Seq count analysis structure. Furthermore, clustering can be performed with monocle and SC3 packages (Trapnell et al., 2014; Kiselev et al., 2017). 
 
 ![BingleSeq Single-Cell RNA-Seq pipeline](/figures/sc.jpg)
-
 
 
 #### Input
