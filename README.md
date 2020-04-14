@@ -154,12 +154,12 @@ Once normalization and feature selection methods are complete, a Variable Featur
   
   
 #### 4.	Clustering
-Following normalization, the ‘Clustering’ tab is generated which implements functionality for scaling of the data, dimensionality reduction with PCA, PC selection, and unsupervised clustering. The former three are done simultaneously and Seurat’s ‘PCElbowPlot’ is used to generate and return an elbow plot. The returned elbow plot provides an ad hoc method for determining the true dimensionality of the dataset (i.e. PC Selection). Selecting which PCs to include in Seurat and monocle clustering methods is an essential step as it enables a large portion of technical noise to be excluded.
+Following normalization, the ‘Clustering’ tab is generated which implements functionality for scaling of the data, dimensionality reduction with PCA, PC selection, and unsupervised clustering. The former three are done simultaneously and Seurat’s ‘PCElbowPlot’ is used to generate and return an elbow plot. The returned elbow plot serves as a heuristic method for determining the true dimensionality of the dataset (i.e. PC Selection). Selecting which PCs to include in Seurat and monocle clustering methods is an essential step as it enables a large portion of technical noise to be excluded.
 
 ![BingleSeq Bulk RNA-Seq sc clustEblow](/figures/sc_clustElbow.PNG)
   
   
-In addition to the Elbow plot, BingleSeq implements Seurat's PC heatmaps option - to be used as a complementary tool to the heuristic nature of the elbow plot.
+In addition to the Elbow plot, BingleSeq implements Seurat's PC heatmaps option - to be used as a complementary tool to the elbow plot.
   
 ![BingleSeq Bulk RNA-Seq sc clustHeat](/figures/sc_clustHeat.PNG)
 
