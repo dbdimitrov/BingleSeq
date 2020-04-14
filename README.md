@@ -185,21 +185,24 @@ Following normalization, the ‘Clustering’ tab is generated which implements 
 ![BingleSeq Bulk RNA-Seq sc clustEblow](/figures/sc_clustElbow.PNG)
   
   
-In addition to the Elbow plot, BingleSeq also implements Seurat's PC heatmaps, as a confirmation option available after clustering.
+In addition to the Elbow plot, BingleSeq also implements Seurat's PC heatmaps option - to be used as a more supervised supplementary tool, complementary to the heuristic nature of the elbow plot.
   
 ![BingleSeq Bulk RNA-Seq sc clustHeat](/figures/sc_clustHeat.PNG)
 
-*A) represents the 1st PC Heatmap with the top 10 most variable Genes and it is very likely to represent part of the true dimensionality of the dataset. In contrast, B) represents the 15th PC Heatmap and it seems unlikely to represent true variance.*
+*A) represents the 1st PC Heatmap with the top 10 most variable Genes and it is very likely to represent part of the true dimensionality of the dataset. In contrast, B) represents the 15th PC Heatmap which likely represent mainly noise and not true signal.*
 
 
-Once the count data is scaled and linear dimensionality reduction performed, users can proceed to unsupervised clustering with Seurat, SC3, and monocle. When using Seurat for unsupervised clustering, users must specify the number of PCs to be included in the analysis as well as the value of its ‘Resolution’ parameter. The latter parameter is used to set the ‘granularity’ of the clustering and as such it controls the number of clusters. The authors suggest that the optimal Resolution for datasets with ~3000 cells is 0.6-1.2 and it is typically higher for larger datasets. Users can also choose from Seurat’s inbuilt clustering algorithms including Louvain and SLM algorithms.
+
+Once the count data is scaled and linear dimensionality reduction performed, users can proceed to unsupervised clustering with Seurat, SC3, and monocle. 
+
+When using Seurat for unsupervised clustering, users must specify the number of PCs to be included in the analysis as well as the value of its ‘Resolution’ parameter. The latter parameter is used to set the ‘granularity’ of the clustering and as such it controls the number of clusters. The authors suggest that the optimal Resolution for datasets with ~3000 cells is 0.6-1.2 and it is typically higher for larger datasets. Users can also choose from Seurat’s inbuilt clustering algorithms including Louvain and SLM algorithms.
 
 ![BingleSeq Bulk RNA-Seq sc clustSeurat](/figures/sc_clustSeurat.PNG)
 
 *tSNE plot produced using 0.5 as granularity parameter and the first 10 PCs.*
   
   
-When clustering with monocle, users are requested to specify the number of PCs to be included in the analysis. Also, if required users can further minimize noise by filtering the gene counts according to the minimum expression level prior to clustering via the ‘Lower Detection Parameter’. Users can also pick from monocle’s inbuilt clustering algorithms, which include Density Peak and Louvain algorithms. Furthermore, users can choose whether to explicitly specify the number of clusters or use monocle to estimate the number of clusters.
+When clustering with monocle, users are requested to specify the number of PCs to be included in the analysis. Also, if required users can further minimize noise by filtering the gene counts according to the minimum expression level via the ‘Lower Detection Parameter’. Users can also pick from monocle’s inbuilt clustering algorithms, which include Density Peak and Louvain algorithms. Furthermore, Monocle enables the number of clusters to be explicitly specified as well as to be estimated.
   
   
 ![BingleSeq Bulk RNA-Seq sc clustMono](/figures/sc_clustMonocle.PNG)
@@ -207,7 +210,8 @@ When clustering with monocle, users are requested to specify the number of PCs t
 *tSNE plot produced by explicitly setting the number of clusters to 9 and using the first 10 PCs (without any additional filtering).*
 
 
-Unsupervised clustering with SC3 enables users to specify the number of random datasets used in clustering, as such it is used to control the clustering complexity and hence computational time. By default, this parameter is set to 1000 when working with less than 2000 cells and to 50 when working with more than 2000 cells. Users can also use SC3’s inbuilt filtering options to further reduce noise by filtering out genes below and above certain dropout (zero value) percentage thresholds. Similarly to monocle, the number of clusters can be supplied by users or estimated with SC3.
+Unsupervised clustering with SC3 enables users to specify the number of random initial centroid selections used in k-means clustering. A larger number of initial centroid configurations is likely to produce a better clustering result, but has a high toll on computational complexity and time. By default, this parameter is set to 1000 when working with less than 2000 cells and to 50 when working with more than 2000 cells, according to the authors recommendantions.
+Users can also use SC3’s inbuilt filtering options to further reduce noise by filtering out genes below and above certain dropout (zero value) percentage thresholds. Similarly to monocle, the number of clusters can be supplied by users or estimated with SC3.
 
 ![BingleSeq Bulk RNA-Seq sc clustSC3](/figures/sc_clustSC3.PNG)
 
