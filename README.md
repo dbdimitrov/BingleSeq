@@ -1,5 +1,5 @@
 # BingleSeq
-BingleSeq - A user-friendly R package for Bulk and Single-cell RNA-Seq data analyses
+BingleSeq - a user-friendly R package for Bulk and Single-cell RNA-Seq data analyses
 
 
 ## About
