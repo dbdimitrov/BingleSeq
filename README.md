@@ -169,14 +169,14 @@ In addition to the Elbow plot, BingleSeq implements Seurat's PC heatmaps option 
 
 Once the count data is scaled and linear dimensionality reduction performed, users can proceed to unsupervised clustering with Seurat, SC3, and monocle. 
 
-When using Seurat for unsupervised clustering, users must specify the number of PCs to be included in the analysis as well as the value of its ‘Resolution’ parameter. The latter parameter is used to set the ‘granularity’ of the clustering and as such it controls the number of clusters. The authors suggest that the optimal Resolution for datasets with ~3000 cells is 0.6-1.2 and it is typically higher for larger datasets. Users can also choose from Seurat’s inbuilt clustering algorithms including Louvain and SLM algorithms.
+When using Seurat for unsupervised clustering, users must specify the number of PCs to be included in the analysis as well as the value of its ‘Resolution’ parameter. The latter parameter is used to set the ‘granularity’ of the clustering and as such it controls the number of clusters. The authors suggest that the optimal Resolution for datasets with ~3000 cells is 0.6-1.2 and it is typically higher for larger datasets. Users can also choose from Seurat’s inbuilt algorithms including Louvain and SLM algorithms.
 
 ![BingleSeq Bulk RNA-Seq sc clustSeurat](/figures/sc_clustSeurat.PNG)
 
 *tSNE plot produced using 0.5 as granularity parameter and the first 10 PCs.*
   
   
-When clustering with monocle, users are requested to specify the number of PCs to be included in the analysis. Also, if required users can further minimize noise by filtering the gene counts according to the minimum expression level via the ‘Lower Detection Parameter’. Users can also pick from monocle’s inbuilt clustering algorithms, which include Density Peak and Louvain algorithms. Furthermore, Monocle enables the number of clusters to be explicitly specified as well as to be estimated.
+When clustering with monocle, users are requested to specify the number of PCs to be included in the analysis. Also, if required users can further minimize noise by filtering the gene counts according to the minimum expression level via the ‘Lower Detection Parameter’. Users can also pick from monocle’s inbuilt algorithms, which include Density Peak and Louvain algorithms. Furthermore, Monocle enables the number of clusters to be explicitly specified as well as to be estimated.
   
   
 ![BingleSeq Bulk RNA-Seq sc clustMono](/figures/sc_clustMonocle.PNG)
@@ -186,7 +186,7 @@ When clustering with monocle, users are requested to specify the number of PCs t
 
 Unsupervised clustering with SC3 in BingleSeq utilizes SC3's k-means-based clusering approach. Users must specify the number of random initial centroid selections (sets). A larger number of initial centroid configurations (nStart) is likely to produce a better clustering result, but has a high toll on computational time. By default, this parameter is set to 1000 when working with less than 2000 cells and to 50 when working with more than 2000 cells, in accordance to the authors recommendantions.
 Users can also use SC3’s inbuilt filtering options to further reduce noise by filtering out genes below and above certain dropout (zero value) percentage thresholds. Similarly to monocle, the number of clusters can be supplied by user or estimated with SC3.
-It is worth noting that the k-means approach of SC3 is likely too computantionally demanding when working with large datasets (e.g. when N=2000, computational time is ~20 mins), hence future updates of BingleSeq are likely to also implement SC3's SVM-hybrid approach as an alternative solution. 
+It is worth noting that the k-means approach of SC3 is likely too computationally demanding when working with large datasets (e.g. when N=2000, computational time is ~20 mins), hence future updates of BingleSeq are likely to also implement SC3's SVM-hybrid approach as an alternative solution. 
 
 ![BingleSeq Bulk RNA-Seq sc clustSC3](/figures/sc_clustSC3.PNG)
 
@@ -199,7 +199,7 @@ Also, when performing clustering with SC3 or monocle, the data used to create th
 
 #### 5.	Differential Expression
 Following clustering, DE analysis can be conducted using Seurat’s inbuilt functionality to identify marker genes. Users can perform marker gene identification using the following inbuilt DE testing methods: Student’s T test, Wilcoxon Rank Sum test, and Logistic regression. Additionally, DE analysis can also be performed with DESEq2 and MAST packages (Love, Huber, and Anders, 2014; Finak et al., 2015). It is worth noting that DESeq2 is magnitudes slower than other DE tests; thus, making it impractical when working with large datasets.
-Prior to running the DE analysis, users are prompted to enter the following filtering parameters: genes expressed in a minimum fraction of cells, fold-change, and adjusted p-value.
+Prior to running DE analysis, users are prompted to enter the following filtering parameters: genes expressed in a minimum fraction of cells, fold-change, and adjusted p-value.
 
 ![BingleSeq Bulk RNA-Seq sc deTab](/figures/sc_deTab.PNG)
 
@@ -218,7 +218,6 @@ The scRNA-Seq part of BingleSeq incorporates functional annotation in an analogo
 The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to the ‘DE Package Comparison’ tab in Bulk RNA-Seq. The only difference is that scRNA-Seq Overlap functionality enables filtering according to the same parameters used in marker gene identification. Furthermore, rather than comparing the different packages, it compares the DE Methods implemented within Seurat. These include: DE testing with MAST, Wilcoxon Rank Sum Test, and Student’s T test.
 
 *Also, note that Rank-based consensus is yet to be implemented for the scRNA-Seq pipeline.*
-
 
 
 ### Prerequisites
