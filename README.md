@@ -50,7 +50,7 @@ BingleSeq's scRNA-Seq pipeline accepts 10x genomics data as well as count tables
 For the purpose of representation, a simulated two-group dataset with 4 replicates was generated with compcodeR package (Soneson, 2014).
 
 #### 1.	Load Count Table and Metadata Table
-To begin DE analysis of Bulk RNA-Seq data, first a count table with a specific format (shown above) must be loaded. BingleSeq allows some flexibility in terms of the ‘separator’ used. Once a count table is loaded, it is displayed to allow the user to check whether it was loaded appropriately. Similarly, a metadata table is also required that also requires a specific format (shown above).
+To begin DE analysis of Bulk RNA-Seq data, first a count table with a specific format (shown above) must be loaded. BingleSeq allows some flexibility in terms of the ‘separator’ used. Once a count table is loaded, it is displayed to allow the user to check whether it was loaded appropriately. A metadata table is also required in a specific format (shown above).
 
 ![BingleSeq Bulk RNA-Seq Load Data](/figures/bulk_loadData.PNG)
 
