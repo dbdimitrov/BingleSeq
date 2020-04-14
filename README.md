@@ -210,12 +210,13 @@ When clustering with monocle, users are requested to specify the number of PCs t
 *tSNE plot produced by explicitly setting the number of clusters to 9 and using the first 10 PCs (without any additional filtering).*
 
 
-Unsupervised clustering with SC3 enables users to specify the number of random initial centroid selections used in k-means clustering. A larger number of initial centroid configurations is likely to produce a better clustering result, but has a high toll on computational complexity and time. By default, this parameter is set to 1000 when working with less than 2000 cells and to 50 when working with more than 2000 cells, according to the authors recommendantions.
-Users can also use SC3’s inbuilt filtering options to further reduce noise by filtering out genes below and above certain dropout (zero value) percentage thresholds. Similarly to monocle, the number of clusters can be supplied by users or estimated with SC3.
+Unsupervised clustering with SC3 in BingleSeq utilizes SC3's k-means-based clusering approach. Users must specify the number of random initial centroid selections (sets). A larger number of initial centroid configurations (nStart) is likely to produce a better clustering result, but has a high toll on computational time. By default, this parameter is set to 1000 when working with less than 2000 cells and to 50 when working with more than 2000 cells, in accordance to the authors recommendantions.
+Users can also use SC3’s inbuilt filtering options to further reduce noise by filtering out genes below and above certain dropout (zero value) percentage thresholds. Similarly to monocle, the number of clusters can be supplied by user or estimated with SC3.
+It is worth noting that the k-means approach of SC3 is likely too computantionally demanding when working with large datasets (e.g. when N=2000, computational time is ~20 mins), hence future updates of BingleSeq are likely to also implement SC3's SVM-hybrid approach as an alternative solution. 
 
 ![BingleSeq Bulk RNA-Seq sc clustSC3](/figures/sc_clustSC3.PNG)
 
-*tSNE plot produced by explicitly setting the number of clusters to 9 and 50 random datsets (nStart) (without any additional filtering).*
+*tSNE plot produced by explicitly setting the number of clusters to 9 and 50 random initial centroid sets (without any additional filtering).*
   
   
 *Each tSNE plot in BingleSeq is generated using the package with which clustering was performed.
@@ -223,7 +224,7 @@ Also, when performing clustering with SC3 or monocle, the data used to create th
 
 
 #### 5.	Differential Expression
-Following clustering, DE analysis can be conducted using Seurat’s inbuilt functionality to identify marker genes. Users can perform marker gene identification by using the following inbuilt DE testing methods: Student’s T test, Wilcoxon Rank Sum test, and Logistic regression. Additionally, DE analysis can also be performed with DESEq2 and MAST packages (Love, Huber, and Anders, 2014; Finak et al., 2015). Note that some of Seurat’s inbuilt DE testing methods were removed as their result formats were inconsistent with downstream analyses. Also, DESeq2 is magnitudes slower than other DE tests; thus, making it impractical when working with large datasets.
+Following clustering, DE analysis can be conducted using Seurat’s inbuilt functionality to identify marker genes. Users can perform marker gene identification using the following inbuilt DE testing methods: Student’s T test, Wilcoxon Rank Sum test, and Logistic regression. Additionally, DE analysis can also be performed with DESEq2 and MAST packages (Love, Huber, and Anders, 2014; Finak et al., 2015). It is worth noting that DESeq2 is magnitudes slower than other DE tests; thus, making it impractical when working with large datasets.
 Prior to running the DE analysis, users are prompted to enter the following filtering parameters: genes expressed in a minimum fraction of cells, fold-change, and adjusted p-value.
 
 ![BingleSeq Bulk RNA-Seq sc deTab](/figures/sc_deTab.PNG)
@@ -240,7 +241,7 @@ The scRNA-Seq part of BingleSeq incorporates functional annotation in an analogo
   
   
 #### 7.	DE Method Comparison
-The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to the ‘DE Package Comparison’ tab in Bulk RNA-Seq. The only differences are that scRNA-Seq Overlap functionality enables filtering according to the same parameters used in marker gene identification. Furthermore, rather than comparing the different packages, it compares the DE Methods implemented within Seurat. These include: DE testing with MAST, Wilcoxon Rank Sum Test, and Student’s T test.
+The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to the ‘DE Package Comparison’ tab in Bulk RNA-Seq. The only difference is that scRNA-Seq Overlap functionality enables filtering according to the same parameters used in marker gene identification. Furthermore, rather than comparing the different packages, it compares the DE Methods implemented within Seurat. These include: DE testing with MAST, Wilcoxon Rank Sum Test, and Student’s T test.
 
 *Also, note that Rank-based consensus is yet to be implemented for the scRNA-Seq pipeline.*
 
