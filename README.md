@@ -25,7 +25,7 @@ A metadata table is also required and its appropriate formating is key for the a
 
 ![BingleSeq Bulk meta format](/figures/meta_format.jpg)
 
-*Metadata tables were insipired by similar applications preceding BingleSeq - DEapp and DEBrowser (Li and Andrade, 2017; Kucukural et al., 2019).*
+*The use of metadata tables was insipired by similar applications preceding BingleSeq - DEapp and DEBrowser (Li and Andrade, 2017; Kucukural et al., 2019).*
 
 
 
