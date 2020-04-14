@@ -9,7 +9,7 @@ BingleSeq was developed as part of my MSc Bioinformatics thesis at the Universit
 
 
 ### Bulk RNA-Seq
-The Bulk RNA-Seq part follows a typical pipeline used for the DE analysis of Bulk RNA-Seq count data and it makes use of differential expression packages DESeq2 (Love, Huber, and Anders, 2014), edgeR (Robinson et al., 2010), and Limma (Ritchie et al., 2015).
+The Bulk RNA-Seq part follows the structure of a typical pipeline used for the DE analysis of Bulk RNA-Seq count data and it makes use of differential expression packages DESeq2 (Love, Huber, and Anders, 2014), edgeR (Robinson et al., 2010), and Limma (Ritchie et al., 2015).
 
 ![BingleSeq Bulk RNA-Seq pipeline](/figures/Bulk.png)
 
@@ -22,7 +22,7 @@ BingleSeq's Bulk RNA-Seq pipeline accepts count tables in the following format:
 **Note that a metadata table must also be provided for the Bulk RNA-Seq pipeline.**
 
 ### scRNA-Seq
-The scRNA-Seq part is based on Seurat’s pipeline (Satija et al., 2015) and follows a typical scRNA-Seq pipeline. Nonetheless, clustering can also be performed with monocle and SC3 packages (Trapnell et al., 2014; Kiselev et al., 2017). 
+The scRNA-Seq part is based on Seurat’s pipeline (Satija et al., 2015) and follows a typical scRNA-Seq count analysis structure. Furthermore, clustering can be performed with monocle and SC3 packages (Trapnell et al., 2014; Kiselev et al., 2017). 
 
 ![BingleSeq Single-Cell RNA-Seq pipeline](/figures/sc.jpg)
 
@@ -95,7 +95,7 @@ Moreover, if required Batch effect correction is also available with Harman and 
 
 
 #### 3.	Differential Expression 
-Subsequent to filtering is the ‘Differential Expression’ tab, where the user is given the option to run DESeq2, edgeR, and limma pipelines. Upon DE pipeline completion, the results are displayed as a table that contains the log2 expression fold-change (logFC), package specific test statistics, p-value, multiple-testing adjusted p-value (FDR).
+Subsequent to filtering is the ‘Differential Expression’ tab, where the user is given the option to run DESeq2, edgeR, and limma pipelines. Upon DE pipeline completion, the results are displayed as a table that contains the log2 expression fold-change (logFC), package specific test statistics, p-value, and multiple-testing adjusted p-value (FDR).
 
 ![BingleSeq Bulk RNA-Seq de Data](/figures/bulk_deData.PNG)
 
@@ -165,7 +165,7 @@ Once the data is loaded, the ‘Quality Control’ tab is generated which enable
   
   
 #### 3.	Normalization
-After excluding unwanted cells and features from the dataset, the next step is to normalize the data. BingleSeq provides two Seurat-supplied global-scaling normalization options. The first one is the “LogNormalize” method in which gene counts for each cell are divided by the total counts for that cell, multiplied by a ‘scale factor’, and then natural-log transformed. The second method is “Relative Counts” which follows the same procedure without the log transformation. Seurat's authors recommend using the former method when working with integer counts and the latter when working with relative counts. 10e4 is the recommended and default scale factor option, but when using CPM values the scale factor should be set to 10e6.
+After excluding unwanted cells and features from the dataset, the next step is to normalize the data. BingleSeq provides two Seurat-based global-scaling normalization options. The first one is the “LogNormalize” method in which gene counts for each cell are divided by the total counts for that cell, multiplied by a ‘scale factor’, and then natural-log transformed. The second method is “Relative Counts” which follows the same procedure excluding the log transformation. Seurat's authors recommend using the former method when working with integer counts and the latter when working with relative counts. 10e4 is the recommended and default scale factor option, but when using CPM values the scale factor should be set to 10e6.
 
 Simultaneously with normalization, the highly variable features within the dataset are identified and these features are later used when clustering with Seurat.
 
@@ -189,7 +189,7 @@ In addition to the Elbow plot, BingleSeq also implements Seurat's PC heatmaps, a
   
 ![BingleSeq Bulk RNA-Seq sc clustHeat](/figures/sc_clustHeat.PNG)
 
-*A) represents the 1st PC Heatmap with the top 10 most variable Genes and it is very likely to represent the true dimensionality of the dataset. In contrast, B) represents the 15th PC Heatmap and it seems unlikely to represent true dimensionality.*
+*A) represents the 1st PC Heatmap with the top 10 most variable Genes and it is very likely to represent part of the true dimensionality of the dataset. In contrast, B) represents the 15th PC Heatmap and it seems unlikely to represent true variance.*
 
 
 Once the count data is scaled and linear dimensionality reduction performed, users can proceed to unsupervised clustering with Seurat, SC3, and monocle. When using Seurat for unsupervised clustering, users must specify the number of PCs to be included in the analysis as well as the value of its ‘Resolution’ parameter. The latter parameter is used to set the ‘granularity’ of the clustering and as such it controls the number of clusters. The authors suggest that the optimal Resolution for datasets with ~3000 cells is 0.6-1.2 and it is typically higher for larger datasets. Users can also choose from Seurat’s inbuilt clustering algorithms including Louvain and SLM algorithms.
