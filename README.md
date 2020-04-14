@@ -62,7 +62,7 @@ When a count table is uploaded the ‘Quality Control’ tab is generated. This 
 
 ![BingleSeq Bulk RNA-Seq QC Data](/figures/bulk_qcData.PNG)
 
-Moreover, if required Batch effect correction is also available with Harman and ComBat (Leek et al. 2016; Oytam et al., 2019).
+Moreover, if required Batch effect correction is available with Harman and ComBat packages (Leek et al. 2016; Oytam et al., 2019).
 
 ![BingleSeq Bulk RNA-Seq Batch Correction](/figures/batchCorrected.jpg)
 *Batch effect corrected using Harman package on example data acquired from HarmanData package (Bowden, Ross, Oytam, 2019).*
