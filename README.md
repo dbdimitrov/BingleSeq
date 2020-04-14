@@ -6,8 +6,6 @@ BingleSeq - A user-friendly R package for Bulk and Single-cell RNA-Seq data anal
 BingleSeq was developed as part of my MSc Bioinformatics thesis at the University of Glasgow under the supervision of Dr Quan Gu. The application provides a comprehesnive solution to both Bulk and scRNA-Seq analyses, as such it is best to look at BingleSeq as two separate parts.
 
 
-
-
 ### Bulk RNA-Seq
 The Bulk RNA-Seq part follows the structure of a typical pipeline used for the DE analysis of Bulk RNA-Seq count data and it makes use of differential expression packages DESeq2 (Love, Huber, and Anders, 2014), edgeR (Robinson et al., 2010), and Limma (Ritchie et al., 2015).
 
@@ -22,6 +20,14 @@ BingleSeq's Bulk RNA-Seq pipeline accepts count tables in the following format:
 
 **Note that a metadata table must also be provided for the Bulk RNA-Seq pipeline.**
 
+#### Metadata table format
+A metadata table is also required and its appropriate formating is key for the acquisition of correct results using the Bulk RNA-Seq part of the application. Metadata tables must be in this specific format:
+
+![BingleSeq Bulk meta format](/figures/meta_format.jpg)
+
+*Note that Metadata tables were insipired by similar applications preceding BingleSeq - DEapp and DEBrowser (Li and Andrade, 2017; Kucukural et al., 2019).*
+
+
 
 ### scRNA-Seq
 The scRNA-Seq part is based on Seurat’s pipeline (Satija et al., 2015) and follows a typical scRNA-Seq count analysis structure. Furthermore, clustering can be performed with monocle and SC3 packages (Trapnell et al., 2014; Kiselev et al., 2017). 
@@ -35,39 +41,6 @@ BingleSeq's scRNA-Seq pipeline accepts 10x genomics data as well as count tables
 
 ![BingleSeq Bulk RNA-Seq format](/figures/sc_format.jpg)
 
-
-### Metadata table format
-A metadata table is also required and its appropriate formating is key for the acquisition of correct results using the Bulk RNA-Seq part of the application. Metadata tables must be in this specific format:
-
-![BingleSeq Bulk meta format](/figures/meta_format.jpg)
-
-*Note that Metadata tables were insipired by similar applications preceding BingleSeq - DEapp and DEBrowser (Li and Andrade, 2017; Kucukural et al., 2019).*
-
-
-### Prerequisites
-
-BingleSeq requires R>= 3.5.3
-
-
-### Installing
-
-To install BingleSeq on your machine simply copy the following R code:
-
-```
-install.packages("devtools")
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-setwd("*Folder Containing BingleSeq's zip file*")
-d <- getwd()
-
-untar(file.path(d, "BingleSeq_0.3.0.tar.gz"), exdir=d)
-devtools::install(file.path(d, "BingleSeq"), dependencies=TRUE,
-                  repos=BiocManager::repositories())
-
-
-library(BingleSeq)  # Load BingleSeq
-BingleSeq::startBingleSeq()  # Starts the application
-```
 
 ## Typical Workflow
 
@@ -245,6 +218,34 @@ The scRNA-Seq part of BingleSeq incorporates functional annotation in an analogo
 The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to the ‘DE Package Comparison’ tab in Bulk RNA-Seq. The only difference is that scRNA-Seq Overlap functionality enables filtering according to the same parameters used in marker gene identification. Furthermore, rather than comparing the different packages, it compares the DE Methods implemented within Seurat. These include: DE testing with MAST, Wilcoxon Rank Sum Test, and Student’s T test.
 
 *Also, note that Rank-based consensus is yet to be implemented for the scRNA-Seq pipeline.*
+
+
+
+### Prerequisites
+
+BingleSeq requires R>= 3.5.3
+
+
+
+### Installing
+
+To install BingleSeq on your machine simply copy the following R code:
+
+```
+install.packages("devtools")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+setwd("*Folder Containing BingleSeq's zip file*")
+d <- getwd()
+
+untar(file.path(d, "BingleSeq_0.3.0.tar.gz"), exdir=d)
+devtools::install(file.path(d, "BingleSeq"), dependencies=TRUE,
+                  repos=BiocManager::repositories())
+
+
+library(BingleSeq)  # Load BingleSeq
+BingleSeq::startBingleSeq()  # Starts the application
+```
 
 
 ## Built With
