@@ -163,7 +163,7 @@ In addition to the Elbow plot, BingleSeq implements Seurat's PC heatmaps option 
   
 ![BingleSeq Bulk RNA-Seq sc clustHeat](/figures/sc_clustHeat.PNG)
 
-*A) represents the 1st PC Heatmap with the top 10 most variable Genes and it is very likely to represent part of the true dimensionality of the dataset. In contrast, B) represents the 15th PC Heatmap which likely represent mainly noise and not true signal.*
+*A) represents the 1st PC Heatmap with the top 10 most variable Genes and it is highly likely to represent part of the true dimensionality of the dataset. In contrast, B) represents the 15th PC Heatmap which likely represent mainly noise and not true signal.*
 
 
 
