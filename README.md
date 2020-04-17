@@ -78,7 +78,7 @@ Subsequent to filtering is the ‘Differential Expression’ tab, where the user
 
 
 #### 4.	Visualization
-In a typical DE analysis workflow, the next stage following DE analysis would be to proceed to the various visualization techniques. BingleSeq offers this functionality within the ‘Visualize Data’ tab, which allows users to pick from several key plotting techniques including a PCA plot (A), Scree plot (B), Barchart (C), Volcano plot (D), MA plot (E), Venn Diagram (F), and a Heatmap (shown below). 
+In a typical DE analysis workflow, the next stage following DE analysis would be to proceed to the various visualization techniques. BingleSeq offers this functionality within the ‘Visualize Data’ tab, which allows users to pick from several key plotting techniques including a PCA plot (A), Scree plot (B), Barchart (C), Volcano plot (D), MA plot (E) and a Heatmap (shown below). 
 
 ![BingleSeq Bulk RNA-Seq de Data](/figures/bulk_visData.PNG)
 
