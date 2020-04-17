@@ -115,7 +115,7 @@ BingleSeq supplies users with an option to assess the agreement between the diff
 
 ![BingleSeq Bulk RNA-Seq compVenn Data](/figures/bulk_compVenn.PNG)
 
-Furthermore, the DE results from the same packages are used to generate a **Rank-based consesus**. The Rank-based consesus is displayed as a table, alongisde adjusted p-values and the ranks for each gene, as calculated by the different packages.
+Furthermore, the DE results from the same packages are used to generate a **Rank-based consensus**. The Rank-based consensus is displayed as a table, alongside adjusted p-values and the ranks for each gene, as calculated by the different packages.
 
 ![BingleSeq Bulk RNA-Seq compRank Data](/figures/bulk_compRank.PNG)
 
