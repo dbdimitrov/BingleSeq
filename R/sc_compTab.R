@@ -61,9 +61,25 @@ sc_compUI <- function(id) {
     ),
 
     mainPanel(
-      htmlOutput(ns("helpCompInfo")),
-      plotOutput(ns("comparsionPlot"), width = "800px", height = "500px")
+      
+      tabsetPanel(
+        id = ns("compMainTabSet"),
+        tabPanel(
+          title = "Venn Diagram",
+          value = "compPlotTab",
+          htmlOutput(ns("helpCompInfo")),
+          plotOutput(ns("comparsionPlot"), width = "800px", height = "500px")
+        ),
+        tabPanel(title = "Rank Table",
+                 value = "compTableTab",
+                 DT::dataTableOutput(ns("rankTable")),
+                 conditionalPanel(condition = "input.comparisonButton > 0",
+                                  ns = ns,
+                                  downloadButton(ns("downloadRank"), "Download Ranking Consensus")
+                 )
+        )
       )
+    )
   )
 }
 
@@ -115,12 +131,31 @@ sc_comp <- function(input, output, session, finData) {
       )
 
     grid.newpage()
+    
+    comp$xlist_names <- list(rownames(comp$xlist[[1]]),
+                             rownames(comp$xlist[[2]]),
+                             rownames(comp$xlist[[3]]))
+    
+    names(comp$xlist_names) <-
+      c("Wilcoxon", "T-test", "MAST")
+    
+    print(comp$xlist_names)
 
-    comp$plot <- (plotAllVenn(comp$xlist))
-
+    comp$plot <- (plotAllVenn(comp$xlist_names))
+    
     output$comparsionPlot <- renderPlot({
       grid.draw(comp$plot)
     })
+    
+    
+    comp$consensus <- rankConsesus(comp$xlist[[1]], comp$xlist[[2]], comp$xlist[[3]], 1)
+    
+    output$rankTable <-
+      DT::renderDataTable(comp$consensus)
+    
+    updateTabsetPanel(session,
+                      "compMainTabSet",
+                      selected = "compTableTab")
 
     hide_waiter()
 
@@ -128,7 +163,7 @@ sc_comp <- function(input, output, session, finData) {
 
   observeEvent(input$selectIntersect, {
     if (!is.null(comp$xlist)) {
-      comp$intersect <- getIntersect(comp$xlist, input$selectIntersect)
+      comp$intersect <- getIntersect(comp$xlist_names, input$selectIntersect)
     }
 
   })
@@ -189,14 +224,14 @@ sc_getAllDE <- function(data, mPCT, fc, pValue) {
   x2_sig <- subset(x2, p_val_adj < pValue)
   x3_sig <- subset(x3, p_val_adj < pValue)
 
-
+  
   list <-
-    list(rownames(x1_sig),
-         rownames(x2_sig),
-         rownames(x3_sig))
-
+    list(x1_sig,
+         x2_sig,
+         x3_sig)
+  
   names(list) <-
     c("Wilcoxon", "T-test", "MAST")
-
+  
   return(list)
 }

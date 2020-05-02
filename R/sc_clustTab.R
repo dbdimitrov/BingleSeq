@@ -269,8 +269,8 @@ sc_clust <- function(input, output, session, normData) {
       SC3’s inbuilt filtering options enable further reducion of noise by filtering out <br>
       genes below and above certain dropout (zero value) percentage thresholds. <br> <br>
 
-      'nStart' parameter enables control over the number of
-      random datasets used in clustering and hence computational time. <br>
+      'nStart' parameter enables control over the number of random initial cetroids
+      used in k-means clustering and hence computational time. <br>
       By default, this parameter is set to 1000 when working with
       less than 2000 cells and to 50 when working with more than 2000 cells. <br>
       SC3 is magnitudes slower than the other approaches

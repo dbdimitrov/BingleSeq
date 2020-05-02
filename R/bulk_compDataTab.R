@@ -278,90 +278,158 @@ rankConsesus <- function(x1_data, x2_data, x3_data, pipeline){
 
 
   if(pipeline == 1){
-
+    
+    x1_data$X <- row.names(x1_data)
+    x2_data$X <- row.names(x2_data)
+    x3_data$X <- row.names(x3_data)
+    
+    
+    # order the data according to most significant
+    wilcox_ord <- x1_data[order(x1_data$p_val_adj), ]
+    t_ord <- x2_data[order(x2_data$p_val_adj), ]
+    MAST_ord <- x3_data[order(x3_data$p_val_adj), ]
+    
+    
+    
+    x1 <- as.vector(wilcox_ord$p_val_adj) # extract FDR
+    names(x1) <- wilcox_ord$X # assign names
+    x1_ranked <- rank(x1) # produce ranks
+    x1_ranked <- x1_ranked[order(names((x1_ranked)))]
+    
+    x2 <- as.vector(t_ord$p_val_adj)
+    names(x2) <- t_ord$X
+    x2_ranked <- rank(x2)
+    x2_ranked <- x2_ranked[order(names((x2_ranked)))]
+    
+    x3 <- as.vector(MAST_ord$p_val_adj)
+    names(x3) <- MAST_ord$X
+    x3_ranked <- rank(x3)
+    x3_ranked <- x3_ranked[order(names((x3_ranked)))]
+    
+    
+    # combine the vectors into a
+    xdf <- as.data.frame((cbind(x1_ranked,x2_ranked,x3_ranked)))
+    
+    
+    # produce consesus
+    xdf$consensus <- (rowSums(xdf[,1:3])/3)
+    
+    
+    consesus <- as.vector(xdf$consensus) # extract consesus
+    names(consesus) <- row.names(xdf) # assign names
+    consesus
+    
+    
+    rerank <- rank(consesus)
+    rerank <- rerank[order(names((rerank)))]
+    
+    # p.adj vectors
+    edgeR_padj <- as.vector(x1_data$p_val_adj)
+    names(edgeR_padj) <- x1_data$X
+    edgeR_padj <- edgeR_padj[order(names((edgeR_padj)))]
+    
+    limma_padj <- as.vector(x2_data$p_val_adj)
+    names(limma_padj) <- x2_data$X
+    limma_padj <- limma_padj[order(names((limma_padj)))]
+    
+    DESeq_padj <- as.vector(x3_data$p_val_adj)
+    names(DESeq_padj) <- x3_data$X
+    DESeq_padj <- DESeq_padj[order(names((DESeq_padj)))]
+    
+    
+    # rebind the rankings + FDR for each package + consesus
+    xdf <- as.data.frame(cbind(x1_ranked, edgeR_padj,
+                               x2_ranked, limma_padj,
+                               x3_ranked, DESeq_padj,
+                               rerank))
+    
+    
+    xdf <- xdf[order(xdf$rerank),]
     #rename p_val_adj to FDR
+  } else {
+    x1_data$X <- row.names(x1_data)
+    x2_data$X <- row.names(x2_data)
+    x3_data$X <- row.names(x3_data)
+    
+    
+    # order the data according to most significant
+    edgeR_ord <- x1_data[order(x1_data$FDR), ]
+    limma_ord <- x2_data[order(x2_data$FDR), ]
+    DESeq_ord <- x3_data[order(x3_data$FDR), ]
+    
+    
+    
+    x1 <- as.vector(edgeR_ord$FDR) # extract FDR
+    names(x1) <- edgeR_ord$X # assign names
+    x1_ranked <- rank(x1) # produce ranks
+    x1_ranked <- x1_ranked[order(names((x1_ranked)))]
+    
+    x2 <- as.vector(limma_ord$FDR)
+    names(x2) <- limma_ord$X
+    x2_ranked <- rank(x2)
+    x2_ranked <- x2_ranked[order(names((x2_ranked)))]
+    
+    x3 <- as.vector(DESeq_ord$FDR)
+    names(x3) <- DESeq_ord$X
+    x3_ranked <- rank(x3)
+    x3_ranked <- x3_ranked[order(names((x3_ranked)))]
+    
+    
+    # combine the vectors into a
+    xdf <- as.data.frame((cbind(x1_ranked,x2_ranked,x3_ranked)))
+    
+    
+    # produce consesus
+    xdf$consensus <- (rowSums(xdf[,1:3])/3)
+    
+    
+    consesus <- as.vector(xdf$consensus) # extract consesus
+    names(consesus) <- row.names(xdf) # assign names
+    consesus
+    
+    
+    rerank <- rank(consesus)
+    rerank <- rerank[order(names((rerank)))]
+    
+    # p.adj vectors
+    edgeR_padj <- as.vector(x1_data$FDR)
+    names(edgeR_padj) <- x1_data$X
+    edgeR_padj <- edgeR_padj[order(names((edgeR_padj)))]
+    
+    limma_padj <- as.vector(x2_data$FDR)
+    names(limma_padj) <- x2_data$X
+    limma_padj <- limma_padj[order(names((limma_padj)))]
+    
+    DESeq_padj <- as.vector(x3_data$FDR)
+    names(DESeq_padj) <- x3_data$X
+    DESeq_padj <- DESeq_padj[order(names((DESeq_padj)))]
+    
+    
+    # rebind the rankings + FDR for each package + consesus
+    xdf <- as.data.frame(cbind(x1_ranked, edgeR_padj,
+                               x2_ranked, limma_padj,
+                               x3_ranked, DESeq_padj,
+                               rerank))
+    
+    
+    
+    xdf <- xdf[order(xdf$rerank),]
   }
-  x1_data$X <- row.names(x1_data)
-  x2_data$X <- row.names(x2_data)
-  x3_data$X <- row.names(x3_data)
-
-
-  # order the data according to most significant
-  edgeR_ord <- x1_data[order(x1_data$FDR), ]
-  limma_ord <- x2_data[order(x2_data$FDR), ]
-  DESeq_ord <- x3_data[order(x3_data$FDR), ]
-
-
-
-
-
-  x1 <- as.vector(edgeR_ord$FDR) # extract FDR
-  names(x1) <- edgeR_ord$X # assign names
-  x1_ranked <- rank(x1) # produce ranks
-  x1_ranked <- x1_ranked[order(names((x1_ranked)))]
-
-  x2 <- as.vector(limma_ord$FDR)
-  names(x2) <- limma_ord$X
-  x2_ranked <- rank(x2)
-  x2_ranked <- x2_ranked[order(names((x2_ranked)))]
-
-  x3 <- as.vector(DESeq_ord$FDR)
-  names(x3) <- DESeq_ord$X
-  x3_ranked <- rank(x3)
-  x3_ranked <- x3_ranked[order(names((x3_ranked)))]
-
-
-  # combine the vectors into a
-  xdf <- as.data.frame((cbind(x1_ranked,x2_ranked,x3_ranked)))
-
-
-  # produce consesus
-  xdf$consensus <- (rowSums(xdf[,1:3])/3)
-
-
-  consesus <- as.vector(xdf$consensus) # extract consesus
-  names(consesus) <- row.names(xdf) # assign names
-  consesus
-
-
-  rerank <- rank(consesus)
-  rerank <- rerank[order(names((rerank)))]
-
-  # p.adj vectors
-  edgeR_padj <- as.vector(x1_data$FDR)
-  names(edgeR_padj) <- x1_data$X
-  edgeR_padj <- edgeR_padj[order(names((edgeR_padj)))]
-
-  limma_padj <- as.vector(x2_data$FDR)
-  names(limma_padj) <- x2_data$X
-  limma_padj <- limma_padj[order(names((limma_padj)))]
-
-  DESeq_padj <- as.vector(x3_data$FDR)
-  names(DESeq_padj) <- x3_data$X
-  DESeq_padj <- DESeq_padj[order(names((DESeq_padj)))]
-
-
-  # rebind the rankings + FDR for each package + consesus
-  xdf <- as.data.frame(cbind(x1_ranked, edgeR_padj,
-                             x2_ranked, limma_padj,
-                             x3_ranked, DESeq_padj,
-                             rerank))
-
-
-
-
-  xdf <- xdf[order(xdf$rerank),]
+  
 
   if(pipeline == 2){
-    colnames(xdf) <- c("edgeR Rank", "edgeR adj.p-value",
-                       "limma Rank", "limma adj.p-value",
-                       "DESeq2 Rank", "DESeq2 adj.p-value",
-                       "Ranking Consesus")
+    colnames(xdf) <- c(
+      "edgeR Rank", "edgeR adj.p-value",
+      "limma Rank", "limma adj.p-value",
+      "DESeq2 Rank", "DESeq2 adj.p-value",
+      "Ranking Consesus")
+    
   } else {
-    colnames(xdf) <- c("T-test Rank", "T-test adj.p-value",
-                       "Wilcoxon Rank", "Wilcoxon adj.p-value",
-                       "MAST Rank", "MAST adj.p-value",
-                       "Ranking Consesus")
+    colnames(xdf) <- c(
+      "Wilcoxon Rank", "Wilcoxon adj.p-value",
+      "T-test Rank", "T-test adj.p-value",
+      "MAST Rank", "MAST adj.p-value",
+      "Ranking Consesus")
   }
 
   return(xdf)
