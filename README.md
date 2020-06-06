@@ -6,7 +6,7 @@ BingleSeq - A user-friendly R package for Bulk and Single-cell RNA-Seq data anal
 
 To install BingleSeq on your machine simply copy the following R code:
 
-Please mind and check the "*Folder containing BingleSeq's zip file*" to the appropriate location.
+Please mind and change the "*Folder containing BingleSeq's zip file*" to the appropriate location.
 
 ```
 install.packages("devtools")
