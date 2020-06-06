@@ -2,6 +2,29 @@
 BingleSeq - A user-friendly R package for Bulk and Single-cell RNA-Seq data analyses
 
 
+### Installation
+
+To install BingleSeq on your machine simply copy the following R code:
+
+Please mind and check the "*Folder containing BingleSeq's zip file*" to the appropriate location.
+
+```
+install.packages("devtools")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+setwd("*Folder Containing BingleSeq's zip file*")
+d <- getwd()
+
+untar(file.path(d, "BingleSeq_0.3.0.tar.gz"), exdir=d)
+devtools::install(file.path(d, "BingleSeq"), dependencies=TRUE,
+                  repos=BiocManager::repositories())
+
+
+library(BingleSeq)  # Load BingleSeq
+BingleSeq::startBingleSeq()  # Starts the application
+```
+
+
 ## About
 BingleSeq was developed as part of my MSc Bioinformatics thesis at the University of Glasgow under the supervision of Dr Quan Gu. The application provides a comprehesnive solution to both Bulk and scRNA-Seq analyses, as such it is best to look at BingleSeq as two separate parts.
 
@@ -223,28 +246,6 @@ The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to
 ### Prerequisites
 
 BingleSeq requires R>= 3.5.3
-
-
-
-### Installing
-
-To install BingleSeq on your machine simply copy the following R code:
-
-```
-install.packages("devtools")
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-setwd("*Folder Containing BingleSeq's zip file*")
-d <- getwd()
-
-untar(file.path(d, "BingleSeq_0.3.0.tar.gz"), exdir=d)
-devtools::install(file.path(d, "BingleSeq"), dependencies=TRUE,
-                  repos=BiocManager::repositories())
-
-
-library(BingleSeq)  # Load BingleSeq
-BingleSeq::startBingleSeq()  # Starts the application
-```
 
 
 ## Built With
