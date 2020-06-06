@@ -11,15 +11,10 @@ Please mind and change the "*Folder containing BingleSeq's zip file*" to the app
 
 ```
 install.packages("devtools")
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-setwd("*Folder Containing BingleSeq's zip file*")
-d <- getwd()
-
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+d <- "*Folder Containing BingleSeq's zip file*"
 untar(file.path(d, "BingleSeq_0.3.1.tar.gz"), exdir=d)
-devtools::install(file.path(d, "BingleSeq"), dependencies=TRUE,
-                  repos=BiocManager::repositories())
-
+devtools::install(file.path(d, "BingleSeq"), dependencies=TRUE, repos=BiocManager::repositories())
 
 library(BingleSeq)  # Load BingleSeq
 BingleSeq::startBingleSeq()  # Starts the application
