@@ -6,7 +6,7 @@ BingleSeq - A user-friendly R package for Bulk and Single-cell RNA-Seq data anal
 
 To install BingleSeq on your machine simply copy the following R code:
 
-Please mind and change the "*Folder containing BingleSeq's zip file*" to the appropriate location.
+Please mind and change the "*Folder containing BingleSeq's zip file*" to the appropriate location containing BingleSeq's zip file e.g. Users/Username/BingleSeq_0.3.1.tar.gz or C:\Users\User123\Downloads\BingleSeq_0.3.1.tar.gz.
 
 ```
 install.packages("devtools")
@@ -15,7 +15,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 setwd("*Folder Containing BingleSeq's zip file*")
 d <- getwd()
 
-untar(file.path(d, "BingleSeq_0.3.0.tar.gz"), exdir=d)
+untar(file.path(d, "BingleSeq_0.3.1.tar.gz"), exdir=d)
 devtools::install(file.path(d, "BingleSeq"), dependencies=TRUE,
                   repos=BiocManager::repositories())
 
@@ -101,7 +101,7 @@ Subsequent to filtering is the ‘Differential Expression’ tab, where the user
 
 
 #### 4.	Visualization
-In a typical DE analysis workflow, the next stage following DE analysis would be to proceed to the various visualization techniques. BingleSeq offers this functionality within the ‘Visualize Data’ tab, which allows users to pick from several key plotting techniques including a PCA plot (A), Scree plot (B), Barchart (C), Volcano plot (D), MA plot (E) and a Heatmap (shown below). 
+In a typical DE analysis workflow, the next stage following DE analysis would be to proceed to the various visualization techniques. BingleSeq offers this functionality within the ‘Visualize Data’ tab, which allows users to pick from several key plotting techniques. Including A) Barchart plot presenting the number of up- and downregulated genes B) PCA plot, C) Volcano plot, and D) MA plot. Note that these results were generated with limma using real data taken from McFarlane et al., 2019.
 
 ![BingleSeq Bulk RNA-Seq de Data](/figures/bulk_visData.PNG)
 
