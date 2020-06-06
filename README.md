@@ -8,6 +8,7 @@ To install BingleSeq on your machine simply copy the following R code:
 
 Please mind and change the "*Folder containing BingleSeq's zip file*" to the appropriate location containing BingleSeq's zip file e.g. Users/Username/BingleSeq_0.3.1.tar.gz or C:\Users\User123\Downloads\BingleSeq_0.3.1.tar.gz.
 
+
 ```
 install.packages("devtools")
 if (!requireNamespace("BiocManager", quietly = TRUE))
