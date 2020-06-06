@@ -442,10 +442,10 @@ plotVP <- function(data, fcValue, pValue) {
     as.factor(x$FDR < pValue & abs(x$logFC) > fcValue)
 
   VP <-
-    ggplot(data = x, aes(x$logFC, y = -log10(x$FDR), colour = sig_flag)) +
+    ggplot(data = x, aes(x$logFC, y = -log10(x$Pvalue), colour = sig_flag)) +
     geom_point(size = 1.8) +
-    xlab("-log10 Adjusted p-value") +
-    ylab("Log2 Fold Change") +
+    xlab("Log2 Fold Change") +
+    ylab("-log10 Adjusted p-value") +
     theme_classic() +
     theme(legend.position = "bottom", legend.title = element_blank()) +
     scale_colour_discrete(

@@ -2,7 +2,7 @@ Package: BingleSeq
 Type: Package
 Title: BingleSeq: A user-friendly R package for Bulk and Single-cell
         RNA-Seq Data Analysis
-Version: 0.3.0
+Version: 0.3.1
 Author: Daniel Dimitrov
 Maintainer: Daniel Dimitrov <d.boykoff@gmail.com>
 Description: 
@@ -23,4 +23,4 @@ Collate: 'bulk_compDataTab.R' 'bulk_deDataTab.R' 'bulk_filterDataTab.R'
         'sc_loadDataTab.R' 'sc_normTab.R' 'sc_qcTab.R' 'server.R'
         'ui.R' 'startApp.R'
 NeedsCompilation: no
-Packaged: 2019-08-17 08:54:51 UTC; Daniel
+Packaged: 06/06/2020 08:54:51 UTC; Daniel

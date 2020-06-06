@@ -66,8 +66,11 @@ bulk_loadDataUI <- function(id) {
         ),
 
         selected = ","
-      )
-
+      ),
+      
+      tags$hr(),
+      h5("Use HSV-1 control vs IFB-treated HFT cells data"),
+      actionButton(ns("testDataButton"), label = "Load Test Data")
 
     ),
 
@@ -100,7 +103,12 @@ bulk_loadData <- function(input, output, session) {
       contains the read counts in .csv/.txt file format. </p>
       <p style ='font-style: italic; padding-bottom: 8px;'>
       Note: The first row (header) may contain contain condition(sample) names,
-      and first column should contain gene names/IDs. </p> </div>")
+      and first column should contain gene names/IDs. </p>
+      <p style ='padding-bottom: 8px;'>
+       Example data set represents a contrast between herpes simplex virus 1 (HSV-1) 
+       infected control and interferon B treatment on human foreskin fibroblasts (HFT) cells
+       (Data taken from McFarlane et al. 2019 - see GitHub references) </p>
+      </div>")
     } else{
       HTML("<h4 style='padding-top: 8px'>Preview Count Table</h4>
            <p style='padding-bot: 8px;'><i>Please ensure
@@ -120,6 +128,7 @@ bulk_loadData <- function(input, output, session) {
 
   })
 
+  # Load Metadata table ----
   observeEvent(input$metaFile1, {
 
     if(!is.null(counts$countTable)){
@@ -138,6 +147,19 @@ bulk_loadData <- function(input, output, session) {
 
   })
 
+  
+  observeEvent(input$testDataButton, {
+    example_csv <-system.file("extdata", "MockvsIFN.txt", package = "BingleSeq")
+    example_meta <-system.file("extdata", "m_ifn.csv", package = "BingleSeq")
+    
+    counts$countTable <- read.csv(example_csv, sep=" ", header=TRUE)
+    output$dto <- DT::renderDataTable(DT::datatable(counts$countTable, options = list(pageLength = 10)))
+    
+    counts$metaTable <- read.csv(example_meta, sep=",", header=TRUE)
+    output$metaTable <- DT::renderDataTable(DT::datatable(counts$metaTable, options = list(pageLength = 10)))
+      
+  })
+  
   return(counts)
 
 }

@@ -277,8 +277,7 @@ sc_clust <- function(input, output, session, normData) {
       and appropriately setting 'nStart' is essential. <br> <br>
 
       Note that SC3 enables the number of clusters to be specified or estimated. <br>
-      However, it should be noted that estimating
-           cluster number with SC3 often results in overestimations. </div")
+           </div")
 
     } else{
       HTML(
