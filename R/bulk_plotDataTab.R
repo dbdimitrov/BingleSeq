@@ -445,7 +445,7 @@ plotVP <- function(data, fcValue, pValue) {
     ggplot(data = x, aes(x$logFC, y = -log10(x$Pvalue), colour = sig_flag)) +
     geom_point(size = 1.8) +
     xlab("Log2 Fold Change") +
-    ylab("-log10 Adjusted p-value") +
+    ylab("-log10 p-value") +
     theme_classic() +
     theme(legend.position = "bottom", legend.title = element_blank()) +
     scale_colour_discrete(

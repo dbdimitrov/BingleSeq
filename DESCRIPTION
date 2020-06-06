@@ -14,8 +14,8 @@ Imports: dplyr, shiny, shinyjs, shinyFiles, shinyWidgets, waiter, DT,
         grDevices, ggplot2, VennDiagram, factoextra, fastcluster,
         gridExtra, ggrepel, DESeq2, edgeR, limma, MAST,
         monocle, Seurat, scran, SC3, GenomeInfoDbData, geneLenDataBase,
-        org.Mm.eg.db, org.Hs.eg.db, GO.db, goseq, sva, Harman
-Suggests:
+        GO.db, goseq, sva, Harman
+Suggests: org.Mm.eg.db, org.Hs.eg.db
 RoxygenNote: 6.1.1
 Collate: 'bulk_compDataTab.R' 'bulk_deDataTab.R' 'bulk_filterDataTab.R'
         'bulk_goDataTab.R' 'bulk_loadDataTab.R' 'bulk_plotDataTab.R'
