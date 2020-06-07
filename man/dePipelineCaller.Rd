@@ -4,8 +4,15 @@
 \alias{dePipelineCaller}
 \title{Differential Expression Pipeline Caller}
 \usage{
-dePipelineCaller(filteredCounts, metaData, testType, paramX,
-  selectedPackage, session, useBatch)
+dePipelineCaller(
+  filteredCounts,
+  metaData,
+  testType,
+  paramX,
+  selectedPackage,
+  session,
+  useBatch
+)
 }
 \arguments{
 \item{testType}{The type of test to be used}

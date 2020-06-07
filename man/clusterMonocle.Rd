@@ -4,8 +4,16 @@
 \alias{clusterMonocle}
 \title{Monocle Clustering Pipeline}
 \usage{
-clusterMonocle(s_object, lowerDetection, redMethod, clustMethod,
-  dimensionNo, estimateClust, clustNo, session)
+clusterMonocle(
+  s_object,
+  lowerDetection,
+  redMethod,
+  clustMethod,
+  dimensionNo,
+  estimateClust,
+  clustNo,
+  session
+)
 }
 \arguments{
 \item{s_object}{Seurat object with scaled and PCA data}

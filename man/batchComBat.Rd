@@ -10,10 +10,6 @@ batchComBat(counts, meta, session)
 \item{counts, }{Filtered Count Table}
 
 \item{meta, }{Metadata Table}
-
-\item{counts, }{Filtered Count Table}
-
-\item{meta, }{Metadata Table}
 }
 \value{
 Returns batch-effect corrected table

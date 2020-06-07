@@ -14,7 +14,7 @@ sc_loadDataUI <- function(id) {
       radioButtons(
         ns("loadData"),
         label = "Data Type",
-        c("Count Data Table" = 1, "10x Genomics Data" = 2)
+        c("Count Data Table" = 1, "10x Genomics Data" = 2, "Test Single cell Data" = 3)
       ),
 
       conditionalPanel(
@@ -55,7 +55,16 @@ sc_loadDataUI <- function(id) {
           'Please select a folder'
         )
 
+      ),
+      
+      conditionalPanel(
+        condition = "input.loadData == 3",
+        ns = ns,
+        tags$hr(),
+        actionButton(ns("scTestDataButton"), label = "Load Test Data")
+        
       )
+      
     ),
 
     # Main panel for displaying outputs ----
@@ -90,6 +99,11 @@ sc_loadData <- function(input, output, session) {
            <p style='padding-top: 8px'; padding-bottom: 8px;>
            Select a 10x Genomics output directory containing
            matrix.mtx, barcodes.tsv, and genes.tsv files </p> </div>")
+    }else if(as.numeric(input$loadData)==3 && is.null(counts$countTable)){
+      HTML("<div style='border:2px solid blue; font-size: 14px; border-radius: 10px;text-align: center'>
+           <p style='padding-top: 8px'; padding-bottom: 8px;>
+           Load an example public 10x Genomics dataset with 1k Brain Cells from an E18 Mouse
+           matrix.mtx, barcodes.tsv, and genes.tsv files </p> </div>")
     } else{
       HTML("")
     }
@@ -112,7 +126,7 @@ sc_loadData <- function(input, output, session) {
 
     if (!is.null(path1)) {
       req(nchar(path1()) > 0)
-      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+      waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
       counts$countTable <- load10xData(path1(), session)
       hide_waiter()
     }
@@ -120,7 +134,7 @@ sc_loadData <- function(input, output, session) {
 
   # Load CountTable -----
   observeEvent(input$file1, {
-    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
     counts$countTable <- read.csv(input$file1$datapath,
                                   sep = input$sep,
                                   row.names = 1)
@@ -130,6 +144,14 @@ sc_loadData <- function(input, output, session) {
   })
 
 
+  # Load Test Data -----
+  observeEvent(input$scTestDataButton, {
+    sc_example_data <-paste0(system.file("extdata", "mm10", package = "BingleSeq"), "/") 
+    print(sc_example_data)
+    req(nchar(sc_example_data > 0))
+    counts$countTable <- load10xData(sc_example_data, session)
+  })
+  
   observe({
     output$loadDataText <- renderText({
       sprintf(

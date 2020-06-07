@@ -9,11 +9,9 @@ rankConsesus(x1_data, x2_data, x3_data, pipeline)
 \arguments{
 \item{x1_data}{DE method 1 results}
 
-\item{x2_data}{DE method 2 results}
+\item{x2_data}{DE method 3 results}
 
 \item{pipeline}{The pipeline used - scRNA-Seq or Bulk}
-
-\item{x2_data}{DE method 3 results}
 }
 \value{
 Returns a dataframe with the ranking consensus

@@ -20,6 +20,10 @@ library(BingleSeq)  # Load BingleSeq
 BingleSeq::startBingleSeq()  # Starts the application
 ```
 
+### Prerequisites
+
+BingleSeq requires R>= 3.6.3
+
 
 ## About
 BingleSeq was developed as part of my MSc Bioinformatics thesis at the University of Glasgow under the supervision of Dr Quan Gu. The application provides a comprehesnive solution to both Bulk and scRNA-Seq analyses, as such it is best to look at BingleSeq as two separate parts.
@@ -239,10 +243,10 @@ The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to
 *Also, note that Rank-based consensus is yet to be implemented for the scRNA-Seq pipeline.*
 
 
-### Prerequisites
-
-BingleSeq requires R>= 3.5.3
-
+## Test Data
+As of v 0.3.2 BingleSeq features test data for both Bulk- and scRNA-Seq.
+Bulk data - contrast between HSV-1 infected control and interferon B treatment (taken from McFarlane et al., 2019) 
+Single cell data - 10x Genomics public dataset looking at 931 cells from a combined cortex, hippocampus and sub ventricular zone of an E18 mouse (Available at: https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/neurons_900)
 
 ## Built With
 

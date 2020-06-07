@@ -4,8 +4,17 @@
 \alias{runGOSEQ}
 \title{Functional Annotation Pipeline (Both pipelines)}
 \usage{
-runGOSEQ(deGenes, data, genome, symbol, testType, pCorrect, pValue, appNum,
-  session)
+runGOSEQ(
+  deGenes,
+  data,
+  genome,
+  symbol,
+  testType,
+  pCorrect,
+  pValue,
+  appNum,
+  session
+)
 }
 \arguments{
 \item{deGenes}{a vector with DE gene names}
