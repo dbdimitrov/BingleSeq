@@ -1,24 +1,35 @@
 # BingleSeq
-BingleSeq - A user-friendly R package for Bulk and Single-cell RNA-Seq data analyses
+BingleSeq - A user-friendly R package for Bulk and Single-cell RNA-Seq data analyses.
+
+Preprint available at [![bioRxiv](https://www.biorxiv.org/content/10.1101/2020.06.16.148239v1)](https://www.biorxiv.org/content/10.1101/2020.06.16.148239v1) - abstract correction: **some of the best reviewed and most widely used** packages.
 
 
 ### Installation
 
-To install BingleSeq on your machine simply download the zip file (BingleSeq_0.3.1.tar.gz) and copy the following R code:
+To install BingleSeq on your machine simply download the zip file (BingleSeq_0.3.5.tar.gz) and copy the following R code:
 
-Please mind and change the "*Folder containing BingleSeq's zip file*" to the appropriate location containing BingleSeq's zip file e.g. Users/Username/BingleSeq_0.3.1.tar.gz or C:/Users/User123/Downloads/BingleSeq_0.3.1.tar.gz.
+Before you copy the code, please change the "*Directory containing BingleSeq's zip file*" to the appropriate location containing BingleSeq's zip file e.g. Users/Username/ or C:/Users/User123/Downloads/
 
 
 ```
+dir <- "*Directory Containing BingleSeq's zip file*"
+
 install.packages("devtools")
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
-d <- "*Folder Containing BingleSeq's zip file*"
-untar(file.path(d, "BingleSeq_0.3.1.tar.gz"), exdir=d)
-devtools::install(file.path(d, "BingleSeq"), dependencies=TRUE, repos=BiocManager::repositories())
+untar(file.path(dir, "BingleSeq_0.3.3.tar.gz"), exdir=dir)
+devtools::install(file.path(dir, "BingleSeq"), dependencies=TRUE, repos=BiocManager::repositories())
 
 library(BingleSeq)  # Load BingleSeq
 BingleSeq::startBingleSeq()  # Starts the application
 ```
+
+Alternatively, BingleSeq can be installed directly from GitHub using the following commands:
+
+```
+library("devtools")
+install_github("dbdimitrov/BingleSeq")
+```
+
 
 ### Prerequisites
 
@@ -26,7 +37,7 @@ BingleSeq requires R>= 3.6.3
 
 
 ## About
-BingleSeq was developed as part of my MSc Bioinformatics thesis at the University of Glasgow under the supervision of Dr Quan Gu. The application provides a comprehesnive solution to both Bulk and scRNA-Seq analyses, as such it is best to look at BingleSeq as two separate parts.
+BingleSeq provides a comprehesnive solution to both Bulk and scRNA-Seq analyses, as such it is best to look at BingleSeq as two separate parts.
 
 
 ### Bulk RNA-Seq
@@ -63,6 +74,7 @@ The scRNA-Seq part is based on Seurat’s pipeline (Satija et al., 2015) and fol
 BingleSeq's scRNA-Seq pipeline accepts 10x genomics data as well as count tables in the following format:
 
 ![BingleSeq Bulk RNA-Seq format](/figures/sc_format.jpg)
+
 
 
 ## Typical Workflow
@@ -221,8 +233,7 @@ Also, when performing clustering with SC3 or monocle, the data used to create th
 
 
 #### 5.	Differential Expression
-Following clustering, DE analysis can be conducted using Seurat’s inbuilt functionality to identify marker genes. Users can perform marker gene identification using the following inbuilt DE testing methods: Student’s T test, Wilcoxon Rank Sum test, and Logistic regression. Additionally, DE analysis can also be performed with DESEq2 and MAST packages (Love, Huber, and Anders, 2014; Finak et al., 2015). It is worth noting that DESeq2 is magnitudes slower than other DE tests; thus, making it impractical when working with large datasets.
-Prior to running DE analysis, users are prompted to enter the following filtering parameters: genes expressed in a minimum fraction of cells, fold-change, and adjusted p-value.
+Following clustering, DE analysis can be conducted using Seurat’s inbuilt functionality to identify marker genes. Users can perform marker gene identification using the following inbuilt DE testing methods: Student’s T test, Wilcoxon Rank Sum test, and Logistic regression. Additionally, DE analysis can also be performed with DESEq2 and MAST packages (Love, Huber, and Anders, 2014; Finak et al., 2015). Prior to running DE analysis, users are prompted to enter the following filtering parameters: genes expressed in a minimum fraction of cells, fold-change, and adjusted p-value.
 
 ![BingleSeq Bulk RNA-Seq sc deTab](/figures/sc_deTab.PNG)
 
@@ -244,9 +255,9 @@ The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to
 
 
 ## Test Data
-As of v 0.3.2 BingleSeq features test data for both Bulk- and scRNA-Seq.
+As of v0.3.2 BingleSeq features test data for both Bulk- and scRNA-Seq.
 Bulk data - contrast between HSV-1 infected control and interferon B treatment (taken from McFarlane et al., 2019) 
-Single cell data - 10x Genomics public dataset looking at 931 cells from a combined cortex, hippocampus and sub ventricular zone of an E18 mouse (Available at: https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/neurons_900)
+Single cell data - 10x Genomics public dataset looking at filtered data of 931 cells from a combined cortex, hippocampus and sub ventricular zone of an E18 mouse (Available at: https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/neurons_900)
 
 ## Built With
 
