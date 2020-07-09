@@ -16,7 +16,7 @@ dir <- "*Directory Containing BingleSeq's zip file*"
 
 install.packages("devtools")
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
-untar(file.path(dir, "BingleSeq_0.3.3.tar.gz"), exdir=dir)
+untar(file.path(dir, "BingleSeq_0.3.5.tar.gz"), exdir=dir)
 devtools::install(file.path(dir, "BingleSeq"), dependencies=TRUE, repos=BiocManager::repositories())
 
 library(BingleSeq)  # Load BingleSeq
