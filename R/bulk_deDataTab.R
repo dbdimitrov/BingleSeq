@@ -46,6 +46,21 @@ bulk_deDataUI <- function(id) {
           "Mean" = "mean"
         )
       ),
+      
+      
+      hr(),
+      
+      prettyCheckbox(ns("twoCondCheck"), label = tags$b("Use all samples for DE analysis"),
+                    value = TRUE, bigger = TRUE, animation ="rotate"),
+      
+      conditionalPanel(condition = "!input.twoCondCheck",
+                       ns = ns,
+                       h5("Samples to be compared (2 condition contrast):"),
+                       splitLayout(cellWidths = c("50%", "50%"), 
+                                   uiOutput(ns("boxHolder_A")),
+                                   uiOutput(ns("boxHolder_B"))
+                                   )
+      ),
 
 
       actionButton(ns("dePackageButton"), label = "Run DE Analysis"),
@@ -124,22 +139,118 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
               multiple-testing BH adjusted p-value (FDR).</i></p>")
     }
   })
+  
+  
+  # Two Condition option ----
+  sample_names <- reactive({
+    #get names from metatable
+    unfCounts$metaTable$sample
+  })
+  
+  output$boxHolder_A <-
+    renderUI({
+      if (is.null(sample_names()))
+        return()
+      else
+        checkboxGroupInput(session$ns("checkBox_A"), "Group A Samples", sample_names())
+    })
+  
+  observeEvent(sample_names(), {
+    updateCheckboxGroupInput(session, "checkBox_A", choices = sample_names())
+  })
+  
+  observeEvent(input$checkBox_A, {
+    de$treatment_A <- strsplit(input$checkBox_A, " ")
+  })
+  
+  
+  output$boxHolder_B <-
+    renderUI({
+      if (is.null(sample_names()))
+        return()
+      else
+        checkboxGroupInput(session$ns("checkBox_B"), "Group B Samples", sample_names())
+    })
+  
+  observeEvent(sample_names(), {
+    updateCheckboxGroupInput(session, "checkBox_B", choices = sample_names())
+  })
+  
+  observeEvent(input$checkBox_B, {
+    de$treatment_B <- strsplit(input$checkBox_B, " ")
+  })
+  
 
   # Run DE ----
   observeEvent(input$dePackageButton, {
     # Save values to variables
-
+    
+    ## All or just two cond. -----
+    if(!input$twoCondCheck){
+        if(length(de$treatment_A) > 1 && length(de$treatment_B) > 1){
+          df_sample_A <-
+            data.frame(matrix(
+              unlist(de$treatment_A),
+              nrow = length(de$treatment_A),
+              byrow = TRUE
+            ))
+          df_sample_A$batch <- "1"
+          df_sample_A$treatment <- "A"
+          
+          df_sample_B <-
+            data.frame(matrix(
+              unlist(de$treatment_B),
+              nrow = length(de$treatment_B),
+              byrow = T
+            ))
+          df_sample_B$batch <- "1"
+          df_sample_B$treatment <- "B"
+          
+          colnames(df_sample_A) <-
+            c("sample", "batch", "treatment")
+          colnames(df_sample_B) <-
+            c("sample", "batch", "treatment")
+          
+          new_meta <- rbind(df_sample_A, df_sample_B)
+          de$meta <- new_meta
+          
+          
+          
+          if(!is.null(fCounts$batchCorrected)){
+            samples.used <- names(fCounts$batchCorrected)[(names(fCounts$batchCorrected) %in% new_meta$sample)]
+            de$counts_batch <- fCounts$batchCorrected[, samples.used]
+          } else{
+            samples.used <- names(fCounts$filteredCounts)[(names(fCounts$filteredCounts) %in% new_meta$sample)]
+            samples.used <- c(names(fCounts$filteredCounts)[1],samples.used)
+            de$counts_filter <- fCounts$filteredCounts[, samples.used]
+          }
+        }
+    } else {
+      
+      
+      if(!is.null(fCounts$batchCorrected)){
+        de$counts_batch <- fCounts$batchCorrected
+      } else{
+        de$counts_filter <- fCounts$filteredCounts
+      }
+      de$meta <- unfCounts$metaTable
+      
+    }
+    
+    
+    
     de$selectedPackage <- as.numeric(input$selectPackage)
 
 
     show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
-
+      
+    
     if(!is.null(fCounts$batchCorrected)){
 
       de$batched <- TRUE
 
-      de$deTable <- dePipelineCaller(fCounts$batchCorrected,
-                                     unfCounts$metaTable,
+      de$deTable <- dePipelineCaller(de$counts_batch,
+                                     de$meta,
                                      input$selectTestType,
                                      input$selectParamX,
                                      as.numeric(input$selectPackage),
@@ -150,9 +261,8 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
     } else{
 
       de$batched <- FALSE
-
-      de$deTable <- dePipelineCaller(fCounts$filteredCounts,
-                                     unfCounts$metaTable,
+      de$deTable <- dePipelineCaller(de$counts_filter,
+                                     de$meta,
                                      input$selectTestType,
                                      input$selectParamX,
                                      as.numeric(input$selectPackage),
@@ -163,6 +273,7 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
       if(!is.null(de$deTable))
         de$merged <- cbind(de$deTable[[1]],de$deTable[[2]])
     }
+    
 
     observe({
 
@@ -331,8 +442,6 @@ deSequence <- function(readCounts, meta, testType, fitType, useBatch){
   } else{
     output2 <- readCounts
   }
-
-  print(head(output2))
 
   samplescondition <- meta$treatment
 
