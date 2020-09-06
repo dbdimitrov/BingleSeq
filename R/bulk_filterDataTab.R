@@ -414,7 +414,7 @@ plotPCA <- function(data, rowNames, meta, col) {
                       title = "",
                       legend.title = leg,
                       axes.linetype=NA) +
-           theme(panel.grid.minor=element_blank()))
+           theme_classic(base_size = 16))
 }
 
 
@@ -430,5 +430,7 @@ plotScree <- function(data) {
   x <- as.matrix(sapply(data, as.numeric))
   xx <- prcomp(t(x))
 
-  return(fviz_eig(xx))
+  return(fviz_eig(xx,
+                  title=""
+                  ) + theme_classic(base_size = 16))
 }
