@@ -306,7 +306,7 @@ plotBarChart <- function(df) {
     ylab("Number of significant genes") +
     xlab("") +
     scale_fill_discrete(name = "Direction") +
-    theme_classic(base_size = 13) +
+    theme_classic(base_size = 16) +
     geom_text(
       aes(label = number_of_sig_genes),
       position = position_dodge(width = 0.9),
@@ -396,9 +396,9 @@ plotHeatmapTop <-
             axis.text.x = element_text(
               angle = 90,
               hjust = 1,
-              size = 12
+              size = 16
             ),
-            axis.title = element_text(size = 14),
+            axis.title = element_text(size = 16),
             axis.ticks = element_blank(),
             plot.background = element_blank(),
             panel.grid.major = element_blank(),
@@ -446,7 +446,7 @@ plotVP <- function(data, fcValue, pValue) {
     geom_point(size = 1.8) +
     xlab("Log2 Fold Change") +
     ylab("-log10 unajusted p-value") +
-    theme_classic() +
+    theme_classic(base_size = 16) +
     theme(legend.position = "bottom", legend.title = element_blank()) +
     scale_colour_discrete(
       breaks = c("TRUE", "FALSE"),
@@ -490,7 +490,7 @@ plotMA <- function(data,
     geom_hline(aes(yintercept = 0), colour = "black", size = 0.75) +
     xlab("Log2 Mean Expression") +
     ylab("Log2 Fold Change") +
-    theme_classic() +
+    theme_classic(base_size = 16) +
     theme(legend.position = "bottom", legend.title = element_blank()) +
     scale_colour_discrete(
       breaks = c("TRUE", "FALSE"),
