@@ -6,24 +6,7 @@ Preprint available at [![bioRxiv](https://www.biorxiv.org/content/10.1101/2020.0
 
 ### Installation
 
-To install BingleSeq on your machine simply download the zip file (BingleSeq_0.3.5.tar.gz) and copy the following R code:
-
-Before you copy the code, please change the "*Directory containing BingleSeq's zip file*" to the appropriate location containing BingleSeq's zip file e.g. Users/Username/ or C:/Users/User123/Downloads/
-
-
-```
-dir <- "*Directory Containing BingleSeq's zip file*"
-
-install.packages("devtools")
-if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
-untar(file.path(dir, "BingleSeq_0.3.5.tar.gz"), exdir=dir)
-devtools::install(file.path(dir, "BingleSeq"), dependencies=TRUE, repos=BiocManager::repositories())
-
-library(BingleSeq)  # Load BingleSeq
-BingleSeq::startBingleSeq()  # Starts the application
-```
-
-Alternatively, BingleSeq can be installed directly from GitHub using the following commands:
+BingleSeq can be installed directly from GitHub using the following code:
 
 ```
 library("devtools")
@@ -269,6 +252,8 @@ As of v0.3.5 BingleSeq features Footprint analysis with viper and regulons from 
 
 
 ## References
+Alvarez M.J., Shen Y., Giorgi F.M., Lachmann A., Ding B.B., Ye B.H., Califano A. (2016). “Functional characterization of somatic mutations in cancer using network-based inference of protein activity.” Nature genetics, 48(8), 838–47.
+
 Bowden J, Ross J, Oytam Y (2019). HarmanData: Data for the Harman package. R package version 1.12.0, http://www.bioinformatics.csiro.au/harman/.
 
 Carlson, M. Falcon, S., Pages, H., Li, N., 2019. GO.db: A set of annotation maps describing the entire Gene Ontology. R package version 3.8.2.
