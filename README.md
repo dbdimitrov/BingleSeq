@@ -253,11 +253,14 @@ The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to
 
 *Also, note that Rank-based consensus is yet to be implemented for the scRNA-Seq pipeline.*
 
-
 ## Test Data
 As of v0.3.2 BingleSeq features test data for both Bulk- and scRNA-Seq.
 Bulk data - contrast between HSV-1 infected control and interferon B treatment (taken from McFarlane et al., 2019) 
 Single cell data - 10x Genomics public dataset looking at filtered data of 931 cells from a combined cortex, hippocampus and sub ventricular zone of an E18 mouse (Available at: https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/neurons_900)
+
+## Footprint Analysis
+As of v0.3.5 BingleSeq features Footprint analysis with viper and regulons from DoRothEA. Description to be extended.
+
 
 ## Built With
 
@@ -271,6 +274,12 @@ Bowden J, Ross J, Oytam Y (2019). HarmanData: Data for the Harman package. R pac
 Carlson, M. Falcon, S., Pages, H., Li, N., 2019. GO.db: A set of annotation maps describing the entire Gene Ontology. R package version 3.8.2.
 
 Finak, G., McDavid, A., Yajima, M., Deng, J., Gersuk, V., Shalek, A.K., Slichter, C.K., Miller, H.W., McElrath, M.J., Prlic, M. and Linsley, P.S., 2015. MAST: a flexible statistical framework for assessing transcriptional changes and characterizing heterogeneity in single-cell RNA sequencing data. Genome biology, 16(278) doi: 10.1186/s13059-015-0844-5.
+
+Garcia-Alonso L, Holland CH, Ibrahim MM, Turei D, Saez-Rodriguez J. "Benchmark and integration of resources for the estimation of human transcription factor activities." Genome Research. 2019. DOI: 
+
+Holland CH, Szalai B, Saez-Rodriguez J. "Transfer of regulatory knowledge from human to mouse for functional genomics analysis." Biochimica et Biophysica Acta (BBA) - Gene Regulatory Mechanisms. 2019. DOI: 10.1016/j.bbagrm.2019.194431.
+
+Holland CH, Tanevski J, Perales-Patón J, Gleixner J, Kumar MP, Mereu E, Joughin BA, Stegle O, Lauffenburger DA, Heyn H, Szalai B, Saez-Rodriguez, J. "Robustness and applicability of transcription factor and pathway analysis tools on single-cell RNA-seq data." Genome Biology. 2020. DOI: 10.1186/s13059-020-1949-z.
 
 Kiselev, V.Y., Kirschner, K., Schaub, M.T., Andrews, T., Yiu, A., Chandra, T., Natarajan, K.N., Reik, W., Barahona, M., Green, A.R. and Hemberg, M., 2017. SC3: consensus clustering of single-cell RNA-seq data. Nature methods, 14(5), pp. 483–486.
 
