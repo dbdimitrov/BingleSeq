@@ -301,11 +301,21 @@ server <- function(input, output, session) {
               tabPanel(
                 id = "goTab",
                 value = "goTab",
-                title = "Functional Annotation",
+                title = "Gene Ontology",
                 bulk_goDataUI("goTab")
               )
             )
 
+            appendTab(
+              inputId = "mainPage",
+              tabPanel(
+                id = "faTab",
+                value = "faTab",
+                title = "Footprint Analysis",
+                bulk_faDataUI("faTab")
+              )
+            )
+            
             appendTab(
               inputId = "mainPage",
               tabPanel(
@@ -326,6 +336,9 @@ server <- function(input, output, session) {
 
         # Functional Annotation -----
         callModule(bulk_goData, "goTab", counts , de)
+        
+        # Functional Annotation -----
+        callModule(bulk_faData, "faTab", counts , de)
 
         # Compare Data ------
         callModule(bulk_compData, "compTab", filt, de)

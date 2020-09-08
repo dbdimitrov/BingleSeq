@@ -16,11 +16,24 @@ Imports: dplyr, shiny, shinyjs, shinyFiles, shinyWidgets, waiter, DT,
         monocle, Seurat, scran, SC3, GenomeInfoDbData, geneLenDataBase,
         GO.db, goseq, sva, Harman
 Suggests: org.Mm.eg.db, org.Hs.eg.db
-RoxygenNote: 7.1.0
-Collate: 'bulk_compDataTab.R' 'bulk_deDataTab.R' 'bulk_filterDataTab.R'
-        'bulk_goDataTab.R' 'bulk_loadDataTab.R' 'bulk_plotDataTab.R'
-        'sc_clustTab.R' 'sc_compTab.R' 'sc_deTab.R' 'sc_goTab.R'
-        'sc_loadDataTab.R' 'sc_normTab.R' 'sc_qcTab.R' 'server.R'
-        'ui.R' 'startApp.R'
+RoxygenNote: 7.1.1
+Collate: 
+    'bulk_compDataTab.R'
+    'bulk_deDataTab.R'
+    'bulk_filterDataTab.R'
+    'bulk_footprintTab.R'
+    'bulk_goDataTab.R'
+    'bulk_loadDataTab.R'
+    'bulk_plotDataTab.R'
+    'sc_clustTab.R'
+    'sc_compTab.R'
+    'sc_deTab.R'
+    'sc_goTab.R'
+    'sc_loadDataTab.R'
+    'sc_normTab.R'
+    'sc_qcTab.R'
+    'server.R'
+    'ui.R'
+    'startApp.R'
 NeedsCompilation: no
 Packaged: 06/06/2020 08:54:51 UTC; Daniel

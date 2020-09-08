@@ -52,7 +52,7 @@ bulk_goDataUI <- function(id) {
               value = ("getGOTermsTab"),
               title = "Get GO Terms",
 
-              h4("Run Functional Annotation"),
+              h4("Get Gene Ontologies"),
 
 
               numericInput(
@@ -84,7 +84,6 @@ bulk_goDataUI <- function(id) {
                   "KEGG Pathways" = "KEGG"
                 )
               ),
-
 
               selectInput(
                 ns("goTermGenome"),
@@ -158,7 +157,7 @@ bulk_goDataUI <- function(id) {
 }
 
 
-#' Bulk Functional Annotation Tab Server
+#' Bulk Gene Ontology Tab Server
 #'
 #' @param counts Unfiltered Count Table (Reactive Value)
 #' @param de Differential Expression Results (Reactive Value)
@@ -199,8 +198,6 @@ bulk_goData <- function(input, output, session, counts, de) {
 
   # Functional Annotation ------
   observeEvent(input$goGetButton, {
-
-    print(head(de$merged))
 
     go$goGetGenes <-
       getDEgenes(
@@ -267,7 +264,6 @@ bulk_goData <- function(input, output, session, counts, de) {
 
     output$goHistPlot <- renderPlot({
       go$hist
-
     })
 
     updateTabsetPanel(session, "goMainTabSet", selected = "goHistTab")
@@ -304,7 +300,6 @@ bulk_goData <- function(input, output, session, counts, de) {
 #' @param fchange Fold-Change threshold
 #' @return Returns a vector with DE gene names
 getDEgenes <- function(data, type, pvalue, fchange) {
-  # table <- data
 
   fchange <- log2(fchange) # convert to log2
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/bulk_goDataTab.R
 \name{bulk_goData}
 \alias{bulk_goData}
-\title{Bulk Functional Annotation Tab Server}
+\title{Bulk Gene Ontology Tab Server}
 \usage{
 bulk_goData(input, output, session, counts, de)
 }
@@ -15,5 +15,5 @@ bulk_goData(input, output, session, counts, de)
 None
 }
 \description{
-Bulk Functional Annotation Tab Server
+Bulk Gene Ontology Tab Server
 }

@@ -32,6 +32,9 @@
 #' @import org.Mm.eg.db
 #' @import org.Hs.eg.db
 #' @import GO.db
+#' @import tibble
+#' @import pheatmap
+#' @import dplyr
 #'
 #' @include server.R
 #' @include ui.R
@@ -77,6 +80,10 @@ startBingleSeq <- function() {
     library(goseq)
     library(GO.db)
 
+    library(tibble)
+    library(pheatmap)
+    library(dplyr)
+    
     options(shiny.maxRequestSize=500*1024^2)
 
     app <- shinyApp(ui = shinyUI(ui),
