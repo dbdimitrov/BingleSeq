@@ -242,7 +242,9 @@ Bulk data - contrast between HSV-1 infected control and interferon B treatment (
 Single cell data - 10x Genomics public dataset looking at filtered data of 931 cells from a combined cortex, hippocampus and sub ventricular zone of an E18 mouse (Available at: https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/neurons_900)
 
 ## Footprint Analysis
-As of v0.3.5 BingleSeq features Footprint analysis with viper and regulons from DoRothEA. Description to be extended.
+As of v0.3.6 BingleSeq features Footprint analysis with viper and regulons from DoRothEA.
+Bulk RNA-Seq code was modified from saezlab/transcripturial (credit goes to saezlab members..).
+Description to be extended.
 
 
 ## Built With
