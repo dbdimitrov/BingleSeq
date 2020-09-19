@@ -74,9 +74,9 @@ startBingleSeq <- function() {
     library(Seurat)
     library('scran')
     library('SC3')
-
-    library(org.Mm.eg.db)
-    library(org.Hs.eg.db)
+    library(AnnotationDbi)
+    require(org.Mm.eg.db)
+    require(org.Hs.eg.db)
     library(goseq)
     library(GO.db)
 

@@ -136,7 +136,7 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
               log2 expression fold-change (logFC);
               package/test specific test statistics;
               uncorrect p-value (Pvalue);
-              multiple-testing BH adjusted p-value (FDR).</i></p>")
+              multiple-testing FDR adjusted p-value (FDR).</i></p>")
     }
   })
   
@@ -516,16 +516,20 @@ deEdgeR <- function(readCounts, meta, testType, normMethod, useBatch){
   if(testType == "exact"){
     de = exactTest(dge)
   }else if(testType == "GLM"){
-    fit <- glmFit(dge)
-    de <- glmLRT(fit)
+    fit <- glmQLFit(dge)
+    de <- glmQLFTest(fit)
   }
 
   # 5. Extract DE results
-  tt = topTags(de, n = nrow(dge), adjust.method = "BH", sort.by	= "none")
+  tt = topTags(de, n = nrow(dge), adjust.method = "fdr", sort.by	= "none")
+  print(head(tt))
   if(ncol(tt$table)>4){
-    res <- tt$table[,-3]
+    print(head(tt$table))
+    print(1)
+    res <- tt$table[,-2]
   } else{
-    res <- tt$table
+    res <- tt$table[,c(1,4,2,3)]
+    print(head(tt$table))
   }
 
   ## 6.Extract normalized  CPMs
@@ -567,7 +571,7 @@ deLimma <- function(readCounts, meta, normMethod, useBatch) {
   fit <- lmFit(v)
   ebayes.fit <- eBayes(fit)
 
-  # if(length(levels(as.factor(meta$treatment))) == 2){
+  if(length(levels(as.factor(meta$treatment))) == 2){
   tab <-
     topTable(
       ebayes.fit,
@@ -581,20 +585,20 @@ deLimma <- function(readCounts, meta, normMethod, useBatch) {
   res <-data.frame(tab$logFC, tab$t, tab$P.Value, tab$adj.P.Val)
   colnames(res) <- c("logFC", "t", "Pvalue", "FDR")
 
-  # }else{
-  #   tab <-
-  #     topTable(
-  #       ebayes.fit,
-  #       coef = 1:length(levels(as.factor(meta$treatment))),
-  #       number = dim(ebayes.fit)[1],
-  #       genelist = fit$genes$NAME,
-  #       adjust = "BH",
-  #       sort.by = "none"
-  #     )
-  #
-  #   res <-data.frame(tab[,1], tab$F, tab$P.Value, tab$adj.P.Val)
-  #   colnames(res) <- c("logFC", "F", "Pvalue", "FDR")
-  # }
+  }else{
+    tab <-
+      topTable(
+        ebayes.fit,
+        coef = 1:length(levels(as.factor(meta$treatment))),
+        number = dim(ebayes.fit)[1],
+        genelist = fit$genes$NAME,
+        adjust = "BH",
+        sort.by = "none"
+      )
+
+    res <-data.frame(tab[,1], tab$F, tab$P.Value, tab$adj.P.Val)
+    colnames(res) <- c("logFC", "F", "Pvalue", "FDR")
+  }
 
   row.names(res) <- row.names(tab)
 

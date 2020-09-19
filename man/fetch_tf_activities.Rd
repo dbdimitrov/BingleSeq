@@ -4,12 +4,16 @@
 \alias{fetch_tf_activities}
 \title{Transcription Factor activity with DoRothEA}
 \usage{
-fetch_tf_activities(de_data, reg_size)
+fetch_tf_activities(de_data, reg_size, regulons, session)
 }
 \arguments{
 \item{de_data}{Table with de results and symbols for gene type}
 
 \item{reg_size}{minimun size of regulons}
+
+\item{regulons}{Dorothea regulons}
+
+\item{session}{currently running r session}
 }
 \value{
 Returns a data frame with TF activities estimated from TF footprints

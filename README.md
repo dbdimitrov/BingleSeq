@@ -243,7 +243,7 @@ Single cell data - 10x Genomics public dataset looking at filtered data of 931 c
 
 ## Footprint Analysis
 As of v0.3.6 BingleSeq features Footprint analysis with viper and regulons from DoRothEA.
-Bulk RNA-Seq code was modified from saezlab/transcripturial (credit goes to saezlab members..).
+Bulk RNA-Seq code was modified from saezlab/transcriptutorial (credit goes to saezlab members..).
 Description to be extended.
 
 

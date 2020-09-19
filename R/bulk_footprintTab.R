@@ -23,10 +23,12 @@ bulk_faDataUI <- function(id) {
                                textInput(ns("faTypeInput"),
                                          "Enter Gene Type:",
                                          "ENSEMBL"),
-                               h5("Available inputs"),
+                               tags$b("Available inputs:"),
                                textOutput(ns("geneTypesText"))
                                
               ),
+              
+              tags$hr(),
               
               checkboxGroupInput(ns("faCheckBox"),
                                  "DoRothEA Confidence levels",
@@ -119,12 +121,12 @@ bulk_faData <- function(input, output, session, counts, de) {
   })
   
   output$geneTypesText <- renderPrint({
-      print(AnnotationDbi::keytypes(org.Hs.eg.db))
+    paste(AnnotationDbi::keytypes(org.Hs.eg.db), collapse=", ")
   })
       
   observeEvent(input$faGeneType,{
       output$geneTypesText <- renderPrint({
-        print(AnnotationDbi::keytypes(org.Hs.eg.db))
+        paste(AnnotationDbi::keytypes(org.Hs.eg.db), collapse=", ")
       })
   })
     
@@ -152,10 +154,8 @@ bulk_faData <- function(input, output, session, counts, de) {
     fa$tfs_sample <- fetch_tfs_per_sample(fa$data_de, input$faTermRegulonValue, fa$regulons, session)
     
     output$faTable <-
-      DT::renderDataTable(as.data.frame(fa$tfs_sample), colnames = ("NES"))
+      DT::renderDataTable(as.data.frame(fa$tfs_sample))
     
-    print(head(fa$tfs))
-    print(head(fa$tfs_sample))
     
     output$faPlot <- renderPlot({
       plot_tfa_per_sample(fa$tfs, fa$tfs_sample, input$faTFNumValue)
@@ -307,7 +307,8 @@ plot_tfa_per_sample <- function(tf_activities, tf_activities_counts, tf_num) {
                             fontsize=14, fontsize_row = 12, fontsize_col = 12, 
                             color=myColor, breaks = dorotheaBreaks,
                             main = "", angle_col = 45,
-                            treeheight_col = 0,  border_color = NA)
+                            treeheight_col = 0,  border_color = NA, silent = T)
+  
   return(dorothea_hmap)
 }
 #' Gene type converter function

@@ -4,12 +4,14 @@
 \alias{fetch_tfs_per_sample}
 \title{TF activity per sample Sample DoRothEA}
 \usage{
-fetch_tfs_per_sample(de_data, reg_size)
+fetch_tfs_per_sample(de_data, reg_size, regulons, session)
 }
 \arguments{
 \item{de_data}{Table with de results and symbols for gene type}
 
-\item{reg_size}{minimun size of regulons}
+\item{reg_size}{minimum size of regulons}
+
+\item{regulons}{Regulons obtained from dorothea}
 }
 \value{
 Returns a data frame with TF activities per Sample
