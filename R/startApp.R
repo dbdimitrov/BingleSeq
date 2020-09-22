@@ -32,10 +32,13 @@
 #' @import org.Mm.eg.db
 #' @import org.Hs.eg.db
 #' @import GO.db
+#' 
 #' @import tibble
 #' @import pheatmap
 #' @import dplyr
-#'
+#' @import progeny
+#' @import dorothea
+#' 
 #' @include server.R
 #' @include ui.R
 #'
@@ -83,6 +86,8 @@ startBingleSeq <- function() {
     library(tibble)
     library(pheatmap)
     library(dplyr)
+    library(progeny)
+    library(dorothea)
     
     options(shiny.maxRequestSize=500*1024^2)
 

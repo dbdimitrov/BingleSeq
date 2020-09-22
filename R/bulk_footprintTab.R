@@ -49,7 +49,7 @@ bulk_faDataUI <- function(id) {
                 ns("faOrganism"),
                 label = "Select Organism",
                 choices = list(
-                  "Homo Sapiens" = "hh",
+                  "Homo sapiens" = "hh",
                   "Mus musculus" = "mm"
                 )
               ),
@@ -72,32 +72,93 @@ bulk_faDataUI <- function(id) {
               ),
               tags$hr()
             )
-          )),
-          
-          # Main panel for displaying outputs ----
-          mainPanel(
-            tabsetPanel(
-              tabPanel(
-                value = ("faTable"),
-                title = "Activities Table",
-                
-                htmlOutput(ns("faInfo")),
-                
-                DT::dataTableOutput(ns("faTable")),
-                
-                conditionalPanel(condition = "input.faTFButton > 0",
-                                 ns = ns,
-                                 downloadButton(ns("faDownload"), "Download Table")
+            ,
+
+
+            tabPanel(
+              value = ("faGetPROGENy"),
+              title = "Pathway Activities",
+
+              h4("Get Pathway Activities with PROGENy"),
+
+              checkboxInput(ns("faProGeneType"),
+                            label = ("Gene IDs are Symbols"),
+                            value = TRUE),
+
+              conditionalPanel(condition = "!input.faProGeneType",
+                               ns = ns,
+                               textInput(ns("faProGeneText"),
+                                         "Enter Gene Type:",
+                                         "ENSEMBL")
+              ),
+
+              tags$hr(),
+
+              selectInput(
+                ns("faProOrganism"),
+                label = "Select Organism",
+                choices = list(
+                  "Homo sapiens" = "Human",
+                  "Mus musculus" = "Mouse"
                 )
               ),
               
-              tabPanel(
-                value = ("faBarTab"),
-                title = "Footprint Plot Tab",
-                plotOutput(ns("faPlot"), width = "800px", height = "700px")
-              )
+              numericInput(
+                ns("faProTopGeneNum"),
+                label = "Number of Top genes per pathway",
+                value = 100,
+                min = 10
+              ),
+              
+              tags$hr(),
+              
+              actionButton(ns("faProSampleButton"),
+                           label = "Get Pathway Activities per Sample"),
+              
+              tags$hr(),
+              
+              actionButton(ns("faProConditionButton"),
+                           label = "Get Pathway Activities"),
+              
+              
+              tags$line(),
+              
+              conditionalPanel(condition = "input.faProConditionButton > 0",
+                               ns = ns,
+
+                               tags$b("Available pathways:"),
+                               tags$i("Androgen, EGFR, Estrogen, Hypoxia,
+                                         JAK-STAT, MAPK, NFkB, p53, PI3K, TGFb,
+                                         TNFa, Trail, VEGF, WNT"),
+                               textInput(ns("faProPathwayText"),
+                                         "Enter Pathway:",
+                                         "JAK-STAT"),
+                               actionButton(ns("faProPathwayButton"),
+                                            label = "Get Top Genes per Pathway")
+                               
+                               
+              ),
+              
             )
-          ))
+          )
+        ),
+          
+          # Main panel for displaying outputs ----
+          mainPanel(
+              htmlOutput(ns("faInfo")),
+              
+              tags$h4("Replace with a text output"),
+              DT::dataTableOutput(ns("faTable")),
+              
+              conditionalPanel(condition = "input.faTFButton > 0",
+                               ns = ns,
+                               downloadButton(ns("faDownload"), "Download Table")
+              ),
+              tags$hr(),
+              tags$h4("Replace with a text output"),
+              plotOutput(ns("faPlot"), width = "800px", height = "700px")
+          )
+        )
 }
 
 
@@ -110,7 +171,8 @@ bulk_faData <- function(input, output, session, counts, de) {
   fa <- reactiveValues()
   
   output$faInfo <- renderUI({
-    if(input$faTFButton == 0){
+    if(input$faTFButton == 0 && input$faProSampleButton == 0
+       && input$faProConditionButton){
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px'>
         info goes here
@@ -119,6 +181,7 @@ bulk_faData <- function(input, output, session, counts, de) {
         HTML("")
     }
   })
+  
   
   output$geneTypesText <- renderPrint({
     paste(AnnotationDbi::keytypes(org.Hs.eg.db), collapse=", ")
@@ -161,6 +224,66 @@ bulk_faData <- function(input, output, session, counts, de) {
       plot_tfa_per_sample(fa$tfs, fa$tfs_sample, input$faTFNumValue)
     })
   })
+  
+  
+  # ---- 
+  # progeny
+  
+  observeEvent(input$faProSampleButton,{
+    
+    fa$data_de <- tibble::rownames_to_column(de$merged, "X")
+    if(!input$faProGeneType){
+      fa$data_de <- convert_gene_type(fa$data_de, input$faTypeInput, "SYMBOL")
+    }
+    fa$progSample<- get_pathway_activity_per_sample(fa$data_de,
+                                                    as.character(input$faProOrganism),
+                                                    as.numeric(input$faProTopGeneNum),
+                                                    session)
+
+    output$faTable <-
+      DT::renderDataTable(as.data.frame(fa$progSample[[1]]))
+
+    output$faPlot <- renderPlot({
+      grid.draw(fa$progSample[[2]])
+    })
+  })
+  
+  
+  observeEvent(input$faProConditionButton,{
+    
+    fa$data_de <- tibble::rownames_to_column(de$merged, "X")
+    if(!input$faProGeneType){
+      fa$data_de <- convert_gene_type(fa$data_de, input$faTypeInput, "SYMBOL")
+    }
+    fa$proCondition <- get_pathway_activity(fa$data_de,
+                                             as.character(input$faProOrganism),
+                                             as.numeric(input$faProTopGeneNum),
+                                             session)
+    
+    output$faTable <-
+      DT::renderDataTable(as.data.frame(fa$proCondition[[1]]))
+    
+    output$faPlot <- renderPlot({
+      grid.draw(fa$proCondition[[2]])
+    })
+  })
+  
+  
+  observeEvent(input$faProPathwayButton,{
+    
+    if(req(fa$proCondition[[3]])){
+      fa$scatter <- get_progeny_scatter(fa$proCondition[[3]],
+                                        as.character(input$faProPathwayText),
+                                        as.character(input$faProOrganism),
+                                        as.numeric(input$faProTopGeneNum),
+                                        fa$de_data
+      )
+    } 
+    plot(fa$scatter)
+    output$faPlot <- renderPlot({
+      fa$scatter
+    })
+  })
 }
 
 
@@ -177,7 +300,7 @@ fetch_tf_activities <- function(de_data, reg_size, regulons, session) {
   out <- tryCatch({
     de_data$gene <- de_data$X
     gene_counts <- de_data[,6:ncol(de_data)]
-    de_data$stat <- de_data[[3]]
+    de_data$stat <- de_data[[3]] # reassign package-specific stat 
     
     de_data_matrix <- de_data %>% 
       dplyr::select(gene, stat) %>% 
@@ -223,10 +346,10 @@ plot_top_tfs <- function(tf_activities, tf_num) {
            scale_fill_gradient2(low = "darkblue", high = "indianred", 
                                 mid = "whitesmoke", midpoint = 0) + 
            theme_minimal() +
-           theme(axis.title = element_text(face = "bold", size = 12),
+           theme(axis.title = element_text(face = "bold", size = 14),
                  axis.text.x = 
-                   element_text(angle = 45, hjust = 1, size =10, face= "bold"),
-                 axis.text.y = element_text(size = 10, face= "bold"),
+                   element_text(angle = 45, hjust = 1, size =12, face= "bold"),
+                 axis.text.y = element_text(size = 12, face= "bold"),
                  panel.grid.major = element_blank(), 
                  panel.grid.minor = element_blank()) +
            xlab("Transcription Factors"))
@@ -351,4 +474,159 @@ fetch_regulons <- function(org, conf_list) {
   }
   
   return(regulons)
+}
+
+
+
+
+#' Fetch Sample Pathway Activity
+#' 
+#' @param de_data de results dataframe
+#' @param organism Human or Mouse
+#' @param top # the top n genes for generating the model matrix sorted by p
+#' @export
+#' @return a list with pathway activity counts and a heatmap 
+get_pathway_activity_per_sample <- function(de_data, organism, top, session) {
+  out <- tryCatch({
+    # get and format normalized counts
+    normalised_counts <- de_data[,6:ncol(de_data)]
+    normalised_counts$gene <- de_data$X
+    
+    normalised_counts_matrix <- normalised_counts %>% 
+      dplyr::mutate_if(~ any(is.na(.x)),~ if_else(is.na(.x),0,.x)) %>% 
+      tibble::column_to_rownames(var = "gene") %>% 
+      as.matrix()
+    
+    
+    # Pathway activity with Progeny
+    pathway_activity_counts <- progeny(normalised_counts_matrix, scale=TRUE, 
+                                       organism=as.character(organism), top = top)
+    activity_counts <- as.vector(pathway_activity_counts)
+    
+    # heatmap
+    paletteLength <- 100
+    myColor <- 
+      colorRampPalette(c("darkblue", "whitesmoke","indianred"))(paletteLength)
+    
+    progenyBreaks <- c(seq(min(activity_counts), 0, 
+                           length.out=ceiling(paletteLength/2) + 1),
+                       seq(max(activity_counts)/paletteLength, 
+                           max(activity_counts), 
+                           length.out=floor(paletteLength/2)))
+    
+    progeny_hmap <- pheatmap(t(pathway_activity_counts),fontsize=16, 
+                             fontsize_row = 14, fontsize_col = 14, 
+                             color=myColor, breaks = progenyBreaks, 
+                             main = "", angle_col = 45,
+                             treeheight_col = 0,  border_color = NA)
+    
+    out <- list(pathway_activity_counts, progeny_hmap)
+  },
+  error = function(cond) {
+    sendSweetAlert(
+      session = session,
+      title = "Data Mismatch",
+      text = "Please ensure that Gene IDs are of type Symbol, if select appropriate type to convert",
+      type = "error"
+    )
+    return()
+  })
+  return(out)
+}
+
+
+#' Fetch Pathway Activity
+#' 
+#' @param de_data de results dataframe
+#' @param organism Human or Mouse
+#' @param top num of top n genes for generating the model matrix sorted by p
+#' @param session current R session
+#' @export
+#' @return a list with pathway activities, barplot, de_results matrix
+get_pathway_activity <- function(de_data, organism, top, session) {
+  out <- tryCatch({
+    de_results <- de_data[,0:5]
+    de_results$stat <- de_data[[3]] # reasign package-specific stat 
+    
+    de_results_matrix <- de_results %>% 
+      dplyr::select(X, stat) %>% 
+      dplyr::filter(!is.na(stat)) %>% 
+      column_to_rownames(var = "X") %>%
+      as.matrix()
+    
+    pathway_activity_zscore <- progeny(de_results_matrix, 
+                                       scale=TRUE,
+                                       organism=as.character(organism),
+                                       top = top, perm = 10000,
+                                       z_scores = TRUE) %>%
+      t()
+    colnames(pathway_activity_zscore) <- "NES"
+    
+    
+    pathway_activity_zscore_df <- as.data.frame(pathway_activity_zscore) %>% 
+      rownames_to_column(var = "Pathway") %>%
+      dplyr::arrange(NES) %>%
+      dplyr::mutate(Pathway = factor(Pathway))
+    
+    
+    pathway_plot <- 
+      ggplot(pathway_activity_zscore_df,aes(x = reorder(Pathway, NES), y = NES)) + 
+      geom_bar(aes(fill = NES), stat = "identity") +
+      scale_fill_gradient2(low = "darkblue", high = "indianred", 
+                           mid = "whitesmoke", midpoint = 0) + 
+      theme_minimal() +
+      theme(axis.title = element_text(face = "bold", size = 14),
+            axis.text.x = 
+              element_text(angle = 45, hjust = 1, size =12, face= "bold"),
+            axis.text.y = element_text(size =12, face= "bold"),
+            panel.grid.major = element_blank(), 
+            panel.grid.minor = element_blank()) +
+      xlab("Pathways")
+    
+    out <- list(pathway_activity_zscore_df, pathway_plot, de_results_matrix)
+  },
+  error = function(cond) {
+    sendSweetAlert(
+      session = session,
+      title = "Data Mismatch",
+      text = "Please ensure that Gene IDs are of type Symbol, if select appropriate type to convert",
+      type = "error"
+    )
+    return()
+  })
+  return(out)
+}
+
+
+
+
+#' Fetch Progeny Scatter with top Genes
+#' 
+#' @param de_data_results de results matrix as returned by get_pathway_activity
+#' @param x_pathway pathway to be plotted
+#' @param organism Human or Mouse
+#' @param top # of significant genes for each pathway
+#' @param session current R session
+#' 
+#' @export
+#' @return a scatter plot with the top most signif signature genes
+get_progeny_scatter <- function(de_results_matrix, x_pathway,
+                                organism, top, de_data) {
+  
+  prog_matrix <- getModel(as.character(organism), top=top) %>% 
+    as.data.frame()  %>%
+    tibble::rownames_to_column("GeneID")
+  
+  ttop_results <- de_results_matrix %>% 
+    as.data.frame() %>% 
+    tibble::rownames_to_column("GeneID")
+  
+  # statistic name
+  stat_x = as.character(colnames(de_data)[3])
+  
+  scat_plots <- progeny::progenyScatter(df = ttop_results, 
+                                        weight_matrix = prog_matrix, 
+                                        statName = stat_x, verbose = TRUE)
+  
+  return(scat_plots[[1]][[as.character(x_pathway)]])
 }

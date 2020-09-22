@@ -470,7 +470,8 @@ deSequence <- function(readCounts, meta, testType, fitType, useBatch){
   DEData <- data.frame(as.data.frame(res))
 
   DEData.matching <- DEData[, c(2, 4:6)]
-  colnames(DEData.matching) <- c("logFC", "stat", "Pvalue", "FDR")
+
+  colnames(DEData.matching) <- c("logFC", as.character(testType), "Pvalue", "FDR")
 
   normCounts <- as.data.frame(counts(dds, normalized = TRUE))
 
@@ -524,12 +525,9 @@ deEdgeR <- function(readCounts, meta, testType, normMethod, useBatch){
   tt = topTags(de, n = nrow(dge), adjust.method = "fdr", sort.by	= "none")
   print(head(tt))
   if(ncol(tt$table)>4){
-    print(head(tt$table))
-    print(1)
-    res <- tt$table[,-2]
+    res <- tt$table[,c(3,1,4,5)]
   } else{
-    res <- tt$table[,c(1,4,2,3)]
-    print(head(tt$table))
+    res <- tt$table[,c(2,1,4,3)]
   }
 
   ## 6.Extract normalized  CPMs
