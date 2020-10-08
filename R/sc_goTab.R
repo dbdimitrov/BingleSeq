@@ -75,7 +75,9 @@ sc_goUI <- function(id) {
                 ns("goTermPvalue")
               ))),
 
-              checkboxInput(ns("goTermFDR"), label = "FDR Correction", value = TRUE),
+              checkboxInput(ns("goTermFDR"),
+                            label = "FDR Correction",
+                            value = TRUE),
 
               radioButtons(
                 ns("goTermSymbol"),

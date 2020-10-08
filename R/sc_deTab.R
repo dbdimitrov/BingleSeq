@@ -190,11 +190,14 @@ sc_de <- function(input, output, session, finData) {
 
     output$dgeTable <-
       DT::renderDataTable(if (input$dgeClusterCheck) {
-        de$markers[,1:(ncol(de$markers)-1)] %>% datatable() %>%
-          formatSignif(columns = c(1:2, 5), digits = 4)
+        de$markers[,1:(ncol(de$markers)-1)] %>% 
+          rownames_to_column("gene_id") %>% 
+          datatable(rownames = FALSE)
       } else{
-        de$markers[de$markers$cluster == input$dgeClustInput, 1:(ncol(de$markers)-1)] %>% datatable() %>%
-          formatSignif(columns = c(1:2, 5), digits = 4)
+        de$markers[de$markers$cluster == input$dgeClustInput,
+                   1:(ncol(de$markers)-1)] %>%
+          rownames_to_column("gene_id") %>% 
+          datatable(rownames = FALSE)
       }, options = list(pageLength = 10))
   })
 

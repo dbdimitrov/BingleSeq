@@ -69,8 +69,11 @@ bulk_deDataUI <- function(id) {
                        ns = ns,
 
                        hr(),
+                       
+                       h4("Filter DE results"),
 
-                       checkboxInput(ns("exploreDE"), label = ("Explore DE results"),
+                       checkboxInput(ns("exploreDE"),
+                                     label = "",
                                      value = FALSE),
 
                        conditionalPanel(condition = "input.exploreDE",
@@ -82,6 +85,8 @@ bulk_deDataUI <- function(id) {
                                           min = 0.0001,
                                           max = 0.5
                                         ),
+                                        textInput(ns("exploreGenes"),
+                                                  "Please enter genes you wish to filer"),
                                         fluidRow(column(3, verbatimTextOutput(ns(
                                           "explorePvalue"
                                         )))),
@@ -279,8 +284,8 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
 
       output$deTable <-
         DT::renderDataTable(
-          de$deTable[[1]] %>% datatable() %>%
-            formatSignif(columns = c(1:4), digits = 4),
+          de$deTable[[1]] %>%  rownames_to_column("gene_id") %>% 
+            datatable(rownames = FALSE),
           options = list(pageLength = 10)
         )
     })
@@ -288,13 +293,14 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
     hide_waiter()
 
     observeEvent(input$exploreButton,{
-      de$dispTable <-
-        subset(de$deTable[[1]], FDR < input$explorePvalue)
+      de$deTable[[1]] <- de$deTable[[1]] %>%
+        dplyr::filter(FDR < input$explorePvalue) %>%
+        dplyr::filter(!grepl(as.character(input$exploreGenes), rownames(.)))
 
       output$deTable <-
         DT::renderDataTable(
-          de$dispTable %>% datatable() %>%
-            formatSignif(columns = c(1:4), digits = 4),
+          de$deTable[[1]] %>% rownames_to_column("gene_id") %>% 
+            datatable(rownames = FALSE),
           options = list(pageLength = 10)
         )
 

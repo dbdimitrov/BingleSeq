@@ -214,7 +214,10 @@ bulk_faData <- function(input, output, session, counts, de) {
   
   observeEvent(input$faSampleButton,{
     
-    fa$tfs_sample <- fetch_tfs_per_sample(fa$data_de, input$faTermRegulonValue, fa$regulons, session)
+    fa$tfs_sample <- fetch_tfs_per_sample(fa$data_de,
+                                          input$faTermRegulonValue,
+                                          fa$regulons,
+                                          session)
     
     output$faTable <-
       DT::renderDataTable(as.data.frame(fa$tfs_sample))
@@ -309,8 +312,10 @@ fetch_tf_activities <- function(de_data, reg_size, regulons, session) {
       as.matrix()
     
     out <- dorothea::run_viper(de_data_matrix, regulons,
-                               options =  list(minsize = reg_size, eset.filter = FALSE, 
-                                               cores = 1, verbose = FALSE, nes = TRUE))
+                               options =  list(minsize = reg_size,
+                                               eset.filter = FALSE, 
+                                               cores = 1, verbose = FALSE,
+                                               nes = TRUE))
   },
   error = function(cond) {
     sendSweetAlert(
@@ -377,8 +382,10 @@ fetch_tfs_per_sample <- function(de_data, reg_size, regulons, session) {
     
     out <- 
       dorothea::run_viper(normalised_counts_matrix, regulons,
-                          options =  list(minsize = reg_size, eset.filter = FALSE, 
-                                          cores = 1, verbose = FALSE, method = c("scale")))
+                          options =  list(minsize = reg_size,
+                                          eset.filter = FALSE, 
+                                          cores = 1, verbose = FALSE,
+                                          method = c("scale")))
   },
   error = function(cond) {
     sendSweetAlert(
@@ -434,6 +441,9 @@ plot_tfa_per_sample <- function(tf_activities, tf_activities_counts, tf_num) {
   
   return(dorothea_hmap)
 }
+
+
+
 #' Gene type converter function
 #'
 #' @param de_data Table with de results
@@ -499,8 +509,10 @@ get_pathway_activity_per_sample <- function(de_data, organism, top, session) {
     
     
     # Pathway activity with Progeny
-    pathway_activity_counts <- progeny(normalised_counts_matrix, scale=TRUE, 
-                                       organism=as.character(organism), top = top)
+    pathway_activity_counts <- progeny(normalised_counts_matrix,
+                                       scale=TRUE, 
+                                       organism=as.character(organism),
+                                       top = top)
     activity_counts <- as.vector(pathway_activity_counts)
     
     # heatmap
