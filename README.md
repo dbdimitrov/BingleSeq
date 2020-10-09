@@ -239,7 +239,8 @@ The scRNA-Seq part also implements a ‘DE Method Comparison’ tab analogous to
 ## Test Data
 As of v0.3.2 BingleSeq features test data for both Bulk- and scRNA-Seq.
 Bulk data - contrast between HSV-1 infected control and interferon B treatment (taken from McFarlane et al., 2019) 
-Single cell data - 10x Genomics public dataset looking at filtered data of 931 cells from a combined cortex, hippocampus and sub ventricular zone of an E18 mouse (Available at: https://support.10xgenomics.com/single-cell-gene-expression/datasets/2.1.0/neurons_900)
+Single cell data - Cell Ranger 10x Genomics public dataset looking at filtered data of 2700 PBMCs
+[10x Genomics link](https://support.10xgenomics.com/single-cell-multiome-atac-gex/datasets/1.0.0/pbmc_unsorted_3k)
 
 ## Footprint Analysis
 As of v0.3.6 BingleSeq features Footprint analysis with viper and regulons from DoRothEA.

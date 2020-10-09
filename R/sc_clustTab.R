@@ -58,7 +58,7 @@ sc_clustUI <- function(id) {
             label = "Resolution parameter Value",
             min = 0,
             max = 3,
-            value = 0.6
+            value = 0.5
           )
         ),
 

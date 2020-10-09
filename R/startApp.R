@@ -33,9 +33,8 @@
 #' @import org.Hs.eg.db
 #' @import GO.db
 #' 
-#' @import tibble
 #' @import pheatmap
-#' @import dplyr
+#' @import tidyverse
 #' @import progeny
 #' @import dorothea
 #' 

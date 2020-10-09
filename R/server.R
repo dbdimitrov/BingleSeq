@@ -114,13 +114,21 @@ server <- function(input, output, session) {
         # Cluster Data ----
         finalData <-
           callModule(sc_clust, "clustTab", normalizedData)
+        
+        
+
 
         observe({
           if (!is.null(finalData$finalData) && !tabs$clust) {
             appendTab(inputId = "mainPage",
-                      tabPanel(title = "Differential Expression", sc_deUI("deTab")))
+                      tabPanel(title = "Differential Expression",
+                               sc_deUI("deTab")))
             appendTab(inputId = "mainPage",
-                      tabPanel(title = "Compare DE Methods", sc_compUI("compTab")))
+                      tabPanel(title = "Compare DE Methods",
+                               sc_compUI("compTab")))
+            appendTab(inputId = "mainPage",
+                      tabPanel(title = "Footprint Analysis",
+                               sc_faUI("faTab")))
 
             tabs$clust = TRUE
           }
@@ -146,7 +154,10 @@ server <- function(input, output, session) {
           }
         })
 
-
+        
+        # Footprint Analysis -----
+        callModule(sc_fa_Server, "faTab", finalData)
+        
         # Differential Expression Markers ----
         markers <- callModule(sc_de, "deTab", finalData)
 
@@ -178,7 +189,7 @@ server <- function(input, output, session) {
         })
 
 
-        # Functional Annotation ----
+        # Gene Ontology ----
         callModule(sc_go, "goTab", markers, counts)
 
 
@@ -194,12 +205,13 @@ server <- function(input, output, session) {
 
               filename = paste("SeuratObj_", format(Sys.time(), "%y-%m-%d_%H-%M"), '.Robj', sep = "")
 
-              saveDir = file.path(tempdir(), filename)
+              saveDir = file.path("~/Downloads", filename)
               print(saveDir)
 
-              shiny::setProgress(value = 0.4, detail = "This could take a while for large datasets...")
+              shiny::setProgress(value = 0.4, detail =
+                                   "This could take a while for large datasets...")
 
-              save(data, file = saveDir)
+              saveRDS(data, file = saveDir)
 
             })
           }

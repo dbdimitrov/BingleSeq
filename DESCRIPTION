@@ -28,6 +28,7 @@ Collate:
     'sc_clustTab.R'
     'sc_compTab.R'
     'sc_deTab.R'
+    'sc_footprintTab.R'
     'sc_goTab.R'
     'sc_loadDataTab.R'
     'sc_normTab.R'

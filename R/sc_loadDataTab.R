@@ -130,7 +130,7 @@ sc_loadData <- function(input, output, session) {
   
   # Load Test Data -----
   observeEvent(input$scTestDataButton, {
-    sc_example_data <-paste0(system.file("extdata", "mm10", package = "BingleSeq"), "/") 
+    sc_example_data <-paste0(system.file("extdata", "hg19", package = "BingleSeq"), "/") 
     req(nchar(sc_example_data > 0))
     counts$countTable <- load10xData(sc_example_data, session)
   })

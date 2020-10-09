@@ -218,7 +218,7 @@ bulk_faData <- function(input, output, session, counts, de) {
       
   observeEvent(input$faGeneType,{
       output$geneTypesText <- renderPrint({
-        paste(AnnotationDbi::keytypes(org.Hs.eg.db), collapse=", ")
+        "ALIAS, ENSEMBL, ENTREZID, ENZYME, SYMBOL, UNIGENE"
       })
   })
     
