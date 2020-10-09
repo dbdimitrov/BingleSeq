@@ -169,7 +169,14 @@ bulk_goData <- function(input, output, session, counts, de) {
     if(input$goGetButton == 0){
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px'>
-        The <i> 'Get DE Genes' </i> tab enables
+        
+        
+        This tab enables the Gene Ontology and Pathway analysis of deregulated 
+        gene sets using the over representation analysis approach implemented 
+        within the GOseq package.
+        <br> <br>
+        
+        The <i> 'Get DE Genes' </i> subtab enables
         DE genes obtained from the DE analysis to be pre-filtered according to:
         Fold-change, adj. P-value threshold <br>
         Once the DE genes are filtered,
@@ -178,7 +185,7 @@ bulk_goData <- function(input, output, session, counts, de) {
       if(is.null(go$goTermTable)){
         HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
-        The <i> 'Get GO Terms' </i> tab provides a comprehensive
+        The <i> 'Get GO Terms' </i> subtab provides a comprehensive
         Functional Annotation Pipeline using the filtered DE genes. <br> <br>
 
         Prior to running the pipeline, please specify the following parameters:

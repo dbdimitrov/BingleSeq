@@ -56,7 +56,7 @@ bulk_faDataUI <- function(id) {
               
               numericInput(
                 ns("faTFNumValue"),
-                label = "Number of Top TFs to be Plotted",
+                label = "Number of Top TFs to be plotted",
                 value = 25,
                 min = 5
               ),
@@ -105,7 +105,7 @@ bulk_faDataUI <- function(id) {
               
               numericInput(
                 ns("faProTopGeneNum"),
-                label = "Number of Top genes per pathway",
+                label = "Number of footprint genes per pathway",
                 value = 100,
                 min = 10
               ),
@@ -121,7 +121,7 @@ bulk_faDataUI <- function(id) {
                            label = "Get Pathway Activities"),
               
               
-              tags$line(),
+              tags$hr(),
               
               conditionalPanel(condition = "input.faProConditionButton > 0",
                                ns = ns,
@@ -146,8 +146,7 @@ bulk_faDataUI <- function(id) {
           # Main panel for displaying outputs ----
           mainPanel(
               htmlOutput(ns("faInfo")),
-              
-              tags$h4("Replace with a text output"),
+              textOutput(ns("faPlotText")),
               DT::dataTableOutput(ns("faTable")),
               
               conditionalPanel(condition = "input.faTFButton > 0",
@@ -155,7 +154,7 @@ bulk_faDataUI <- function(id) {
                                downloadButton(ns("faDownload"), "Download Table")
               ),
               tags$hr(),
-              tags$h4("Replace with a text output"),
+              textOutput(ns("faTableText")),
               plotOutput(ns("faPlot"), width = "800px", height = "700px")
           )
         )
@@ -172,10 +171,40 @@ bulk_faData <- function(input, output, session, counts, de) {
   
   output$faInfo <- renderUI({
     if(input$faTFButton == 0 && input$faProSampleButton == 0
-       && input$faProConditionButton){
+       && input$faProConditionButton == 0){
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px'>
-        info goes here
+        This tab enables the use of footprint analysis tools
+         DoRothEA and PROGENy which  infer the activity of TFs and pathways,
+         respectively. Footprint-based strategies such as the aforementioned
+         packages infer TF/pathway activityfrom the expression of molecules 
+         considered to be donstream of a given pathway/TF.
+         <br> <br>
+         DoRothEA is a gene set resource containing signed TF-target 
+         interactions that can be coupled with different statistical methods to
+         estimate TF activity. In BingleSeq, DoRothEA is coupled to the
+         statistical method VIPER.
+         <br>
+         'DoRothEA Confidence levels' are based on the supporting evidence for
+         the TF-target interactions with A being the highest level.
+         <br>
+         'Minimum Regulon Size' refers to the minimum number of TF-target
+         interactions for a given TF.
+         <br> <br>
+        PROGENy estimates the activity of 14 signalling pathways from gene
+        expression using a linear model.
+        PROGENy is based on downstream gene signatures observed to be 
+        consistently deregulated in pertrubation experiments.
+        
+        'PROGENy footprint genes' refers to the number of most responsive genes
+        per pathway. This number should be increased in cases with low gene
+        coverage such as RNA-Seq (for more information refer to the papers cited
+        in BingleSeq's manuscript).
+         
+         <br> <br>
+         
+         Also, please ensure that the approprate gene nomelcature is selected.
+
         </div>")
     }else {
         HTML("")
@@ -184,7 +213,7 @@ bulk_faData <- function(input, output, session, counts, de) {
   
   
   output$geneTypesText <- renderPrint({
-    paste(AnnotationDbi::keytypes(org.Hs.eg.db), collapse=", ")
+    "ALIAS, ENSEMBL, ENTREZID, ENZYME, SYMBOL, UNIGENE"
   })
       
   observeEvent(input$faGeneType,{
@@ -209,6 +238,15 @@ bulk_faData <- function(input, output, session, counts, de) {
      plot_top_tfs(fa$tfs, input$faTFNumValue)
    })
    
+   output$faTableText <- renderText({
+     "Table with TFs and corresponding NES activity estimate"
+   })
+   
+   output$faPlotText <- renderText({
+     "Top TFs according to normalized enrichment scores (NES)"
+   })
+   
+   
   })
   
   
@@ -226,11 +264,18 @@ bulk_faData <- function(input, output, session, counts, de) {
     output$faPlot <- renderPlot({
       plot_tfa_per_sample(fa$tfs, fa$tfs_sample, input$faTFNumValue)
     })
+    
+    output$faTableText <- renderText({
+      "Table with TFs and corresponding NES per Sample"
+    })
+    
+    output$faPlotText <- renderText({
+      "Top TFs with corresponding NES per Sample"
+    })
   })
   
   
-  # ---- 
-  # progeny
+  # Progeny ----
   
   observeEvent(input$faProSampleButton,{
     
@@ -248,6 +293,14 @@ bulk_faData <- function(input, output, session, counts, de) {
 
     output$faPlot <- renderPlot({
       grid.draw(fa$progSample[[2]])
+    })
+    
+    output$faTableText <- renderText({
+      "Table with Pathway activities represented by NES per Sample"
+    })
+    
+    output$faPlotText <- renderText({
+      "Pathway activities per Sample Heatmap"
     })
   })
   
@@ -269,6 +322,14 @@ bulk_faData <- function(input, output, session, counts, de) {
     output$faPlot <- renderPlot({
       grid.draw(fa$proCondition[[2]])
     })
+    
+    output$faTableText <- renderText({
+      "Table with Pathway activities represented by NES per Sample"
+    })
+    
+    output$faPlotText <- renderText({
+      "Normalised Enrichment Scores (NES) for each pathway"
+    })
   })
   
   
@@ -285,6 +346,10 @@ bulk_faData <- function(input, output, session, counts, de) {
     plot(fa$scatter)
     output$faPlot <- renderPlot({
       fa$scatter
+    })
+    
+    output$faPlotText <- renderText({
+      "Scatter plot with n most responsive genes for the provided pathway"
     })
   })
 }
