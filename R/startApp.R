@@ -37,6 +37,7 @@
 #' @import tidyverse
 #' @import progeny
 #' @import dorothea
+#' @import plotly
 #' 
 #' @include server.R
 #' @include ui.R
@@ -82,11 +83,11 @@ startBingleSeq <- function() {
     library(goseq)
     library(GO.db)
 
-    library(tibble)
     library(pheatmap)
-    library(dplyr)
+    library(tidyverse)
     library(progeny)
     library(dorothea)
+    library(plotly)
     
     options(shiny.maxRequestSize=500*1024^2)
 

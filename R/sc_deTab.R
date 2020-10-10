@@ -124,7 +124,7 @@ sc_deUI <- function(id) {
               title = "Plot",
               value = "dePlotTab",
 
-              plotOutput(ns("dgePlot"), width = "800px", height = "500px"),
+              plotOutput(ns("dgePlot"), width = "1280px", height = "720px"),
               downloadButton(ns("downloaddgePlot"), "Download Plot")
             )
           )))
@@ -213,7 +213,9 @@ sc_de <- function(input, output, session, finData) {
       hm.palette <-
         colorRampPalette(c("red", "white", "blue")) # Set the colour range
 
-      de$dgePlot <- de$dgePlot +  scale_fill_gradientn(colours = hm.palette(100))
+      de$dgePlot <- de$dgePlot +
+        scale_fill_gradientn(colours = hm.palette(100))
+      
 
       output$dgePlot <- renderPlot({
         de$dgePlot
@@ -237,7 +239,11 @@ sc_de <- function(input, output, session, finData) {
 
 
       output$dgePlot <- renderPlot({
-        de$dgePlot
+        de$dgePlot  +
+          theme(axis.text.x = element_text(size = 18),
+                axis.text.y = element_text(size = 18),  
+                axis.title.x = element_text(size = 16),
+                axis.title.y = element_text(size = 16))
       })
 
       updateTabsetPanel(session, "deMainTabSet", selected = "dePlotTab")
@@ -306,7 +312,9 @@ sc_de <- function(input, output, session, finData) {
 #' @return Returns DE Heatmap
 getClusterHeatmap <- function(s_object, markers, geneNo) {
   topMarkers <-
-    markers %>% group_by(cluster) %>% top_n(n = geneNo, wt = avg_logFC)
+    markers %>% 
+    group_by(cluster) %>%
+    top_n(n = geneNo, wt = avg_logFC)
   p <- DoHeatmap(s_object, features = topMarkers$gene)
   return(p)
 }

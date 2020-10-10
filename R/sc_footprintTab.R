@@ -124,7 +124,7 @@ sc_faUI <- function(id) {
           # Main panel for displaying outputs ----
           mainPanel(
             htmlOutput(ns("faInfo")),
-            textOutput(ns("faPlotText")),
+            textOutput(ns("faTableText")),
             DT::dataTableOutput(ns("faTable")),
             
             conditionalPanel(condition = "input.faTFButton > 0",
@@ -132,7 +132,7 @@ sc_faUI <- function(id) {
                              downloadButton(ns("faDownload"), "Download Table")
             ),
             tags$hr(),
-            textOutput(ns("faTableText")),
+            textOutput(ns("faPlotText")),
             plotOutput(ns("faPlot"), width = "800px", height = "700px")
           )
   )

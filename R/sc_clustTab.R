@@ -210,7 +210,7 @@ sc_clustUI <- function(id) {
       htmlOutput(ns("helpClustInfo")),
 
 
-      plotOutput(ns("clusterPlot"), width = "800px", height = "500px"),
+      plotlyOutput(ns("clusterPlot"), width = "1280px", height = "720px"),
 
       verbatimTextOutput(ns("clustNoText"), placeholder = F),
 
@@ -308,8 +308,8 @@ sc_clust <- function(input, output, session, normData) {
     clust$scaledData <- seuratElbow(normData$normalizedData)
     clust$clustPlot <- clust$scaledData[[2]]
 
-    output$clusterPlot <- renderPlot({
-      clust$clustPlot
+    output$clusterPlot <- renderPlotly({
+      ggplotly(clust$clustPlot)
     })
 
     hide_waiter()
@@ -365,7 +365,9 @@ sc_clust <- function(input, output, session, normData) {
         clust$finalData <- clust$results[[1]]
       }
 
-      clust$clustPlot <- clust$results[[2]]
+      tooltip.vector = c("ident", "tSNE_1", "tSNE_2")
+      clust$clustPlot <- ggplotly(clust$results[[2]],
+                                  tooltip = tooltip.vector)
 
       output$clustNoText <- renderText({
         sprintf("Number of estimated clusters is: %s",
@@ -384,13 +386,16 @@ sc_clust <- function(input, output, session, normData) {
         clust$clustPlot <- clust$scaledData[[2]]
 
       } else if (input$clustplotType == "pca") {
-        clust$clustPlot <- DimPlot(clust$finalData,
+        tooltip.vector = c("ident", "PC_1", "PC_2")
+        clust$clustPlot <- ggplotly(DimPlot(clust$finalData,
                                    reduction = input$clustplotType,
-                                   pt.size = 1.4)
-
+                                   pt.size = 1.4), tooltip = tooltip.vector)
       } else if(input$clustplotType == "tsne"){
+        
+        tooltip.vector = c("ident", "tSNE_1", "tSNE_2")
+        clust$clustPlot <- ggplotly(clust$results[[2]],
+                                    tooltip = tooltip.vector)
 
-        clust$clustPlot <- clust$results[[2]]
 
       } else{
         clust$clustPlot <-
@@ -405,10 +410,13 @@ sc_clust <- function(input, output, session, normData) {
         hm.palette <-
           colorRampPalette(c("red", "white", "blue")) # Set the colour range
 
-        clust$clustPlot <- clust$clustPlot +  scale_fill_gradientn(colours = hm.palette(100))
+        clust$clustPlot <- clust$clustPlot +
+          scale_fill_gradientn(colours = hm.palette(100))
       }
+      
 
-      output$clusterPlot <- renderPlot({
+
+      output$clusterPlot <- renderPlotly({
         clust$clustPlot
       })
     }

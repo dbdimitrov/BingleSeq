@@ -56,7 +56,7 @@ sc_normUI <- function(id) {
     # Main panel for displaying outputs ----
     mainPanel(
       htmlOutput(ns("helpNormInfo")),
-      plotOutput(ns("normalizePlot"), width = "850px", height = "500px"),
+      plotlyOutput(ns("normalizePlot"), width = "1280px", height = "720px"),
       textOutput(ns("violionPlotInfo"))
       )
   )
@@ -112,17 +112,18 @@ sc_norm <- function(input, output, session, filtData) {
 
 
     if (!is.null(norm$normalizedData)) {
-      norm$variancePlot <- variancePlotSeurat(norm$normalizedData)
+      norm$variancePlot <- VariableFeaturePlot(norm$normalizedData)
+
 
     }
 
-    output$normalizePlot <- renderPlot({
-      norm$variancePlot
-
+    output$normalizePlot <- renderPlotly({
+      ggplotly(norm$variancePlot)
+      style(norm$variancePlot, text = VariableFeatures(norm$normalizedData))
     })
 
     output$violionPlotInfo <- renderText({
-      "Note: Highly Variable Features are shown in red"
+      "Note: Highly Variable Features are shown in red (Hover for Gene names)"
     })
 
     hide_waiter()
@@ -166,25 +167,3 @@ normalizeSeurat <-
 
     return(normalized_object)
   }
-
-#' Single Cell Plot Variance Function
-#'
-#' @param s_object Suerat Object with filtered data
-#' @export
-#' @return Returns a variance estimation plot
-variancePlotSeurat <- function(s_object) {
-  # Identify the 10 most highly variable genes
-  top10 <- head(VariableFeatures(s_object), 10)
-
-  plot1 <- VariableFeaturePlot(s_object)
-  plot2 <-
-    LabelPoints(
-      plot = plot1,
-      points = top10,
-      repel = T,
-      xnudge = 0,
-      ynudge = 0
-    )
-
-  return(plot2)
-}
