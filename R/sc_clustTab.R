@@ -210,7 +210,7 @@ sc_clustUI <- function(id) {
       htmlOutput(ns("helpClustInfo")),
 
 
-      plotlyOutput(ns("clusterPlot"), width = "1280px", height = "720px"),
+      plotlyOutput(ns("clusterPlot"), width = "1280px", height = "840px"),
 
       verbatimTextOutput(ns("clustNoText"), placeholder = F),
 
@@ -442,7 +442,7 @@ sc_clust <- function(input, output, session, normData) {
         plot = clust$clustPlot,
         device = device,
         width = 1280,
-        height = 720,
+        height = 840,
         limitsize = FALSE
       )
     }

@@ -284,8 +284,13 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
 
       output$deTable <-
         DT::renderDataTable(
-          de$deTable[[1]] %>%  rownames_to_column("gene_id") %>% 
-            datatable(rownames = FALSE),
+          de$deTable[[1]] %>%
+            rownames_to_column("gene_id") %>% 
+            datatable(rownames = FALSE) %>%
+            formatSignif(
+              colnames(de$deTable[[1]]),
+              digits = 4,
+              interval = 3),
           options = list(pageLength = 10)
         )
     })
@@ -299,8 +304,12 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
 
       output$deTable <-
         DT::renderDataTable(
-          de$deTable[[1]] %>% rownames_to_column("gene_id") %>% 
-            datatable(rownames = FALSE),
+          de$deTable[[1]] %>%
+            rownames_to_column("gene_id") %>% 
+            formatSignif(
+              colnames(de$deTable[[1]]),
+              digits = 4,
+              interval = 3),
           options = list(pageLength = 10)
         )
 

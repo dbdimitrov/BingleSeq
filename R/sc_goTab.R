@@ -106,7 +106,10 @@ sc_goUI <- function(id) {
                   "Homo sapiens (hg17)" = "hg17",
                   "Mus musculus (mm9)" = "mm9",
                   "Mus musculus (mm9)" = "mm8",
-                  "Mus musculus (mm7)" = "mm7"
+                  "Mus musculus (mm7)" = "mm7",
+                  "Danio rerio (danRer5)" = "danRer5",
+                  "Drosophila melanogaster (dm3)" = "dm3",
+                  "E. coli K12" = "E. coli K12"
                 )
               ),
 

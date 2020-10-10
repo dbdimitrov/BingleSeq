@@ -89,7 +89,7 @@ sc_faUI <- function(id) {
               numericInput(
                 ns("faProTopGeneNum"),
                 label = "Number of footprint genes per pathway",
-                value = 100,
+                value = 500,
                 min = 10
               ),
               
@@ -100,22 +100,6 @@ sc_faUI <- function(id) {
               
               
               tags$hr(),
-              
-              conditionalPanel(condition = "input.faProgenyButton > 0",
-                               ns = ns,
-                               
-                               tags$b("Available pathways:"),
-                               tags$i("Androgen, EGFR, Estrogen, Hypoxia,
-                                         JAK-STAT, MAPK, NFkB, p53, PI3K, TGFb,
-                                         TNFa, Trail, VEGF, WNT"),
-                               textInput(ns("faProPathwayText"),
-                                         "Enter Pathway:",
-                                         "JAK-STAT"),
-                               actionButton(ns("faProPathwayButton"),
-                                            label = "Get Top Genes per Pathway")
-                               
-                               
-              ),
               
             )
           )
@@ -189,9 +173,10 @@ sc_fa_Server <- function(input, output, session, finalData) {
   
   observeEvent(input$faTFButton,{
     
-    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+    show_waiter(tagList(spin_folding_cube(), h2("Loading...")))
     
     fa$regulons <- fetch_regulons(input$faOrganism, input$faCheckBox)
+    
     fa$dorothea_tfs <- sc_dorothea_viper(finalData$finalData,
                                          input$faTFNumValue,
                                          fa$regulons)
@@ -220,34 +205,31 @@ sc_fa_Server <- function(input, output, session, finalData) {
   
   observeEvent(input$faProgenyButton,{
     
-    output$faTableText <- renderText({
-      "Table with Pathway activities represented by NES per Sample"
-    })
+    show_waiter(tagList(spin_folding_cube(), h2("Loading...")))
     
-    output$faPlotText <- renderText({
-      "Normalised Enrichment Scores (NES) for each pathway"
-    })
-  })
-  
-  
-  
-  observeEvent(input$faProPathwayButton,{
+    fa$pathways <- sc_progeny(finalData$finalData,
+                              input$faProOrganism,
+                              input$faProTopGeneNum,
+                              1)
     
-    if(req(fa$proCondition[[3]])){
-      fa$scatter <- get_progeny_scatter(fa$proCondition[[3]],
-                                        as.character(input$faProPathwayText),
-                                        as.character(input$faProOrganism),
-                                        as.numeric(input$faProTopGeneNum),
-                                        fa$de_data
-      )
-    } 
-    plot(fa$scatter)
+    waiter_hide()
+    
+    output$faTable <-
+      DT::renderDataTable(fa$pathways %>%
+                            as.data.frame() %>%
+                            t())
+    
     output$faPlot <- renderPlot({
-      fa$scatter
+      sc_progeny_plot(fa$pathways)
+    })
+    
+    output$faTableText <- renderText({
+      "Pathway activities represented by
+      Normalised Enrichment Scores (NES) per Cell Cluster"
     })
     
     output$faPlotText <- renderText({
-      "Scatter plot with n most responsive genes for the provided pathway"
+      "Normalised Enrichment Scores (NES) for each pathway per Cell Cluster"
     })
   })
 }
@@ -255,7 +237,14 @@ sc_fa_Server <- function(input, output, session, finalData) {
 
 
 
-
+#' Dorothea-Viper TF Activity estimation
+#'
+#' @param s_object Seurat object with clustering results
+#' @param tf_num Minimum Regulon size
+#' @param regulon dorothea regulon (human or mouse)
+#' 
+#' @keywords internal
+#' @return Returns a table with TF activity scores ready for display
 sc_dorothea_viper <- function(s_object, tf_num, regulon) {
   
   ## Compute Viper Scores
@@ -314,7 +303,12 @@ sc_dorothea_viper <- function(s_object, tf_num, regulon) {
 }
 
 
-
+#' Dorothea-Viper TF Activity Plot
+#'
+#' @param summarized_viper_scores_df a summarized df with TF activities
+#' 
+#' @keywords internal
+#' @return Returns a heatmap with TF activities
 sc_dorothea_plot <- function(summarized_viper_scores_df){
   palette_length = 100
   my_color = colorRampPalette(c("Darkblue", "white","red"))(palette_length)
@@ -325,10 +319,85 @@ sc_dorothea_plot <- function(summarized_viper_scores_df){
                      max(summarized_viper_scores_df),
                      length.out=floor(palette_length/2)))
   
-  dorothea_hmap <- pheatmap(t(summarized_viper_scores_df),fontsize=16,
+  dorothea_hmap <- pheatmap(t(summarized_viper_scores_df),fontsize=18,
                             fontsize_row = 14,
                             color=my_color, breaks = my_breaks,
                             main = "", angle_col = 45,
                             treeheight_col = 0,  border_color = NA)
   return(dorothea_hmap)
+}
+
+
+
+#' Progeny Pathway Activity estimation
+#'
+#' @param s_object Seurat object with clustering results
+#' @param organism Human or Mouse Model Organism
+#' @param top No. of most variable genes per pathway 
+#' @param perm No. of permutations to be performed
+#' 
+#' @keywords internal
+#' @return Returns a table with Pathway activity scores ready for display
+sc_progeny <- function(s_object, organism, top, perm) {
+  CellsClusters <- data.frame(Cell = names(Idents(s_object)), 
+                              CellType = as.character(Idents(s_object)),
+                              stringsAsFactors = FALSE)
+  
+  # Compute Progeny activity scores and assign to an assay 
+  s_object <- progeny(s_object,
+                      scale=FALSE,
+                      organism=organism, top=top,
+                      perm=perm, 
+                      return_assay = TRUE)
+  
+  # Scale pathway activity scores. 
+  s_object <- Seurat::ScaleData(s_object, assay = "progeny") 
+  
+  # Transform Progeny scores into a data frame
+  progeny_scores_df <- 
+    as.data.frame(t(GetAssayData(s_object, slot = "scale.data", 
+                                 assay = "progeny"))) %>%
+    rownames_to_column("Cell") %>%
+    gather(Pathway, Activity, -Cell) 
+  
+  # Match Progeny scores with cell clusters
+  progeny_scores_df <- inner_join(progeny_scores_df, CellsClusters)
+  
+  # Summarize Progeny scores by cell population
+  summarized_progeny_scores <- progeny_scores_df %>% 
+    group_by(Pathway, CellType) %>%
+    summarise(avg = mean(Activity), std = sd(Activity))
+  
+  # Prepare the data for display
+  progeny_scores_df <- summarized_progeny_scores %>%
+    dplyr::select(-std) %>%   
+    spread(Pathway, avg) %>%
+    data.frame(row.names = 1, check.names = FALSE, stringsAsFactors = FALSE)
+  
+  return(progeny_scores_df)
+}
+
+
+#' Progeny Pathway Activity Heatmap
+#'
+#' @param progeny_scores_df a summarized df with Pathway activities
+#' 
+#' @keywords internal
+#' @return Returns a heatmap with TF activities
+sc_progeny_plot <- function(progeny_scores_df){
+  paletteLength = 100
+  myColor = colorRampPalette(c("Darkblue", "white","red"))(paletteLength)
+  
+  progenyBreaks = c(seq(min(progeny_scores_df), 0, 
+                        length.out=ceiling(paletteLength/2) + 1),
+                    seq(max(progeny_scores_df)/paletteLength, 
+                        max(progeny_scores_df), 
+                        length.out=floor(paletteLength/2)))
+  progeny_hmap = pheatmap(t(progeny_scores_df[,-1]), fontsize=18, 
+                          fontsize_row = 14, 
+                          color=myColor, breaks = progenyBreaks, 
+                          main = "", angle_col = 45,
+                          treeheight_col = 0,  border_color = NA)
+  
+  return(progeny_hmap)
 }

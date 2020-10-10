@@ -2,18 +2,16 @@
 % Please edit documentation in R/sc_footprintTab.R
 \name{sc_fa_Server}
 \alias{sc_fa_Server}
-\title{Bulk FootPrint Tab Server}
+\title{Single cell FootPrint Tab Server}
 \usage{
-sc_fa_Server(input, output, session, counts, de)
+sc_fa_Server(input, output, session, finalData)
 }
 \arguments{
-\item{counts}{Unfiltered Count Table (Reactive Value)}
-
-\item{de}{Differential Expression Results (Reactive Value)}
+\item{finalData}{Seurat object with dim. red. and clustering results}
 }
 \value{
 None
 }
 \description{
-Bulk FootPrint Tab Server
+Single cell FootPrint Tab Server
 }

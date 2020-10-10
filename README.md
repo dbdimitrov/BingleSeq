@@ -105,8 +105,8 @@ BingleSeq's visualization techniques were implemented with customization in mind
 
 ![BingleSeq Bulk RNA-Seq heat Data](/figures/bulk_heatmap.PNG)
 
-
-#### 5.	Functional Annotation
+#### Functional Annotation
+##### 5a.	Over-representation Analysis
 Following DE analysis, BingleSeq enables the Functional Annotation analysis of DE results within the ‘Functional Annotation’ tab via GOseq package (Young et al., 2010). The GOseq pipeline enables users to obtain results from KEGG pathway analysis and three types of GO categories, including ‘Cellular Component’, ‘Molecular Function’, and ‘Biological Function’. To run the pipeline users are first prompted to filter the DEGs according to logFC and adjusted p-value (FDR). Users can then select several parameters before running the pipeline with the previously obtained subset of DEGs. These parameters include the GO category, multiple-testing corrected or uncorrected p-value, gene symbol type, and genome of interest.
 
 ![BingleSeq Bulk RNA-Seq bulkGO Tab](/figures/bulk_GOtab.PNG)
@@ -115,6 +115,17 @@ Once the GOseq pipeline is run and completed, a table with results is returned.
 
 ![BingleSeq Bulk RNA-Seq bulkGO Results](/figures/bulk_GOresults.PNG)
 *Note that these results were generated using real data taken from McFarlane et al., 2019.*
+
+##### 5b.	Footprint Analysis
+Dorothea coupled with Viper, PROGENy (refs)
+
+
+##### As of v3.6, BingleSeq implements the following GOSeq Model organisms:
+Homo sapiens, Mus musculus, Danio rerio, Drosophila melanogaster, E. coli K12.
+Please do not hesitate to contact us or open a GitHub issue if you want us to include additional model organism.
+However, it should be noted that GOSeq requires gene lengths for its usual functions and not all model organisms' genomes have such available.
+Refer to the GOSeq manual for further information as well as a way to obtain 
+
 
 
 Users can also generate GO term histograms with the top 10 GO terms and to choose whether to display their GO identifiers (GO:IDs) or their corresponding terms.
@@ -228,7 +239,7 @@ Furthermore, by using Seurat’s inbuilt visualization options, BingleSeq provid
 
 
 #### 6.	Functional Annotation
-The scRNA-Seq part of BingleSeq incorporates functional annotation in an analogous manner to its Bulk RNA-Seq counterpart. The only difference is that the subsets of DEGs to be used in the GOseq pipeline can be filtered according to the cluster they belong to; thus, allowing users to assess each cluster independently. 
+The scRNA-Seq pipeline of BingleSeq incorporates functional annotation in an analogous manner to its Bulk RNA-Seq counterpart. The only difference is that the subsets of DEGs to be used in the GOseq pipeline can be filtered according to the cluster they belong to; thus, allowing users to assess each cluster independently. Accordingly, it also implements both PROGENy and Dorothea-Viper which were implemented to estimate Pathway and TF activity per cell cluster, respectively.
   
   
 #### 7.	DE Method Comparison

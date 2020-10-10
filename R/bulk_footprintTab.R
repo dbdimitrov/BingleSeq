@@ -634,7 +634,7 @@ get_pathway_activity <- function(de_data, organism, top, session) {
     pathway_activity_zscore <- progeny(de_results_matrix, 
                                        scale=TRUE,
                                        organism=as.character(organism),
-                                       top = top, perm = 10000,
+                                       top = top, perm = 1000,
                                        z_scores = TRUE) %>%
       t()
     colnames(pathway_activity_zscore) <- "NES"

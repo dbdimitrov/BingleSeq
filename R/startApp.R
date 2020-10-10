@@ -28,10 +28,14 @@
 #' @import Seurat
 #' @import scran
 #' @import SC3
+#' 
 #' @import goseq
+#' @import GO.db
 #' @import org.Mm.eg.db
 #' @import org.Hs.eg.db
-#' @import GO.db
+#' @import org.Dm.eg.db
+#' @import org.Dr.eg.db
+#' 
 #' 
 #' @import pheatmap
 #' @import tidyverse
@@ -77,9 +81,8 @@ startBingleSeq <- function() {
     library(Seurat)
     library('scran')
     library('SC3')
+    
     library(AnnotationDbi)
-    require(org.Mm.eg.db)
-    require(org.Hs.eg.db)
     library(goseq)
     library(GO.db)
 

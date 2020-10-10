@@ -88,21 +88,26 @@ sc_loadData <- function(input, output, session) {
   
   output$helpLoadInfo <- renderUI({
     if(as.numeric(input$loadData)==1 && is.null(counts$countTable)){
-      HTML("<div style='border:2px solid blue; font-size: 14px; border-radius: 10px;text-align: center'>
+      HTML("<div style='border:2px solid blue; font-size: 14px;
+      border-radius: 10px;text-align: center'>
       <p style='padding-top: 8px'> Select a count table
       that contains the read counts in .csv/.txt file format. </p>
-      <p style ='font-style: italic; padding-bottom: 8px;'> Note: The first row(header)
-           and first column should contain cell names and gene names/IDs, respsectively </p> </div>")
+      <p style ='font-style: italic; padding-bottom: 8px;'> 
+      Note: The first row(header) and first column should contain cell names 
+      and gene names/IDs, respsectively </p> </div>")
     }else if(as.numeric(input$loadData)==2 && is.null(counts$countTable)){
-      HTML("<div style='border:2px solid blue; font-size: 14px; border-radius: 10px;text-align: center'>
+      HTML("<div style='border:2px solid blue; font-size: 14px;
+      border-radius: 10px;text-align: center'>
            <p style='padding-top: 8px'; padding-bottom: 8px;>
            Select a 10x Genomics output directory containing
            matrix.mtx, barcodes.tsv, and genes.tsv files </p> </div>")
     }else if(as.numeric(input$loadData)==3 && is.null(counts$countTable)){
-      HTML("<div style='border:2px solid blue; font-size: 14px; border-radius: 10px;text-align: center'>
+      HTML("<div style='border:2px solid blue;
+      font-size: 14px;
+      border-radius: 10px;text-align: center'>
            <p style='padding-top: 8px'; padding-bottom: 8px;>
-           Load an example public 10x Genomics dataset with 1k Brain Cells from an E18 Mouse
-           matrix.mtx, barcodes.tsv, and genes.tsv files </p> </div>")
+           Load an example public Cellranger 10x Genomics dataset with 3k PBMCs
+           </p> </div>")
     } else{
       HTML("")
     }
@@ -130,7 +135,9 @@ sc_loadData <- function(input, output, session) {
   
   # Load Test Data -----
   observeEvent(input$scTestDataButton, {
-    sc_example_data <-paste0(system.file("extdata", "hg19", package = "BingleSeq"), "/") 
+    sc_example_data <-paste0(system.file("extdata",
+                                         "hg19",
+                                         package = "BingleSeq"), "/") 
     req(nchar(sc_example_data > 0))
     counts$countTable <- load10xData(sc_example_data, session)
   })
