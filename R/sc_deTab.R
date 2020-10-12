@@ -154,7 +154,11 @@ sc_de <- function(input, output, session, finData) {
         and genes expressed in a minimum fraction of cells. <br> <br>
         <i>Note: MAST was shown to be among
         the best scRNA-Seq DE methods (Soneson & Robinson, 2018),
-        as such it is likely the best option here. </i> </div>"
+        as such it is likely the best option here. </i>
+        Also, please be patient as DE analysis is run on all clusters
+        and as such it may take some time.
+        MAST is particularly time consuming.  </div>"
+        
       )
     } else {
       HTML("")
@@ -163,7 +167,7 @@ sc_de <- function(input, output, session, finData) {
 
   ## Generate DE Data
   observeEvent(input$dgeButton, {
-    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+    show_waiter(tagList(spin_folding_cube(), h2("Loading...Say Patient :)")))
 
     if(input$dgeTestCombo == "DESeq2"){
       finData$finalData[["RNA"]]@counts <- as.matrix(finData$finalData[["RNA"]]@counts) + 1
@@ -315,7 +319,8 @@ getClusterHeatmap <- function(s_object, markers, geneNo) {
     markers %>% 
     group_by(cluster) %>%
     top_n(n = geneNo, wt = avg_logFC)
-  p <- DoHeatmap(s_object, features = topMarkers$gene)
+  p <- DoHeatmap(s_object, features = topMarkers$gene)  +
+    theme_classic(base_size = 14)
   return(p)
 }
 
@@ -336,13 +341,16 @@ genePlot <- function(finalData, plotType, geneName, session) {
   out <- tryCatch(
     {
       if (plotType == 1) {
-        VlnPlot(finalData, features = geneName)
+        VlnPlot(finalData, features = geneName) +
+          theme_classic(base_size = 20)
 
       } else if (plotType == 2) {
-        FeaturePlot(finalData, features = geneName, pt.size = 1.5)
+        FeaturePlot(finalData, features = geneName, pt.size = 1.5) +
+          theme_classic(base_size = 20)
 
       } else if (plotType == 3) {
-        RidgePlot(finalData, features = as.character(geneName))
+        RidgePlot(finalData, features = as.character(geneName))  +
+          theme_classic(base_size = 20)
       }
     },
     error=function(cond) {

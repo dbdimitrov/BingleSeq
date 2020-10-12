@@ -246,6 +246,9 @@ sc_clust <- function(input, output, session, normData) {
     Once the prerequisites are generated,
     the unsupervised clustering methods will become available. <br>
     Subsequent to clustering, visualization options themselves become available.
+    
+    Note: Clustering approaches may be time consuming and the R console can be
+    used to provide information about their progress.
         </div> ")
     } else {
     if(input$clusterPackage == 1){
@@ -319,7 +322,7 @@ sc_clust <- function(input, output, session, normData) {
   observeEvent(input$clustButton, {
     if (!is.null(clust$scaledData)) {
 
-      show_waiter(tagList(spin_folding_cube(), h2("Loading...")))
+      show_waiter(tagList(spin_folding_cube(), h2("Loading...(Stay patient)")))
 
 
       if (input$clusterPackage == 1) {
@@ -666,7 +669,8 @@ clusterMonocle <-
         sendSweetAlert(
           session = session,
           title = "Clustering Error Encountered",
-          text = "Consider using another clustering method/package or applying more stringent QC",
+          text = "Consider using another clustering method/package
+          or applying more stringent QC",
           type = "error"
         )
 

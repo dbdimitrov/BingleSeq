@@ -2,7 +2,7 @@
 % Please edit documentation in R/bulk_footprintTab.R
 \name{get_pathway_activity_per_sample}
 \alias{get_pathway_activity_per_sample}
-\title{Fetch Sample Pathway Activity}
+\title{Fetch Pathway Activity per Sample}
 \usage{
 get_pathway_activity_per_sample(de_data, organism, top, session)
 }
@@ -17,5 +17,5 @@ get_pathway_activity_per_sample(de_data, organism, top, session)
 a list with pathway activity counts and a heatmap
 }
 \description{
-Fetch Sample Pathway Activity
+Fetch Pathway Activity per Sample
 }

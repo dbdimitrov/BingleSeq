@@ -135,10 +135,10 @@ sc_fa_Server <- function(input, output, session, finalData) {
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px'>
         This tab enables the use of footprint analysis tools
-         DoRothEA and PROGENy which  infer the activity of TFs and pathways,
+         DoRothEA and PROGENy which infer the activity of TFs and pathways,
          respectively. Footprint-based strategies such as the aforementioned
-         packages infer TF/pathway activityfrom the expression of molecules 
-         considered to be donstream of a given pathway/TF.
+         packages infer TF/pathway activity from the expression of molecules 
+         considered to be downstream of a given pathway/TF.
          <br> <br>
          DoRothEA is a gene set resource containing signed TF-target 
          interactions that can be coupled with different statistical methods to

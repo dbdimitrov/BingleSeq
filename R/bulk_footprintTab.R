@@ -175,15 +175,15 @@ bulk_faData <- function(input, output, session, counts, de) {
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px'>
         This tab enables the use of footprint analysis tools
-         DoRothEA and PROGENy which  infer the activity of TFs and pathways,
-         respectively. Footprint-based strategies such as the aforementioned
-         packages infer TF/pathway activityfrom the expression of molecules 
-         considered to be donstream of a given pathway/TF.
-         <br> <br>
-         DoRothEA is a gene set resource containing signed TF-target 
-         interactions that can be coupled with different statistical methods to
-         estimate TF activity. In BingleSeq, DoRothEA is coupled to the
-         statistical method VIPER.
+        DoRothEA and PROGENy which are tools used infer the activity of TFs and
+        pathways, respectively. Footprint-based strategies such as the
+        aforementioned packages infer TF/pathway activity from the expression
+        of molecules considered to be downstream of a given pathway/TF.
+        <br> <br>
+        DoRothEA is a gene set resource containing signed TF-target 
+        interactions that can be coupled with different statistical methods to
+        estimate TF activity. In BingleSeq, DoRothEA is coupled to the
+        statistical method VIPER.
          <br>
          'DoRothEA Confidence levels' are based on the supporting evidence for
          the TF-target interactions with A being the highest level.
@@ -416,10 +416,10 @@ plot_top_tfs <- function(tf_activities, tf_num) {
            scale_fill_gradient2(low = "darkblue", high = "indianred", 
                                 mid = "whitesmoke", midpoint = 0) + 
            theme_minimal() +
-           theme(axis.title = element_text(face = "bold", size = 14),
+           theme(axis.title = element_text(face = "bold", size = 18),
                  axis.text.x = 
-                   element_text(angle = 45, hjust = 1, size =12, face= "bold"),
-                 axis.text.y = element_text(size = 12, face= "bold"),
+                   element_text(angle = 45, hjust = 1, size =16, face= "bold"),
+                 axis.text.y = element_text(size = 16, face= "bold"),
                  panel.grid.major = element_blank(), 
                  panel.grid.minor = element_blank()) +
            xlab("Transcription Factors"))
@@ -499,7 +499,7 @@ plot_tfa_per_sample <- function(tf_activities, tf_activities_counts, tf_num) {
                           max(tf_activities_vector), 
                           length.out=floor(paletteLength/2)))
   dorothea_hmap <- pheatmap(tf_activities_counts_filter,
-                            fontsize=14, fontsize_row = 12, fontsize_col = 12, 
+                            fontsize=18, fontsize_row = 16, fontsize_col = 16, 
                             color=myColor, breaks = dorotheaBreaks,
                             main = "", angle_col = 45,
                             treeheight_col = 0,  border_color = NA, silent = T)
@@ -554,7 +554,7 @@ fetch_regulons <- function(org, conf_list) {
 
 
 
-#' Fetch Sample Pathway Activity
+#' Fetch Pathway Activity per Sample
 #' 
 #' @param de_data de results dataframe
 #' @param organism Human or Mouse
@@ -591,8 +591,8 @@ get_pathway_activity_per_sample <- function(de_data, organism, top, session) {
                            max(activity_counts), 
                            length.out=floor(paletteLength/2)))
     
-    progeny_hmap <- pheatmap(t(pathway_activity_counts),fontsize=16, 
-                             fontsize_row = 14, fontsize_col = 14, 
+    progeny_hmap <- pheatmap(t(pathway_activity_counts),fontsize=18, 
+                             fontsize_row = 16, fontsize_col = 16, 
                              color=myColor, breaks = progenyBreaks, 
                              main = "", angle_col = 45,
                              treeheight_col = 0,  border_color = NA)
@@ -634,7 +634,7 @@ get_pathway_activity <- function(de_data, organism, top, session) {
     pathway_activity_zscore <- progeny(de_results_matrix, 
                                        scale=TRUE,
                                        organism=as.character(organism),
-                                       top = top, perm = 1000,
+                                       top = top, perm = 10000,
                                        z_scores = TRUE) %>%
       t()
     colnames(pathway_activity_zscore) <- "NES"
@@ -652,10 +652,10 @@ get_pathway_activity <- function(de_data, organism, top, session) {
       scale_fill_gradient2(low = "darkblue", high = "indianred", 
                            mid = "whitesmoke", midpoint = 0) + 
       theme_minimal() +
-      theme(axis.title = element_text(face = "bold", size = 14),
+      theme(axis.title = element_text(face = "bold", size = 18),
             axis.text.x = 
-              element_text(angle = 45, hjust = 1, size =12, face= "bold"),
-            axis.text.y = element_text(size =12, face= "bold"),
+              element_text(angle = 45, hjust = 1, size = 16, face= "bold"),
+            axis.text.y = element_text(size = 16, face= "bold"),
             panel.grid.major = element_blank(), 
             panel.grid.minor = element_blank()) +
       xlab("Pathways")

@@ -163,8 +163,10 @@ server <- function(input, output, session) {
 
         observe({
           if (!is.null(markers$markers) && !tabs$markers) {
+            
             appendTab(inputId = "mainPage",
-                      tabPanel(title = "Functional Annotation", sc_goUI("goTab")))
+                      tabPanel(title = "Gene Ontology",
+                               sc_goUI("goTab")))
 
             tabs$markers = TRUE
           }

@@ -109,25 +109,6 @@ BingleSeq's visualization techniques were implemented with customization in mind
 ##### 5a.	Over-representation Analysis
 Following DE analysis, BingleSeq enables the Functional Annotation analysis of DE results within the ‘Functional Annotation’ tab via GOseq package (Young et al., 2010). The GOseq pipeline enables users to obtain results from KEGG pathway analysis and three types of GO categories, including ‘Cellular Component’, ‘Molecular Function’, and ‘Biological Function’. To run the pipeline users are first prompted to filter the DEGs according to logFC and adjusted p-value (FDR). Users can then select several parameters before running the pipeline with the previously obtained subset of DEGs. These parameters include the GO category, multiple-testing corrected or uncorrected p-value, gene symbol type, and genome of interest.
 
-![BingleSeq Bulk RNA-Seq bulkGO Tab](/figures/bulk_GOtab.PNG)
-
-Once the GOseq pipeline is run and completed, a table with results is returned.
-
-![BingleSeq Bulk RNA-Seq bulkGO Results](/figures/bulk_GOresults.PNG)
-*Note that these results were generated using real data taken from McFarlane et al., 2019.*
-
-##### 5b.	Footprint Analysis
-Dorothea coupled with Viper, PROGENy (refs)
-
-
-##### As of v3.6, BingleSeq implements the following GOSeq Model organisms:
-Homo sapiens, Mus musculus, Danio rerio, Drosophila melanogaster, E. coli K12.
-Please do not hesitate to contact us or open a GitHub issue if you want us to include additional model organism.
-However, it should be noted that GOSeq requires gene lengths for its usual functions and not all model organisms' genomes have such available.
-Refer to the GOSeq manual for further information as well as a way to obtain 
-
-
-
 Users can also generate GO term histograms with the top 10 GO terms and to choose whether to display their GO identifiers (GO:IDs) or their corresponding terms.
 
 ![BingleSeq Bulk RNA-Seq bulkGO hist](/figures/bulk_GOhist.jpg)
@@ -135,10 +116,43 @@ Users can also generate GO term histograms with the top 10 GO terms and to choos
 Moreover, users can obtain further information about a given GO term by querying its GO:ID using the ‘GO.db’ package (Carlson et al., 2019). 
 
 ![BingleSeq Bulk RNA-Seq bulkGO query](/figures/bulk_GOquery.PNG)
-  
-Note that in the current state of BingleSeq, only Mouse and Human genomes are supported.
-  
-  
+
+##### As of v3.6, BingleSeq implements the following GOSeq Model organisms:
+Homo sapiens, Mus musculus, Danio rerio, Drosophila melanogaster, E. coli K12.
+Please do not hesitate to contact us or open a GitHub issue if you want us to include additional model organism.
+However, it should be noted that GOSeq requires gene lengths for its usual functions and not all model organisms' genomes have such available.
+Refer to the GOSeq manual for further information as well as a way to obtain 
+
+![BingleSeq Bulk RNA-Seq bulkGO Tab](/figures/bulk_GOtab.PNG)
+
+Once the GOseq pipeline is run and completed, a table with results is returned.
+
+![BingleSeq Bulk RNA-Seq bulkGO Results](/figures/bulk_GOresults.PNG)
+
+##### 5b.	Footprint Analysis
+BingleSeq also enables the use of footprint analysis tools DoRothEA and PROGENy
+(Schubert et al., 2018; Garcia-Alonso, et al., 2019; Holland et al., 2019,
+Holland et al., 2020). These tools are used infer the activity of TFs and
+pathways, respectively. Footprint-based strategies such as the aforementioned
+packages infer TF/pathway activity from the expression of molecules considered
+to be downstream of a given TF or pathway (in the case of these tools).
+
+DoRothEA is a gene set resource containing signed TF-target interactions that 
+can be coupled with different statistical methods to estimate TF activity.
+In BingleSeq, DoRothEA is coupled to the statistical method VIPER
+(Alvarez et al., 2016).
+PROGENy is based on downstream gene signatures observed to be consistently
+deregulated in pertrubation experiments. PROGENy estimates the activity of 14
+signalling pathways from gene expression using a linear model.
+For more information, please refer to the cited publications.
+DoRothEA and PROGENy are available for mouse and human data.
+
+![BingleSeq Bulk RNA-Seq Footprint Analysis Results](/figures/footprint.PNG)
+*Fig-S6. A) TF activities (using DE method statistic - e.g. t-value) and B) TF activities per sample (using normalized gene counts) estimated with DoRothEA and viper.
+Pathway activity estimation with PROGENy showing C) the Normalized Enrichment Scores (NES) for each pathway and D) PROGENy pathway scores per sample.*
+
+*Note that these results were generated using real data taken from McFarlane et al., 2019.*  
+
 #### 6.	DE Package Comparison
 BingleSeq supplies users with an option to assess the agreement between the different DE analysis packages. This is done using a Venn diagram which represents the overlap of DE analysis results obtained using DESeq2, edgeR, and limma on the same dataset. Moreover, users can download the genes from the different intersects of the Venn Diagram. 
 
@@ -253,10 +267,6 @@ Bulk data - contrast between HSV-1 infected control and interferon B treatment (
 Single cell data - Cell Ranger 10x Genomics public dataset looking at filtered data of 2700 PBMCs
 [10x Genomics link](https://support.10xgenomics.com/single-cell-multiome-atac-gex/datasets/1.0.0/pbmc_unsorted_3k)
 
-## Footprint Analysis
-As of v0.3.6 BingleSeq features Footprint analysis with viper and regulons from DoRothEA.
-Bulk RNA-Seq code was modified from saezlab/transcriptutorial (credit goes to saezlab members..).
-Description to be extended.
 
 
 ## Built With
@@ -267,6 +277,8 @@ Description to be extended.
 
 ## References
 Alvarez M.J., Shen Y., Giorgi F.M., Lachmann A., Ding B.B., Ye B.H., Califano A. (2016). “Functional characterization of somatic mutations in cancer using network-based inference of protein activity.” Nature genetics, 48(8), 838–47.
+
+Alvarez MJ, Shen Y, Giorgi FM, Lachmann A, Ding BB, Ye BH, Califano A (2016). “Functional characterization of somatic mutations in cancer using network-based inference of protein activity.” Nature genetics, 48(8), 838–47.
 
 Bowden J, Ross J, Oytam Y (2019). HarmanData: Data for the Harman package. R package version 1.12.0, http://www.bioinformatics.csiro.au/harman/.
 
@@ -300,6 +312,8 @@ Robinson, M.D., McCarthy, D.J. and Smyth, G.K., 2010. edgeR: a Bioconductor pack
 
 Satija, R., Farrell, J.A., Gennert, D., Schier, A.F. and Regev, A., 2015. Spatial reconstruction of single-cell gene expression data. Nature biotechnology, 33(5), pp.495-502.
 
+Schubert M, Klinger B, Klünemann M, Sieber A, Uhlitz F, Sauer S, Garnett MJ, Blüthgen N, Saez-Rodriguez J (2018). “Perturbation-response genes reveal signaling footprints in cancer gene expression.” Nature communications, 9(20).
+
 Soneson, C., 2014. compcodeR—an R package for benchmarking differential expression methods for RNA-seq data, Bioinformatics, 30(17), pp.2517–2518.
 
 Trapnell, C., Cacchiarelli, D., Grimsby, J., Pokharel, P., Li, S., Morse, M., Lennon, N.J., Livak, K.J., Mikkelsen, T.S. and Rinn, J.L., 2014. The dynamics and regulators of cell fate decisions are revealed by pseudotemporal ordering of single cells. Nature biotechnology, 32(4), pp. 381–386.
@@ -311,3 +325,67 @@ Young, M.D., Wakefield, M.J., Smyth, G.K. and Oshlack, A., 2010. Gene ontology a
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+
+## R Session Info:
+R version 4.0.2 (2020-06-22)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.1 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=de_DE.UTF-8        LC_COLLATE=en_US.UTF-8     LC_MONETARY=de_DE.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=de_DE.UTF-8       LC_NAME=C                  LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=de_DE.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+ [1] splines   parallel  stats4    grid      stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] BingleSeq_0.3.6             viper_1.22.0                plotly_4.9.2.1              dorothea_1.0.1              progeny_1.10.0              forcats_0.5.0              
+ [7] stringr_1.4.0               purrr_0.3.4                 readr_1.3.1                 tidyr_1.1.2                 tibble_3.0.3                tidyverse_1.3.0            
+[13] pheatmap_1.0.12             GO.db_3.11.4                goseq_1.40.0                geneLenDataBase_1.24.0      BiasedUrn_1.07              AnnotationDbi_1.50.3       
+[19] SC3_1.16.0                  scran_1.16.0                Seurat_3.2.0                monocle_2.16.0              DDRTree_0.1.5               irlba_2.3.3                
+[25] VGAM_1.1-3                  Matrix_1.2-18               MAST_1.14.0                 SingleCellExperiment_1.10.1 edgeR_3.30.3                limma_3.44.3               
+[31] DESeq2_1.28.1               SummarizedExperiment_1.18.2 DelayedArray_0.14.1         matrixStats_0.56.0          Biobase_2.48.0              GenomicRanges_1.40.0       
+[37] GenomeInfoDb_1.24.2         IRanges_2.22.2              S4Vectors_0.26.1            BiocGenerics_0.34.0         sva_3.36.0                  BiocParallel_1.22.0        
+[43] genefilter_1.70.0           mgcv_1.8-33                 nlme_3.1-149                Harman_1.16.0               ggrepel_0.8.2               gridExtra_2.3              
+[49] reshape2_1.4.4              fastcluster_1.1.25          factoextra_1.0.7            VennDiagram_1.6.20          futile.logger_1.4.3         ggplot2_3.3.2              
+[55] DT_0.15                     dplyr_1.0.2                 waiter_0.1.2                shinyWidgets_0.5.3          shinyFiles_0.8.0            shinyjs_1.1                
+[61] shiny_1.5.0                
+
+loaded via a namespace (and not attached):
+  [1] rsvd_1.0.3                ica_1.0-2                 class_7.3-17              ps_1.3.4                  Rsamtools_2.4.0           foreach_1.5.0            
+  [7] lmtest_0.9-37             rprojroot_1.3-2           crayon_1.3.4              MASS_7.3-53               WriteXLS_5.0.0            backports_1.1.9          
+ [13] qlcMatrix_0.9.7           reprex_0.3.0              rlang_0.4.7               XVector_0.28.0            ROCR_1.0-11               readxl_1.3.1             
+ [19] callr_3.4.3               scater_1.16.2             bcellViper_1.24.0         bit64_4.0.5               glue_1.4.2                rngtools_1.5             
+ [25] sctransform_0.2.1         processx_3.4.4            vipor_0.4.5               haven_2.3.1               tidyselect_1.1.0          usethis_1.6.1            
+ [31] rio_0.5.16                fitdistrplus_1.1-1        XML_3.99-0.5              zoo_1.8-8                 ggpubr_0.4.0              GenomicAlignments_1.24.0 
+ [37] org.Mm.eg.db_3.11.4       xtable_1.8-4              magrittr_1.5              cli_2.0.2                 zlibbioc_1.34.0           rstudioapi_0.11          
+ [43] doRNG_1.8.2               miniUI_0.1.1.1            rpart_4.1-15              lambda.r_1.2.4            tinytex_0.26              BiocSingular_1.4.0       
+ [49] xfun_0.16                 askpass_1.1               pkgbuild_1.1.0            cluster_2.1.0             ape_5.4-1                 listenv_0.8.0            
+ [55] Biostrings_2.56.0         png_0.1-7                 future_1.18.0             withr_2.2.0               bitops_1.0-6              slam_0.1-47              
+ [61] plyr_1.8.6                cellranger_1.1.0          pcaPP_1.9-73              sparsesvd_0.2             e1071_1.7-3               dqrng_0.2.1              
+ [67] pillar_1.4.6              GenomicFeatures_1.40.1    fs_1.5.0                  kernlab_0.9-29            DelayedMatrixStats_1.10.1 vctrs_0.3.4              
+ [73] ellipsis_0.3.1            generics_0.0.2            devtools_2.3.1            tools_4.0.2               foreign_0.8-80            beeswarm_0.2.3           
+ [79] munsell_0.5.0             fastmap_1.0.1             HSMMSingleCell_1.8.0      compiler_4.0.2            pkgload_1.1.0             abind_1.4-5              
+ [85] httpuv_1.5.4              rtracklayer_1.48.0        segmented_1.2-0           sessioninfo_1.1.1         GenomeInfoDbData_1.2.3    lattice_0.20-41          
+ [91] deldir_0.1-28             later_1.1.0.1             BiocFileCache_1.12.1      jsonlite_1.7.0            scales_1.1.1              docopt_0.7.1             
+ [97] carData_3.0-4             pbapply_1.4-3             lazyeval_0.2.2            promises_1.1.1            car_3.0-9                 spatstat_1.64-1          
+[103] doParallel_1.0.15         goftest_1.2-2             spatstat.utils_1.17-0     reticulate_1.16           openxlsx_4.1.5            cowplot_1.1.0            
+[109] statmod_1.4.34            Rtsne_0.15                uwot_0.1.8                igraph_1.2.5              survival_3.2-3            yaml_2.2.1               
+[115] htmltools_0.5.0           memoise_1.1.0             locfit_1.5-9.4            viridisLite_0.3.0         digest_0.6.25             rrcov_1.5-5              
+[121] assertthat_0.2.1          mime_0.9                  rappdirs_0.3.1            densityClust_0.3          futile.options_1.0.1      RSQLite_2.2.0            
+[127] future.apply_1.6.0        remotes_2.2.0             data.table_1.13.0         blob_1.2.1                labeling_0.3              fastICA_1.2-2            
+[133] mixtools_1.2.0            RCurl_1.98-1.2            broom_0.7.0               hms_0.5.3                 modelr_0.1.8              colorspace_1.4-1         
+[139] ggbeeswarm_0.6.0          Rcpp_1.0.5                RANN_2.6.1                mvtnorm_1.1-1             fansi_0.4.1               R6_2.4.1                 
+[145] ggridges_0.5.2            lifecycle_0.2.0           formatR_1.7               zip_2.1.1                 curl_4.3                  ggsignif_0.6.0           
+[151] leiden_0.3.3              testthat_2.3.2            robustbase_0.93-6         desc_1.2.0                RcppAnnoy_0.0.16          org.Hs.eg.db_3.11.4      
+[157] RColorBrewer_1.1-2        iterators_1.0.12          htmlwidgets_1.5.1         polyclip_1.10-0           biomaRt_2.44.1            crosstalk_1.1.0.1        
+[163] rvest_0.3.6               globals_0.12.5            openssl_1.4.2             patchwork_1.0.1           codetools_0.2-16          lubridate_1.7.9          
+[169] FNN_1.1.3                 prettyunits_1.1.1         dbplyr_1.4.4              gtable_0.3.0              DBI_1.1.0                 tensor_1.5               
+[175] httr_1.4.2                KernSmooth_2.23-17        stringi_1.4.6             progress_1.2.2            farver_2.0.3              annotate_1.66.0          
+[181] viridis_0.5.1             xml2_1.3.2                combinat_0.0-8            BiocNeighbors_1.6.0       geneplotter_1.66.0        DEoptimR_1.0-8           
+[187] bit_4.0.4                 spatstat.data_1.4-3       pkgconfig_2.0.3           rstatix_0.6.0 

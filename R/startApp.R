@@ -13,7 +13,6 @@
 #' @import VennDiagram
 #' @import factoextra
 #' @import fastcluster
-#' @import reshape2
 #' @import gridExtra
 #' @import ggrepel
 #' @import GenomeInfoDbData
@@ -31,10 +30,6 @@
 #' 
 #' @import goseq
 #' @import GO.db
-#' @import org.Mm.eg.db
-#' @import org.Hs.eg.db
-#' @import org.Dm.eg.db
-#' @import org.Dr.eg.db
 #' 
 #' 
 #' @import pheatmap
@@ -91,6 +86,7 @@ startBingleSeq <- function() {
     library(progeny)
     library(dorothea)
     library(plotly)
+    library(viper)
     
     options(shiny.maxRequestSize=500*1024^2)
 

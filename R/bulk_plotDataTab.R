@@ -307,12 +307,7 @@ plotBarChart <- function(df) {
     ylab("Number of significant genes") +
     xlab("") +
     scale_fill_discrete(name = "Direction") +
-    theme_classic(base_size = 16) +
-    geom_text(
-      aes(label = number_of_sig_genes),
-      position = position_dodge(width = 0.9),
-      vjust = 2
-    )
+    theme_classic(base_size = 20)
 
   return(p)
 }
@@ -392,14 +387,14 @@ plotHeatmapTop <-
           ggplot(counts.scaled.clustered.m, aes(x = Var2, y = Var1, fill = value)) +
           geom_tile() +
           scale_fill_gradientn(colours = hm.palette(100), name ="Row Z-score") +
-          ylab('Genes') + xlab('Samples') + theme_bw() +
+          ylab('Genes') + xlab('Samples') + theme_bw(base_size = 20) +
           theme(
             axis.text.x = element_text(
               angle = 90,
               hjust = 1,
-              size = 16
+              size = 20
             ),
-            axis.title = element_text(size = 16),
+            axis.title = element_text(size = 20),
             axis.ticks = element_blank(),
             plot.background = element_blank(),
             panel.grid.major = element_blank(),
@@ -438,15 +433,20 @@ plotVP <- function(deres, fcValue, pValue) {
   deres <- na.omit(deres) %>%
     rownames_to_column("gene")
   
-  deres$sig_flag <-
-    as.factor(deres$FDR < pValue & abs(deres$logFC) > log2(fcValue))
+  deres <- deres %>%
+    mutate(sig_flag = as.factor(deres$FDR < pValue &
+                                  abs(deres$logFC) > log2(fcValue))) %>%
+    mutate(sig_flag = fct_recode(sig_flag,
+                                "Significant" = "TRUE",
+                                "Non-significant" = "FALSE"
+    ))
   
-  VP <-
+  VP <- 
     ggplot(data = deres, aes(x = logFC, y = -log10(Pvalue), colour = sig_flag)) +
     geom_point(aes(text=gene), size = 1.6) +
     xlab("Log2 Fold Change") +
-    ylab("-log10 unajusted p-value") +
-    theme_classic(base_size = 16) +
+    ylab("-log10 p-value") +
+    theme_classic(base_size = 20) +
     theme(legend.position = "bottom", legend.title = element_blank()) +
     scale_colour_discrete(
       breaks = c("TRUE", "FALSE"),
@@ -456,7 +456,6 @@ plotVP <- function(deres, fcValue, pValue) {
   
   return(VP)
 }
-
 
 #' Generate an MA plot
 #'
@@ -475,10 +474,16 @@ plotMA <- function(deres,
   
   exprValues <- deres[, 6:ncol(deres)]
   
-  deres$sig_flag <-
-    as.factor(deres$FDR < pValue & abs(deres$logFC) > log2(fcValue))
-  deres$mean_expression <- 
-    rowMeans(exprValues, na.rm = FALSE, dims = 1) + 0.000001
+  deres <- deres %>%
+    mutate(sig_flag = as.factor(deres$FDR < pValue &
+                                  abs(deres$logFC) > log2(fcValue))) %>%
+    mutate(sig_flag = fct_recode(sig_flag,
+                                 "Significant" = "TRUE",
+                                 "Non-significant" = "FALSE"
+    )) %>% 
+    mutate(mean_expression = 
+             rowMeans(exprValues, na.rm = FALSE, dims = 1) + 0.000001)
+    
   
   
   ## Generate a MA plot
@@ -489,11 +494,11 @@ plotMA <- function(deres,
       colour = deres$sig_flag
     )) +
     geom_point(aes(text=gene), size = 1.6) +
-    geom_hline(aes(yintercept = 0), colour = "black", size = 0.75) +
+    geom_hline(aes(yintercept = 0), colour = "black", size = 1) +
     xlab("Log2 Mean Expression") +
     ylab("Log2 Fold Change") +
-    theme_classic(base_size = 16) +
-    theme(legend.position = "bottom", legend.title = element_blank()) +
+    theme_classic(base_size = 20) +
+    theme(legend.position = "bottom") +
     scale_colour_discrete(
       breaks = c("TRUE", "FALSE"),
       labels = c("Significant", "Non-significant")
