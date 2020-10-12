@@ -69,12 +69,12 @@ sc_qcUI <- function(id) {
         title = "Outlier Violin Plot",
         value = "tab2_val",
         verbatimTextOutput(ns("preFilterText"), placeholder = T),
-        plotOutput(ns("preqcPlot"), width = "100%", height = "500px"),
+        plotOutput(ns("preqcPlot"), width = "1280px", height = "720px"),
 
         tags$hr(),
 
         verbatimTextOutput(ns("postFilterText"), placeholder = T),
-        plotOutput(ns("postqcPlot"), width = "100%", height = "500px")
+        plotOutput(ns("postqcPlot"), width = "1280px", height = "720px")
       )
     ))
   )

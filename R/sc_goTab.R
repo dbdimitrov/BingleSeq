@@ -75,7 +75,9 @@ sc_goUI <- function(id) {
                 ns("goTermPvalue")
               ))),
 
-              checkboxInput(ns("goTermFDR"), label = "FDR Correction", value = TRUE),
+              checkboxInput(ns("goTermFDR"),
+                            label = "FDR Correction",
+                            value = TRUE),
 
               radioButtons(
                 ns("goTermSymbol"),
@@ -99,12 +101,15 @@ sc_goUI <- function(id) {
                 ns("goTermGenome"),
                 label = "Select Genome",
                 choices = list(
-                  "Homo Sapiens (hg19)" = "hg19",
-                  "Homo Sapiens (hg18)" = "hg18",
-                  "Homo Sapiens (hg17)" = "hg17",
+                  "Homo sapiens (hg19)" = "hg19",
+                  "Homo sapiens (hg18)" = "hg18",
+                  "Homo sapiens (hg17)" = "hg17",
                   "Mus musculus (mm9)" = "mm9",
                   "Mus musculus (mm9)" = "mm8",
-                  "Mus musculus (mm7)" = "mm7"
+                  "Mus musculus (mm7)" = "mm7",
+                  "Danio rerio (danRer5)" = "danRer5",
+                  "Drosophila melanogaster (dm3)" = "dm3",
+                  "E. coli K12" = "E. coli K12"
                 )
               ),
 

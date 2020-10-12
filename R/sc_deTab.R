@@ -124,7 +124,7 @@ sc_deUI <- function(id) {
               title = "Plot",
               value = "dePlotTab",
 
-              plotOutput(ns("dgePlot"), width = "800px", height = "500px"),
+              plotOutput(ns("dgePlot"), width = "1280px", height = "720px"),
               downloadButton(ns("downloaddgePlot"), "Download Plot")
             )
           )))
@@ -154,7 +154,11 @@ sc_de <- function(input, output, session, finData) {
         and genes expressed in a minimum fraction of cells. <br> <br>
         <i>Note: MAST was shown to be among
         the best scRNA-Seq DE methods (Soneson & Robinson, 2018),
-        as such it is likely the best option here. </i> </div>"
+        as such it is likely the best option here. </i>
+        Also, please be patient as DE analysis is run on all clusters
+        and as such it may take some time.
+        MAST is particularly time consuming.  </div>"
+        
       )
     } else {
       HTML("")
@@ -163,7 +167,7 @@ sc_de <- function(input, output, session, finData) {
 
   ## Generate DE Data
   observeEvent(input$dgeButton, {
-    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+    show_waiter(tagList(spin_folding_cube(), h2("Loading...Say Patient :)")))
 
     if(input$dgeTestCombo == "DESeq2"){
       finData$finalData[["RNA"]]@counts <- as.matrix(finData$finalData[["RNA"]]@counts) + 1
@@ -190,11 +194,14 @@ sc_de <- function(input, output, session, finData) {
 
     output$dgeTable <-
       DT::renderDataTable(if (input$dgeClusterCheck) {
-        de$markers[,1:(ncol(de$markers)-1)] %>% datatable() %>%
-          formatSignif(columns = c(1:2, 5), digits = 4)
+        de$markers[,1:(ncol(de$markers)-1)] %>% 
+          rownames_to_column("gene_id") %>% 
+          datatable(rownames = FALSE)
       } else{
-        de$markers[de$markers$cluster == input$dgeClustInput, 1:(ncol(de$markers)-1)] %>% datatable() %>%
-          formatSignif(columns = c(1:2, 5), digits = 4)
+        de$markers[de$markers$cluster == input$dgeClustInput,
+                   1:(ncol(de$markers)-1)] %>%
+          rownames_to_column("gene_id") %>% 
+          datatable(rownames = FALSE)
       }, options = list(pageLength = 10))
   })
 
@@ -210,7 +217,9 @@ sc_de <- function(input, output, session, finData) {
       hm.palette <-
         colorRampPalette(c("red", "white", "blue")) # Set the colour range
 
-      de$dgePlot <- de$dgePlot +  scale_fill_gradientn(colours = hm.palette(100))
+      de$dgePlot <- de$dgePlot +
+        scale_fill_gradientn(colours = hm.palette(100))
+      
 
       output$dgePlot <- renderPlot({
         de$dgePlot
@@ -234,7 +243,11 @@ sc_de <- function(input, output, session, finData) {
 
 
       output$dgePlot <- renderPlot({
-        de$dgePlot
+        de$dgePlot  +
+          theme(axis.text.x = element_text(size = 18),
+                axis.text.y = element_text(size = 18),  
+                axis.title.x = element_text(size = 16),
+                axis.title.y = element_text(size = 16))
       })
 
       updateTabsetPanel(session, "deMainTabSet", selected = "dePlotTab")
@@ -303,8 +316,11 @@ sc_de <- function(input, output, session, finData) {
 #' @return Returns DE Heatmap
 getClusterHeatmap <- function(s_object, markers, geneNo) {
   topMarkers <-
-    markers %>% group_by(cluster) %>% top_n(n = geneNo, wt = avg_logFC)
-  p <- DoHeatmap(s_object, features = topMarkers$gene)
+    markers %>% 
+    group_by(cluster) %>%
+    top_n(n = geneNo, wt = avg_logFC)
+  p <- DoHeatmap(s_object, features = topMarkers$gene)  +
+    theme_classic(base_size = 14)
   return(p)
 }
 
@@ -325,13 +341,16 @@ genePlot <- function(finalData, plotType, geneName, session) {
   out <- tryCatch(
     {
       if (plotType == 1) {
-        VlnPlot(finalData, features = geneName)
+        VlnPlot(finalData, features = geneName) +
+          theme_classic(base_size = 20)
 
       } else if (plotType == 2) {
-        FeaturePlot(finalData, features = geneName, pt.size = 1.5)
+        FeaturePlot(finalData, features = geneName, pt.size = 1.5) +
+          theme_classic(base_size = 20)
 
       } else if (plotType == 3) {
-        RidgePlot(finalData, features = as.character(geneName))
+        RidgePlot(finalData, features = as.character(geneName))  +
+          theme_classic(base_size = 20)
       }
     },
     error=function(cond) {

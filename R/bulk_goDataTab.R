@@ -52,7 +52,7 @@ bulk_goDataUI <- function(id) {
               value = ("getGOTermsTab"),
               title = "Get GO Terms",
 
-              h4("Run Functional Annotation"),
+              h4("Get Gene Ontologies"),
 
 
               numericInput(
@@ -85,17 +85,19 @@ bulk_goDataUI <- function(id) {
                 )
               ),
 
-
               selectInput(
                 ns("goTermGenome"),
                 label = "Select Genome",
                 choices = list(
-                  "Homo Sapiens (hg19)" = "hg19",
-                  "Homo Sapiens (hg18)" = "hg18",
-                  "Homo Sapiens (hg17)" = "hg17",
+                  "Homo sapiens (hg19)" = "hg19",
+                  "Homo sapiens (hg18)" = "hg18",
+                  "Homo sapiens (hg17)" = "hg17",
                   "Mus musculus (mm9)" = "mm9",
                   "Mus musculus (mm9)" = "mm8",
-                  "Mus musculus (mm7)" = "mm7"
+                  "Mus musculus (mm7)" = "mm7",
+                  "Danio rerio (danRer5)" = "danRer5",
+                  "Drosophila melanogaster (dm3)" = "dm3",
+                  "E. coli K12" = "E. coli K12"
                 )
               ),
 
@@ -158,7 +160,8 @@ bulk_goDataUI <- function(id) {
 }
 
 
-#' Bulk Functional Annotation Tab Server
+
+#' Bulk Gene Ontology Tab Server
 #'
 #' @param counts Unfiltered Count Table (Reactive Value)
 #' @param de Differential Expression Results (Reactive Value)
@@ -170,7 +173,14 @@ bulk_goData <- function(input, output, session, counts, de) {
     if(input$goGetButton == 0){
       HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px'>
-        The <i> 'Get DE Genes' </i> tab enables
+        
+        
+        This tab enables the Gene Ontology and Pathway analysis of deregulated 
+        gene sets using the over representation analysis approach implemented 
+        within the GOseq package.
+        <br> <br>
+        
+        The <i> 'Get DE Genes' </i> subtab enables
         DE genes obtained from the DE analysis to be pre-filtered according to:
         Fold-change, adj. P-value threshold <br>
         Once the DE genes are filtered,
@@ -179,7 +189,7 @@ bulk_goData <- function(input, output, session, counts, de) {
       if(is.null(go$goTermTable)){
         HTML("<div style='border:2px solid blue; font-size: 14px;
         padding-top: 8px; padding-bottom: 8px; border-radius: 10px;'>
-        The <i> 'Get GO Terms' </i> tab provides a comprehensive
+        The <i> 'Get GO Terms' </i> subtab provides a comprehensive
         Functional Annotation Pipeline using the filtered DE genes. <br> <br>
 
         Prior to running the pipeline, please specify the following parameters:
@@ -200,8 +210,6 @@ bulk_goData <- function(input, output, session, counts, de) {
   # Functional Annotation ------
   observeEvent(input$goGetButton, {
 
-    print(head(de$merged))
-
     go$goGetGenes <-
       getDEgenes(
         de$merged,
@@ -211,7 +219,8 @@ bulk_goData <- function(input, output, session, counts, de) {
       )
 
     output$goGenesTable <-
-      DT::renderDataTable(as.data.frame(go$goGetGenes), colnames = ("Differentially Expressed Genes"))
+      DT::renderDataTable(as.data.frame(go$goGetGenes),
+                          colnames = ("Differentially Expressed Genes"))
 
     output$goGenesText <-
       renderText({
@@ -242,8 +251,7 @@ bulk_goData <- function(input, output, session, counts, de) {
 
 
     output$goTermTable <- DT::renderDataTable(
-      go$goTermTable %>% datatable() %>%
-        formatSignif(columns = c(2:3), digits = 4),
+      go$goTermTable %>% datatable(),
       rownames = FALSE,
       colnames = c(
         "ID",
@@ -267,7 +275,6 @@ bulk_goData <- function(input, output, session, counts, de) {
 
     output$goHistPlot <- renderPlot({
       go$hist
-
     })
 
     updateTabsetPanel(session, "goMainTabSet", selected = "goHistTab")
@@ -304,34 +311,89 @@ bulk_goData <- function(input, output, session, counts, de) {
 #' @param fchange Fold-Change threshold
 #' @return Returns a vector with DE gene names
 getDEgenes <- function(data, type, pvalue, fchange) {
-  # table <- data
-
+  
   fchange <- log2(fchange) # convert to log2
-
+  
   #filter
   if (type == 1) {
     table <-
       subset(data, FDR < pvalue &
                abs(logFC) > fchange) # absSig
-
+    
   } else if (type == 2) {
     table <-
       subset(data, FDR < pvalue &
                logFC > fchange) # upregSig
-
+    
   } else if (type == 3) {
     table <-
       subset(data, FDR < pvalue &
                logFC < -fchange) # downreg Sig
-
+    
   }
-
+  
   table <- na.omit(table) # omit NANs
-
+  
   gene.vector <- as.vector(row.names(table))
-
+  
   return(gene.vector)
 }
+
+
+
+#' Get GO gene sets for GOSeq
+#'
+#' Filters the DE results table and returns the names of the DE genes
+#' @param assayed.genes Genes in the DE set
+#' @param genome Model organism
+#' @param geneset_symbol Gene nomenclature 
+#' 
+#' @return Returns a data frame with two columns: genes and GO
+getGenesetsGO <- function(assayed.genes, genome, geneset_symbol){
+  if (startsWith(genome, "hg")){
+    require(org.Hs.eg.db)
+    go_data <- AnnotationDbi::select(org.Hs.eg.db,
+                                     keys=assayed.genes,
+                                     keytype = geneset_symbol, 
+                                     columns = c(geneset_symbol, "GO")) %>%
+      dplyr::select(all_of(geneset_symbol), "GO")
+    
+  } else if(startsWith(genome, "mm")) {
+    require(org.Mm.eg.db)
+    go_data <- AnnotationDbi::select(org.Hs.eg.db,
+                                     keys=assayed.genes,
+                                     keytype = geneset_symbol, 
+                                     columns = c(geneset_symbol, "GO")) %>%
+      dplyr::select(all_of(geneset_symbol), "GO")
+    
+  } else if(startsWith(genome, "dan")) {
+    require(org.Dr.eg.db)
+    go_data <- AnnotationDbi::select(org.Dr.eg.db,
+                                     keys=assayed.genes,
+                                     keytype = geneset_symbol, 
+                                     columns = c(geneset_symbol, "GO")) %>%
+      dplyr::select(all_of(geneset_symbol), "GO")
+    
+  } else if(startsWith(genome, "dm")) {
+    require(org.Dr.eg.db)
+    go_data <- AnnotationDbi::select(org.Dm.eg.db,
+                                     keys=assayed.genes,
+                                     keytype = geneset_symbol, 
+                                     columns = c(geneset_symbol, "GO")) %>%
+      dplyr::select(all_of(geneset_symbol), "GO")
+   } else if(startsWith(genome, "E.")) {
+      require(org.Dr.eg.db)
+      go_data <- AnnotationDbi::select(org.EcK12.eg.db,
+                                       keys=assayed.genes,
+                                       keytype = geneset_symbol, 
+                                       columns = c(geneset_symbol, "GO")) %>%
+        dplyr::select(all_of(geneset_symbol), "GO")
+    } 
+  
+  return(go_data)
+}
+
+
 
 
 #' Functional Annotation Pipeline (Both pipelines)
@@ -349,7 +411,6 @@ getDEgenes <- function(data, type, pvalue, fchange) {
 #'
 #' @return Returns a dataframe with Functional Annotation Results
 runGOSEQ <-
-  runGOSEQ <-
   function(deGenes,
            data,
            genome,
@@ -359,7 +420,7 @@ runGOSEQ <-
            pValue,
            appNum,
            session) {
-
+    
     out <- tryCatch(
       {
         if(appNum == 1){ #Single-cell
@@ -369,22 +430,32 @@ runGOSEQ <-
           rownames(countTable) <- data[, 1]
           assayed.genes <- as.vector(row.names(countTable))
         }
-
+        
         gene.vector = as.integer(assayed.genes %in% deGenes)
         names(gene.vector) = assayed.genes
-
+        
+        geneset_symbol = switch(symbol,
+                                "ensGene" = "ENSEMBL",
+                                "geneSymbol" = "SYMBOL")
+        
+        go_data <- getGenesetsGO(assayed.genes, genome, geneset_symbol)
+        
         pwf = nullp(gene.vector, genome, symbol)
-
-        GO.wall = goseq(pwf, genome, symbol, test.cats = testType)
-
+        
+        
+        GO.wall = goseq(pwf, gene2cat = go_data, test.cats = testType)
+        
         if (pCorrect) {
           GO.wall$over_represented_pvalue <-
             p.adjust(GO.wall$over_represented_pvalue, method = "BH")
+          
+          GO.wall$under_represented_pvalue <-
+            p.adjust(GO.wall$under_represented_pvalue, method = "BH")
         }
-
+        
         GO.wall <-
           subset(GO.wall, GO.wall$over_represented_pvalue < pValue)
-
+        
         if (testType == "GO:CC") {
           holder = "CellularComponent"
         } else if (testType == "GO:BP") {
@@ -394,18 +465,20 @@ runGOSEQ <-
         } else{
           holder = "KEGG"
         }
-
+        
         return(GO.wall)
       },
       error=function(cond) {
-
+        
         sendSweetAlert(
           session = session,
           title = "Incorrect Gene type",
           text = "Ensure that the correct Gene symbol or genome is chosen",
           type = "error"
         )
-
+        
+        print(cond)
+        
         return()      # Choose a return value in case of error
       }
     )

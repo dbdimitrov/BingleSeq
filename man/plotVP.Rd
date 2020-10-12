@@ -4,10 +4,10 @@
 \alias{plotVP}
 \title{Generate a Volcano plot}
 \usage{
-plotVP(data, fcValue, pValue)
+plotVP(deres, fcValue, pValue)
 }
 \arguments{
-\item{data}{Differential Expression results (deTable)}
+\item{deres}{Differential Expression results (deTable)}
 
 \item{fcValue}{Fold-Change threshold}
 

@@ -46,7 +46,7 @@ bulk_plotDataUI <- function(id) {
         numericInput(
           ns("plotFC"),
           label = ("Fold-Change threshold >"),
-          value = 2,
+          value = 1.5,
           min = 0,
           max = 20
         ),
@@ -107,13 +107,11 @@ bulk_plotDataUI <- function(id) {
     mainPanel(
       htmlOutput(ns("helpPlotInfo")),
 
-      plotOutput(ns("mainPlot"), width = "800px", height = "500px"),
+      plotlyOutput(ns("mainPlot"), width = "1280px", height = "840px"),
 
       conditionalPanel(
         condition = "input.selectPlotCombo == 'bar'",
         ns = ns
-        # ,
-        # DT::dataTableOutput(ns("barTable"))
       )
     )
   )
@@ -160,8 +158,11 @@ bulk_plotData <- function(input, output, session, rv) {
     if (input$selectPlotCombo == "pca") {
 
       rv$plot <-
-        plotPCA(rv$deTable[[2]], TRUE, rv$deTable[[3]], "treatment")
-
+        ggplotly(plotPCA(rv$deTable[[2]],
+                         TRUE,
+                         rv$deTable[[3]],
+                         "treatment"),
+                 tooltip = c("none"))
 
     } else if (input$selectPlotCombo == "scree") {
       rv$plot <- plotScree(rv$deTable[[2]])
@@ -210,8 +211,8 @@ bulk_plotData <- function(input, output, session, rv) {
 
     }
 
-    output$mainPlot <- renderPlot({
-      grid.draw(rv$plot)
+    output$mainPlot <- renderPlotly({
+      ggplotly(rv$plot)
     })
   })
 
@@ -239,7 +240,7 @@ bulk_plotData <- function(input, output, session, rv) {
         plot = rv$plot,
         device = device,
         width = 1280,
-        height = 720,
+        height = 840,
         limitsize = FALSE
       )
     }
@@ -306,12 +307,7 @@ plotBarChart <- function(df) {
     ylab("Number of significant genes") +
     xlab("") +
     scale_fill_discrete(name = "Direction") +
-    theme_classic(base_size = 16) +
-    geom_text(
-      aes(label = number_of_sig_genes),
-      position = position_dodge(width = 0.9),
-      vjust = 2
-    )
+    theme_classic(base_size = 20)
 
   return(p)
 }
@@ -391,14 +387,14 @@ plotHeatmapTop <-
           ggplot(counts.scaled.clustered.m, aes(x = Var2, y = Var1, fill = value)) +
           geom_tile() +
           scale_fill_gradientn(colours = hm.palette(100), name ="Row Z-score") +
-          ylab('Genes') + xlab('Samples') + theme_bw() +
+          ylab('Genes') + xlab('Samples') + theme_bw(base_size = 20) +
           theme(
             axis.text.x = element_text(
               angle = 90,
               hjust = 1,
-              size = 16
+              size = 20
             ),
-            axis.title = element_text(size = 16),
+            axis.title = element_text(size = 20),
             axis.ticks = element_blank(),
             plot.background = element_blank(),
             panel.grid.major = element_blank(),
@@ -428,74 +424,86 @@ plotHeatmapTop <-
 
 #' Generate a Volcano plot
 #'
-#' @param data Differential Expression results (deTable)
+#' @param deres Differential Expression results (deTable)
 #' @param pValue P-value threshold
 #' @param fcValue Fold-Change threshold
 #' @export
 #' @return Returns a Volcano plot
-plotVP <- function(data, fcValue, pValue) {
-  x <- na.omit(data)
-
-  fcValue <- log2(fcValue)
-
-  x$sig_flag <-
-    as.factor(x$FDR < pValue & abs(x$logFC) > fcValue)
-
-  VP <-
-    ggplot(data = x, aes(x$logFC, y = -log10(x$Pvalue), colour = sig_flag)) +
-    geom_point(size = 1.8) +
+plotVP <- function(deres, fcValue, pValue) {
+  deres <- na.omit(deres) %>%
+    rownames_to_column("gene")
+  
+  deres <- deres %>%
+    mutate(sig_flag = as.factor(deres$FDR < pValue &
+                                  abs(deres$logFC) > log2(fcValue))) %>%
+    mutate(sig_flag = fct_recode(sig_flag,
+                                "Significant" = "TRUE",
+                                "Non-significant" = "FALSE"
+    ))
+  
+  VP <- 
+    ggplot(data = deres, aes(x = logFC, y = -log10(Pvalue), colour = sig_flag)) +
+    geom_point(aes(text=gene), size = 1.6) +
     xlab("Log2 Fold Change") +
-    ylab("-log10 unajusted p-value") +
-    theme_classic(base_size = 16) +
+    ylab("-log10 p-value") +
+    theme_classic(base_size = 20) +
     theme(legend.position = "bottom", legend.title = element_blank()) +
     scale_colour_discrete(
       breaks = c("TRUE", "FALSE"),
       labels = c("Significant", "Non-significant")
     )
-
+  VP <- ggplotly(VP, tooltip = c("gene", "x", "y"))
+  
   return(VP)
 }
 
-
 #' Generate an MA plot
 #'
-#' @param data Differential Expression results (deTable)
+#' @param deres Differential Expression results (deTable)
 #' @param pValue P-value threshold
 #' @param fcValue Fold-Change threshold
 #' @export
 #' @return Returns a MA plot
-plotMA <- function(data,
+plotMA <- function(deres,
                    fcValue,
                    pValue) {
-
-  x <- na.omit(data)
-
-  fcValue <- log2(fcValue)
-
-  exprValues <- x[, 5:ncol(data)]
-
-  x$sig_flag <-
-    as.factor(x$FDR < pValue & abs(x$logFC) > fcValue)
-  x$mean_expression <- rowMeans(exprValues, na.rm = FALSE, dims = 1)
-
-
+  
+  deres <- na.omit(deres) %>% 
+    rownames_to_column("gene")
+  
+  
+  exprValues <- deres[, 6:ncol(deres)]
+  
+  deres <- deres %>%
+    mutate(sig_flag = as.factor(deres$FDR < pValue &
+                                  abs(deres$logFC) > log2(fcValue))) %>%
+    mutate(sig_flag = fct_recode(sig_flag,
+                                 "Significant" = "TRUE",
+                                 "Non-significant" = "FALSE"
+    )) %>% 
+    mutate(mean_expression = 
+             rowMeans(exprValues, na.rm = FALSE, dims = 1) + 0.000001)
+    
+  
+  
   ## Generate a MA plot
   MA <-
-    ggplot(data = x, aes(
-      x = log10(x$mean_expression + 0.001),
-      y = x$logFC,
-      colour = x$sig_flag
+    ggplot(data = deres, aes(
+      x = log10(mean_expression),
+      y = logFC,
+      colour = deres$sig_flag
     )) +
-    geom_point(size = 1.8) +
-    geom_hline(aes(yintercept = 0), colour = "black", size = 0.75) +
+    geom_point(aes(text=gene), size = 1.6) +
+    geom_hline(aes(yintercept = 0), colour = "black", size = 1) +
     xlab("Log2 Mean Expression") +
     ylab("Log2 Fold Change") +
-    theme_classic(base_size = 16) +
-    theme(legend.position = "bottom", legend.title = element_blank()) +
+    theme_classic(base_size = 20) +
+    theme(legend.position = "bottom") +
     scale_colour_discrete(
       breaks = c("TRUE", "FALSE"),
       labels = c("Significant", "Non-significant")
     )
-
+  MA <- ggplotly(MA, tooltip = c("gene", "x", "y"))
+  
   return(MA)
 }

@@ -4,10 +4,10 @@
 \alias{plotMA}
 \title{Generate an MA plot}
 \usage{
-plotMA(data, fcValue, pValue)
+plotMA(deres, fcValue, pValue)
 }
 \arguments{
-\item{data}{Differential Expression results (deTable)}
+\item{deres}{Differential Expression results (deTable)}
 
 \item{fcValue}{Fold-Change threshold}
 

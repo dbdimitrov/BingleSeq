@@ -13,7 +13,6 @@
 #' @import VennDiagram
 #' @import factoextra
 #' @import fastcluster
-#' @import reshape2
 #' @import gridExtra
 #' @import ggrepel
 #' @import GenomeInfoDbData
@@ -28,11 +27,17 @@
 #' @import Seurat
 #' @import scran
 #' @import SC3
+#' 
 #' @import goseq
-#' @import org.Mm.eg.db
-#' @import org.Hs.eg.db
 #' @import GO.db
-#'
+#' 
+#' 
+#' @import pheatmap
+#' @import tidyverse
+#' @import progeny
+#' @import dorothea
+#' @import plotly
+#' 
 #' @include server.R
 #' @include ui.R
 #'
@@ -71,12 +76,18 @@ startBingleSeq <- function() {
     library(Seurat)
     library('scran')
     library('SC3')
-
-    library(org.Mm.eg.db)
-    library(org.Hs.eg.db)
+    
+    library(AnnotationDbi)
     library(goseq)
     library(GO.db)
 
+    library(pheatmap)
+    library(tidyverse)
+    library(progeny)
+    library(dorothea)
+    library(plotly)
+    library(viper)
+    
     options(shiny.maxRequestSize=500*1024^2)
 
     app <- shinyApp(ui = shinyUI(ui),

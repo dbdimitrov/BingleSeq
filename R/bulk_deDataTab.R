@@ -69,8 +69,11 @@ bulk_deDataUI <- function(id) {
                        ns = ns,
 
                        hr(),
+                       
+                       h4("Filter DE results"),
 
-                       checkboxInput(ns("exploreDE"), label = ("Explore DE results"),
+                       checkboxInput(ns("exploreDE"),
+                                     label = "",
                                      value = FALSE),
 
                        conditionalPanel(condition = "input.exploreDE",
@@ -82,6 +85,8 @@ bulk_deDataUI <- function(id) {
                                           min = 0.0001,
                                           max = 0.5
                                         ),
+                                        textInput(ns("exploreGenes"),
+                                                  "Please enter genes you wish to filer"),
                                         fluidRow(column(3, verbatimTextOutput(ns(
                                           "explorePvalue"
                                         )))),
@@ -136,7 +141,7 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
               log2 expression fold-change (logFC);
               package/test specific test statistics;
               uncorrect p-value (Pvalue);
-              multiple-testing BH adjusted p-value (FDR).</i></p>")
+              multiple-testing FDR adjusted p-value (FDR).</i></p>")
     }
   })
   
@@ -279,8 +284,13 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
 
       output$deTable <-
         DT::renderDataTable(
-          de$deTable[[1]] %>% datatable() %>%
-            formatSignif(columns = c(1:4), digits = 4),
+          de$deTable[[1]] %>%
+            rownames_to_column("gene_id") %>% 
+            datatable(rownames = FALSE) %>%
+            formatSignif(
+              colnames(de$deTable[[1]]),
+              digits = 4,
+              interval = 3),
           options = list(pageLength = 10)
         )
     })
@@ -288,13 +298,18 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
     hide_waiter()
 
     observeEvent(input$exploreButton,{
-      de$dispTable <-
-        subset(de$deTable[[1]], FDR < input$explorePvalue)
+      de$deTable[[1]] <- de$deTable[[1]] %>%
+        dplyr::filter(FDR < input$explorePvalue) %>%
+        dplyr::filter(!grepl(as.character(input$exploreGenes), rownames(.)))
 
       output$deTable <-
         DT::renderDataTable(
-          de$dispTable %>% datatable() %>%
-            formatSignif(columns = c(1:4), digits = 4),
+          de$deTable[[1]] %>%
+            rownames_to_column("gene_id") %>% 
+            formatSignif(
+              colnames(de$deTable[[1]]),
+              digits = 4,
+              interval = 3),
           options = list(pageLength = 10)
         )
 
@@ -470,7 +485,8 @@ deSequence <- function(readCounts, meta, testType, fitType, useBatch){
   DEData <- data.frame(as.data.frame(res))
 
   DEData.matching <- DEData[, c(2, 4:6)]
-  colnames(DEData.matching) <- c("logFC", "stat", "Pvalue", "FDR")
+
+  colnames(DEData.matching) <- c("logFC", as.character(testType), "Pvalue", "FDR")
 
   normCounts <- as.data.frame(counts(dds, normalized = TRUE))
 
@@ -516,16 +532,17 @@ deEdgeR <- function(readCounts, meta, testType, normMethod, useBatch){
   if(testType == "exact"){
     de = exactTest(dge)
   }else if(testType == "GLM"){
-    fit <- glmFit(dge)
-    de <- glmLRT(fit)
+    fit <- glmQLFit(dge)
+    de <- glmQLFTest(fit)
   }
 
   # 5. Extract DE results
-  tt = topTags(de, n = nrow(dge), adjust.method = "BH", sort.by	= "none")
+  tt = topTags(de, n = nrow(dge), adjust.method = "fdr", sort.by	= "none")
+  print(head(tt))
   if(ncol(tt$table)>4){
-    res <- tt$table[,-3]
+    res <- tt$table[,c(3,1,4,5)]
   } else{
-    res <- tt$table
+    res <- tt$table[,c(2,1,4,3)]
   }
 
   ## 6.Extract normalized  CPMs
@@ -567,7 +584,7 @@ deLimma <- function(readCounts, meta, normMethod, useBatch) {
   fit <- lmFit(v)
   ebayes.fit <- eBayes(fit)
 
-  # if(length(levels(as.factor(meta$treatment))) == 2){
+  if(length(levels(as.factor(meta$treatment))) == 2){
   tab <-
     topTable(
       ebayes.fit,
@@ -581,20 +598,20 @@ deLimma <- function(readCounts, meta, normMethod, useBatch) {
   res <-data.frame(tab$logFC, tab$t, tab$P.Value, tab$adj.P.Val)
   colnames(res) <- c("logFC", "t", "Pvalue", "FDR")
 
-  # }else{
-  #   tab <-
-  #     topTable(
-  #       ebayes.fit,
-  #       coef = 1:length(levels(as.factor(meta$treatment))),
-  #       number = dim(ebayes.fit)[1],
-  #       genelist = fit$genes$NAME,
-  #       adjust = "BH",
-  #       sort.by = "none"
-  #     )
-  #
-  #   res <-data.frame(tab[,1], tab$F, tab$P.Value, tab$adj.P.Val)
-  #   colnames(res) <- c("logFC", "F", "Pvalue", "FDR")
-  # }
+  }else{
+    tab <-
+      topTable(
+        ebayes.fit,
+        coef = 1:length(levels(as.factor(meta$treatment))),
+        number = dim(ebayes.fit)[1],
+        genelist = fit$genes$NAME,
+        adjust = "BH",
+        sort.by = "none"
+      )
+
+    res <-data.frame(tab[,1], tab$F, tab$P.Value, tab$adj.P.Val)
+    colnames(res) <- c("logFC", "F", "Pvalue", "FDR")
+  }
 
   row.names(res) <- row.names(tab)
 
