@@ -148,8 +148,8 @@ For more information, please refer to the cited publications.
 DoRothEA and PROGENy are available for mouse and human data.
 
 ![BingleSeq Bulk RNA-Seq Footprint Analysis Results](/figures/footprint.PNG)
-*Fig-S6. A) TF activities (using DE method statistic - e.g. t-value) and B) TF activities per sample (using normalized gene counts) estimated with DoRothEA and viper.
-Pathway activity estimation with PROGENy showing C) the Normalized Enrichment Scores (NES) for each pathway and D) PROGENy pathway scores per sample.*
+A) TF activities (using DE method statistic - e.g. t-value) and B) TF activities per sample (using normalized gene counts) estimated with DoRothEA and viper.
+Pathway activity estimation with PROGENy showing C) the Normalized Enrichment Scores (NES) for each pathway and D) PROGENy pathway scores per sample.
 
 *Note that these results were generated using real data taken from McFarlane et al., 2019.*  
 
