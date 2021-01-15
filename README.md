@@ -1,7 +1,7 @@
 # BingleSeq
 BingleSeq - A user-friendly R package for Bulk and Single-cell RNA-Seq data analyses.
 
-Manuscript available at [![PeerJ](https://peerj.com/articles/10469/)].
+Manuscript available at PeerJ DOI: https://doi.org/10.7717/peerj.10469.
 
 
 ### Installation
