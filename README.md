@@ -11,6 +11,10 @@ BingleSeq can be installed directly from GitHub using the following code:
 ```
 library("devtools")
 install_github("dbdimitrov/BingleSeq")
+
+# Start the application
+library(BingleSeq)
+startBingleSeq()
 ```
 
 
