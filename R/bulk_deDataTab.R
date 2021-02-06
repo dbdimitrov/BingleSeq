@@ -247,7 +247,7 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
     de$selectedPackage <- as.numeric(input$selectPackage)
 
 
-    waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(html=tagList(spin_folding_cube(), h2("Loading ...")))
       
     
     if(!is.null(fCounts$batchCorrected)){

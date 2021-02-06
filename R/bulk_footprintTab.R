@@ -517,6 +517,7 @@ plot_tfa_per_sample <- function(tf_activities, tf_activities_counts, tf_num) {
 #' @export
 #' @return Returns a df with gene names convert to symbols
 convert_gene_type <- function(de_data, input_type, output_type) {
+  require(AnnotationDbi)
   geneIDs1 <- AnnotationDbi::select(org.Hs.eg.db,
                                     keys=de_data$X,
                                     keytype = input_type, 

@@ -120,7 +120,7 @@ sc_comp <- function(input, output, session, finData) {
   observeEvent(input$comparisonButton, {
     #* quite different
 
-    waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(html=tagList(spin_folding_cube(), h2("Loading ...")))
 
     comp$xlist <-
       sc_getAllDE(
@@ -194,32 +194,30 @@ sc_comp <- function(input, output, session, finData) {
 #' @export
 #' @return Returns a list with DE genes according to the different methods
 sc_getAllDE <- function(data, mPCT, fc, pValue) {
-  fc <- log(fc)
 
   x1 <-
     FindAllMarkers(
       data,
       test.use = "wilcox",
       min.pct = mPCT,
-      logfc.threshold = fc
+      logfc.threshold =  log2(fc)
     )
   x2 <-
     FindAllMarkers(
       data,
       test.use = "t",
       min.pct = mPCT,
-      logfc.threshold = fc
+      logfc.threshold =  log2(fc)
     )
 
   x3 <-
     FindAllMarkers(
-      data,
+      object=data,
       test.use = "MAST",
       min.pct = mPCT,
-      logfc.threshold = fc
+      logfc.threshold = log2(fc)
     )
-
-
+  
   x1_sig <- subset(x1, p_val_adj < pValue)
   x2_sig <- subset(x2, p_val_adj < pValue)
   x3_sig <- subset(x3, p_val_adj < pValue)

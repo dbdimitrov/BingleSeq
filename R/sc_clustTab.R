@@ -308,7 +308,7 @@ sc_clust <- function(input, output, session, normData) {
 
     waiter_show(
       html = tagList(
-        spin_fading_circles(),
+        spin_folding_cube(),
         h2("Loading ...")
     ))
 

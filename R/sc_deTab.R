@@ -167,7 +167,7 @@ sc_de <- function(input, output, session, finData) {
 
   ## Generate DE Data
   observeEvent(input$dgeButton, {
-    waiter_show(tagList(spin_folding_cube(), h2("Loading...Stay Patient :)")))
+    waiter_show(html=tagList(spin_folding_cube(), h2("Loading...Stay Patient :)")))
 
     if(input$dgeTestCombo == "DESeq2"){
       finData$finalData[["RNA"]]@counts <- as.matrix(finData$finalData[["RNA"]]@counts) + 1
@@ -209,7 +209,7 @@ sc_de <- function(input, output, session, finData) {
   ## Cluster Heatmap
   observeEvent(input$dgeHeatButton, {
     if (!is.null(de$markers)) {
-      waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
+      waiter_show(html=tagList(spin_folding_cube(), h2("Loading ...")))
 
       de$dgePlot <-
         getClusterHeatmap(finData$finalData, de$markers, input$clustHeatInput)

@@ -234,7 +234,7 @@ bulk_goData <- function(input, output, session, counts, de) {
 
   observeEvent(input$goTermButton, {
 
-    waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(html=tagList(spin_folding_cube(), h2("Loading ...")))
 
     go$goTermTable <-
       runGOSEQ(
@@ -352,6 +352,7 @@ getDEgenes <- function(data, type, pvalue, fchange) {
 getGenesetsGO <- function(assayed.genes, genome, geneset_symbol){
   if (startsWith(genome, "hg")){
     require(org.Hs.eg.db)
+    require(AnnotationDbi)
     go_data <- AnnotationDbi::select(org.Hs.eg.db,
                                      keys=assayed.genes,
                                      keytype = geneset_symbol, 

@@ -100,7 +100,7 @@ sc_norm <- function(input, output, session, filtData) {
   ### Normalization ------
   observeEvent(input$normalizeButton, {
 
-    waiter_show(html = tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(html=tagList(spin_folding_cube(), h2("Loading ...")))
     norm$normalizedData <-
       normalizeSeurat(
         filtData$filteredData,

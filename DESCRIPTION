@@ -10,9 +10,9 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 biocViews:
-Imports: tidyverse, shiny, shinyjs, shinyFiles, shinyWidgets, waiter, DT,
-        grDevices, ggplot2, VennDiagram, factoextra, fastcluster,
-        gridExtra, ggrepel, DESeq2, edgeR, limma, MAST,
+Imports: tidyverse, shiny, shinyjs, shinyFiles, shinyWidgets, waiter (>= 0.2.0), 
+        DT, grDevices, ggplot2, VennDiagram, factoextra, fastcluster,
+        gridExtra, ggrepel, DESeq2, edgeR, limma, MAST (>= 1.14.0),
         monocle, Seurat, scran, SC3, GenomeInfoDbData, geneLenDataBase,
         GO.db, goseq, sva, Harman, pheatmap, dorothea, viper, progeny, plotly
 Suggests: org.Mm.eg.db, org.Hs.eg.db, org.Dm.eg.db, org.Dr.eg.db, org.EcK12.eg.db

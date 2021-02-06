@@ -246,7 +246,7 @@ sc_go <- function(input, output, session, de, countsT) {
 
     if(!is.null(go$goGetGenes)){
 
-      waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
+      waiter_show(html=tagList(spin_folding_cube(), h2("Loading ...")))
 
       go$goTermTable <-
         runGOSEQ(

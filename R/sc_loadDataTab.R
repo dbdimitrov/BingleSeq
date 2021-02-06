@@ -16,7 +16,7 @@ sc_loadDataUI <- function(id) {
         label = "Data Type",
         c("Count Data Table" = 1,
           "10x Genomics Data" = 2,
-          "Test Single cell Data" = 3)
+          "10x 3k PBMCs Test Data" = 3)
       ),
       
       conditionalPanel(
@@ -116,14 +116,14 @@ sc_loadData <- function(input, output, session) {
   # Load 10x -----
   observeEvent(input$directoryButton, {
       print(input$location10xInput)
-      waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
+      waiter_show(html=tagList(spin_folding_cube(), h2("Loading ...")))
       counts$countTable <- load10xData(input$location10xInput, session)
       waiter_hide()
   })
   
   # Load CountTable -----
   observeEvent(input$file1, {
-    waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(html=tagList(spin_folding_cube(), h2("Loading ...")))
     counts$countTable <- read.csv(input$file1$datapath,
                                   sep = input$sep,
                                   row.names = 1)
