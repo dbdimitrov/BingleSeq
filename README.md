@@ -332,6 +332,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 
 ## R Session Info:
+─ Session info ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  setting  value                       
  version  R version 4.0.3 (2020-10-10)
  os       Ubuntu 20.04.1 LTS          
@@ -585,3 +586,10 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
    yaml                   2.2.1    2020-02-01 [1] CRAN (R 4.0.2)
    zlibbioc               1.36.0   2020-10-27 [1] Bioconductor  
    zoo                    1.8-8    2020-05-02 [1] CRAN (R 4.0.2)
+
+[1] /home/dbdimitrov/R/x86_64-pc-linux-gnu-library/4.0
+[2] /usr/local/lib/R/site-library
+[3] /usr/lib/R/site-library
+[4] /usr/lib/R/library
+
+ P ── Loaded and on-disk path mismatch.
