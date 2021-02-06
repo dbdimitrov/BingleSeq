@@ -342,152 +342,6 @@ BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
 LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
 
 locale:
- [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
- [3] LC_TIME=de_DE.UTF-8        LC_COLLATE=en_US.UTF-8    
- [5] LC_MONETARY=de_DE.UTF-8    LC_MESSAGES=en_US.UTF-8   
- [7] LC_PAPER=de_DE.UTF-8       LC_NAME=C                 
- [9] LC_ADDRESS=C               LC_TELEPHONE=C            
-[11] LC_MEASUREMENT=de_DE.UTF-8 LC_IDENTIFICATION=C       
-
-attached base packages:
- [1] splines   parallel  stats4    grid      stats     graphics 
- [7] grDevices utils     datasets  methods   base     
-
-other attached packages:
- [1] BingleSeq_0.3.6             org.Hs.eg.db_3.11.4        
- [3] viper_1.24.0                plotly_4.9.3               
- [5] dorothea_1.0.1              progeny_1.10.0             
- [7] forcats_0.5.0               stringr_1.4.0              
- [9] purrr_0.3.4                 readr_1.4.0                
-[11] tidyr_1.1.2                 tibble_3.0.5               
-[13] tidyverse_1.3.0             pheatmap_1.0.12            
-[15] GO.db_3.11.4                AnnotationDbi_1.52.0       
-[17] goseq_1.40.0                geneLenDataBase_1.24.0     
-[19] BiasedUrn_1.07              SC3_1.16.0                 
-[21] scran_1.16.0                Seurat_3.2.3               
-[23] monocle_2.16.0              DDRTree_0.1.5              
-[25] irlba_2.3.3                 VGAM_1.1-4                 
-[27] Matrix_1.2-18               MAST_1.14.0                
-[29] SingleCellExperiment_1.10.1 edgeR_3.30.3               
-[31] limma_3.44.3                DESeq2_1.28.1              
-[33] SummarizedExperiment_1.20.0 Biobase_2.50.0             
-[35] MatrixGenerics_1.2.0        matrixStats_0.57.0         
-[37] GenomicRanges_1.42.0        GenomeInfoDb_1.26.2        
-[39] IRanges_2.24.1              S4Vectors_0.28.1           
-[41] BiocGenerics_0.36.0         sva_3.36.0                 
-[43] BiocParallel_1.24.1         genefilter_1.70.0          
-[45] mgcv_1.8-33                 nlme_3.1-149               
-[47] Harman_1.16.0               ggrepel_0.8.2              
-[49] gridExtra_2.3               reshape2_1.4.4             
-[51] fastcluster_1.1.25          factoextra_1.0.7           
-[53] VennDiagram_1.6.20          futile.logger_1.4.3        
-[55] ggplot2_3.3.2               DT_0.17                    
-[57] dplyr_1.0.2                 waiter_0.2.0               
-[59] shinyWidgets_0.5.4          shinyFiles_0.9.0           
-[61] shinyjs_2.0.0               shiny_1.5.0                
-
-loaded via a namespace (and not attached):
-  [1] rsvd_1.0.3                ica_1.0-2                
-  [3] class_7.3-17              ps_1.5.0                 
-  [5] Rsamtools_2.4.0           foreach_1.5.1            
-  [7] lmtest_0.9-38             rprojroot_2.0.2          
-  [9] crayon_1.3.4              MASS_7.3-53              
- [11] WriteXLS_6.1.0            backports_1.2.1          
- [13] qlcMatrix_0.9.7           reprex_0.3.0             
- [15] rlang_0.4.10              XVector_0.30.0           
- [17] ROCR_1.0-11               readxl_1.3.1             
- [19] callr_3.5.1               scater_1.16.2            
- [21] bcellViper_1.24.0         bit64_4.0.5              
- [23] glue_1.4.2                rngtools_1.5             
- [25] sctransform_0.3.1         processx_3.4.5           
- [27] vipor_0.4.5               haven_2.3.1              
- [29] tidyselect_1.1.0          usethis_2.0.0            
- [31] fitdistrplus_1.1-3        XML_3.99-0.5             
- [33] zoo_1.8-8                 GenomicAlignments_1.24.0 
- [35] xtable_1.8-4              magrittr_2.0.1           
- [37] cli_2.2.0                 zlibbioc_1.36.0          
- [39] rstudioapi_0.13           doRNG_1.8.2              
- [41] miniUI_0.1.1.1            rpart_4.1-15             
- [43] lambda.r_1.2.4            BiocSingular_1.4.0       
- [45] askpass_1.1               pkgbuild_1.2.0           
- [47] cluster_2.1.0             listenv_0.8.0            
- [49] Biostrings_2.56.0         png_0.1-7                
- [51] future_1.21.0             withr_2.4.1              
- [53] bitops_1.0-6              slam_0.1-48              
- [55] plyr_1.8.6                cellranger_1.1.0         
- [57] pcaPP_1.9-73              sparsesvd_0.2            
- [59] e1071_1.7-4               dqrng_0.2.1              
- [61] pillar_1.4.7              cachem_1.0.1             
- [63] GenomicFeatures_1.40.1    fs_1.5.0                 
- [65] kernlab_0.9-29            DelayedMatrixStats_1.10.1
- [67] vctrs_0.3.6               ellipsis_0.3.1           
- [69] generics_0.1.0            devtools_2.3.2           
- [71] tools_4.0.3               beeswarm_0.2.3           
- [73] munsell_0.5.0             DelayedArray_0.16.0      
- [75] fastmap_1.1.0             HSMMSingleCell_1.8.0     
- [77] compiler_4.0.3            pkgload_1.1.0            
- [79] abind_1.4-5               httpuv_1.5.4             
- [81] rtracklayer_1.48.0        segmented_1.3-1          
- [83] sessioninfo_1.1.1         clipr_0.7.1              
- [85] GenomeInfoDbData_1.2.4    lattice_0.20-41          
- [87] deldir_0.2-3              later_1.1.0.1            
- [89] BiocFileCache_1.12.1      jsonlite_1.7.2           
- [91] scales_1.1.1              docopt_0.7.1             
- [93] pbapply_1.4-3             lazyeval_0.2.2           
- [95] promises_1.1.1            spatstat_1.64-1          
- [97] doParallel_1.0.16         goftest_1.2-2            
- [99] spatstat.utils_1.17-0     reticulate_1.18          
-[101] cowplot_1.1.0             statmod_1.4.35           
-[103] Rtsne_0.15                uwot_0.1.9               
-[105] igraph_1.2.6              survival_3.2-7           
-[107] yaml_2.2.1                htmltools_0.5.1.1        
-[109] memoise_2.0.0             locfit_1.5-9.4           
-[111] viridisLite_0.3.0         digest_0.6.27            
-[113] rrcov_1.5-5               assertthat_0.2.1         
-[115] mime_0.9                  rappdirs_0.3.2           
-[117] densityClust_0.3          futile.options_1.0.1     
-[119] RSQLite_2.2.1             future.apply_1.6.0       
-[121] remotes_2.2.0             data.table_1.13.4        
-[123] blob_1.2.1                fastICA_1.2-2            
-[125] labeling_0.4.2            mixtools_1.2.0           
-[127] RCurl_1.98-1.2            broom_0.7.2              
-[129] hms_0.5.3                 modelr_0.1.8             
-[131] colorspace_2.0-0          ggbeeswarm_0.6.0         
-[133] Rcpp_1.0.6                RANN_2.6.1               
-[135] mvtnorm_1.1-1             fansi_0.4.2              
-[137] parallelly_1.22.0         R6_2.5.0                 
-[139] ggridges_0.5.2            lifecycle_0.2.0          
-[141] formatR_1.7               curl_4.3                 
-[143] leiden_0.3.6              testthat_3.0.1           
-[145] robustbase_0.93-6         desc_1.2.0               
-[147] RcppAnnoy_0.0.17          RColorBrewer_1.1-2       
-[149] iterators_1.0.13          htmlwidgets_1.5.3        
-[151] polyclip_1.10-0           biomaRt_2.44.4           
-[153] crosstalk_1.1.1           rvest_0.3.6              
-[155] globals_0.14.0            openssl_1.4.3            
-[157] patchwork_1.1.0           codetools_0.2-16         
-[159] lubridate_1.7.9.2         FNN_1.1.3                
-[161] prettyunits_1.1.1         dbplyr_2.0.0             
-[163] gtable_0.3.0              DBI_1.1.0                
-[165] tensor_1.5                httr_1.4.2               
-[167] KernSmooth_2.23-17        stringi_1.5.3            
-[169] progress_1.2.2            farver_2.0.3             
-[171] annotate_1.68.0           viridis_0.5.1            
-[173] xml2_1.3.2                combinat_0.0-8           
-[175] BiocNeighbors_1.6.0       geneplotter_1.66.0       
-[177] scattermore_0.7           DEoptimR_1.0-8           
-[179] bit_4.0.4                 spatstat.data_1.5-2      
-[181] pkgconfig_2.0.3          
-> sessionInfo()
-R version 4.0.3 (2020-10-10)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 20.04.1 LTS
-
-Matrix products: default
-BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
-LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
-
-locale:
  [1] LC_CTYPE=en_US.UTF-8      
  [2] LC_NUMERIC=C              
  [3] LC_TIME=de_DE.UTF-8       
@@ -502,10 +356,10 @@ locale:
 [12] LC_IDENTIFICATION=C       
 
 attached base packages:
- [1] splines   parallel  stats4   
- [4] grid      stats     graphics 
- [7] grDevices utils     datasets 
-[10] methods   base     
+ [1] splines parallel stats4   
+ [4] grid stats  graphics 
+ [7] grDevices utils  datasets 
+[10] methods base     
 
 other attached packages:
  [1] BingleSeq_0.3.6            
