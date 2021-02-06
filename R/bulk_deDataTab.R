@@ -247,7 +247,7 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
     de$selectedPackage <- as.numeric(input$selectPackage)
 
 
-    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
       
     
     if(!is.null(fCounts$batchCorrected)){
@@ -295,7 +295,7 @@ bulk_deData <- function(input, output, session, fCounts, unfCounts) {
         )
     })
 
-    hide_waiter()
+    waiter_hide()
 
     observeEvent(input$exploreButton,{
       de$deTable[[1]] <- de$deTable[[1]] %>%
@@ -538,7 +538,6 @@ deEdgeR <- function(readCounts, meta, testType, normMethod, useBatch){
 
   # 5. Extract DE results
   tt = topTags(de, n = nrow(dge), adjust.method = "fdr", sort.by	= "none")
-  print(head(tt))
   if(ncol(tt$table)>4){
     res <- tt$table[,c(3,1,4,5)]
   } else{

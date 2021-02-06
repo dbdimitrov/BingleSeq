@@ -234,7 +234,7 @@ bulk_goData <- function(input, output, session, counts, de) {
 
   observeEvent(input$goTermButton, {
 
-    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
 
     go$goTermTable <-
       runGOSEQ(
@@ -264,7 +264,7 @@ bulk_goData <- function(input, output, session, counts, de) {
       )
     )
 
-    hide_waiter()
+    waiter_hide()
 
     updateTabsetPanel(session, "goMainTabSet", selected = "goTableTab")
 

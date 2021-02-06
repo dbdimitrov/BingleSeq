@@ -118,7 +118,7 @@ sc_loadData <- function(input, output, session) {
       print(input$location10xInput)
       waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
       counts$countTable <- load10xData(input$location10xInput, session)
-      hide_waiter()
+      waiter_hide()
   })
   
   # Load CountTable -----
@@ -128,7 +128,7 @@ sc_loadData <- function(input, output, session) {
                                   sep = input$sep,
                                   row.names = 1)
     
-    hide_waiter()
+    waiter_hide()
     
   })
   

@@ -246,7 +246,7 @@ sc_go <- function(input, output, session, de, countsT) {
 
     if(!is.null(go$goGetGenes)){
 
-      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+      waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
 
       go$goTermTable <-
         runGOSEQ(
@@ -276,7 +276,7 @@ sc_go <- function(input, output, session, de, countsT) {
         )
       )
 
-      hide_waiter()
+      waiter_hide()
 
       updateTabsetPanel(session, "goMainTabSet", selected = "goTableTab")
     }

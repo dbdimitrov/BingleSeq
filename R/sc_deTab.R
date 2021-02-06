@@ -167,7 +167,7 @@ sc_de <- function(input, output, session, finData) {
 
   ## Generate DE Data
   observeEvent(input$dgeButton, {
-    show_waiter(tagList(spin_folding_cube(), h2("Loading...Say Patient :)")))
+    waiter_show(tagList(spin_folding_cube(), h2("Loading...Stay Patient :)")))
 
     if(input$dgeTestCombo == "DESeq2"){
       finData$finalData[["RNA"]]@counts <- as.matrix(finData$finalData[["RNA"]]@counts) + 1
@@ -185,7 +185,7 @@ sc_de <- function(input, output, session, finData) {
     de$markers <- de$markers[filter,]
 
 
-    hide_waiter()
+    waiter_hide()
 
     write.csv(de$markers, file=paste0(tempdir(),
                                       "/AllMarkerGenes_",
@@ -209,7 +209,7 @@ sc_de <- function(input, output, session, finData) {
   ## Cluster Heatmap
   observeEvent(input$dgeHeatButton, {
     if (!is.null(de$markers)) {
-      show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+      waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
 
       de$dgePlot <-
         getClusterHeatmap(finData$finalData, de$markers, input$clustHeatInput)
@@ -225,7 +225,7 @@ sc_de <- function(input, output, session, finData) {
         de$dgePlot
       })
 
-      hide_waiter()
+      waiter_hide()
 
       updateTabsetPanel(session, "deMainTabSet", selected = "dePlotTab")
     }

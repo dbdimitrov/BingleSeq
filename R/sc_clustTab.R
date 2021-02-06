@@ -306,7 +306,11 @@ sc_clust <- function(input, output, session, normData) {
 
   observeEvent(input$elbowButton, {
 
-    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(
+      html = tagList(
+        spin_fading_circles(),
+        h2("Loading ...")
+    ))
 
     clust$scaledData <- seuratElbow(normData$normalizedData)
     clust$clustPlot <- clust$scaledData[[2]]
@@ -315,14 +319,19 @@ sc_clust <- function(input, output, session, normData) {
       ggplotly(clust$clustPlot)
     })
 
-    hide_waiter()
+    waiter_hide()
   })
 
 
   observeEvent(input$clustButton, {
     if (!is.null(clust$scaledData)) {
 
-      show_waiter(tagList(spin_folding_cube(), h2("Loading...(Stay patient)")))
+      waiter_show(
+        html = tagList(
+          spin_folding_cube(),
+          h2("Please remain patient ...")
+        )
+      )
 
 
       if (input$clusterPackage == 1) {
@@ -379,7 +388,7 @@ sc_clust <- function(input, output, session, normData) {
 
     }
 
-    hide_waiter()
+    waiter_hide()
   })
 
 

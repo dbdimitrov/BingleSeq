@@ -173,7 +173,7 @@ sc_fa_Server <- function(input, output, session, finalData) {
   
   observeEvent(input$faTFButton,{
     
-    show_waiter(tagList(spin_folding_cube(), h2("Loading...")))
+    waiter_show(tagList(spin_folding_cube(), h2("Loading...")))
     
     fa$regulons <- fetch_regulons(input$faOrganism, input$faCheckBox)
     
@@ -205,7 +205,7 @@ sc_fa_Server <- function(input, output, session, finalData) {
   
   observeEvent(input$faProgenyButton,{
     
-    show_waiter(tagList(spin_folding_cube(), h2("Loading...")))
+    waiter_show(tagList(spin_folding_cube(), h2("Loading...")))
     
     fa$pathways <- sc_progeny(finalData$finalData,
                               input$faProOrganism,

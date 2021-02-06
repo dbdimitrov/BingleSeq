@@ -100,7 +100,7 @@ sc_norm <- function(input, output, session, filtData) {
   ### Normalization ------
   observeEvent(input$normalizeButton, {
 
-    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(html = tagList(spin_folding_cube(), h2("Loading ...")))
     norm$normalizedData <-
       normalizeSeurat(
         filtData$filteredData,
@@ -126,7 +126,7 @@ sc_norm <- function(input, output, session, filtData) {
       "Note: Highly Variable Features are shown in red (Hover for Gene names)"
     })
 
-    hide_waiter()
+    waiter_hide()
 
   })
 

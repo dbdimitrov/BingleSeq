@@ -107,11 +107,11 @@ bulk_compData <- function(input, output, session, rv, de) {
   })
 
   observeEvent(input$comparisonButton, {
-    show_waiter(tagList(spin_folding_cube(), h2("Loading ...")))
+    waiter_show(tagList(spin_folding_cube(), h2("Loading ...")))
 
     rv$allDE <- getAllDE(de$counts_filter, de$meta, de$batched)
 
-    hide_waiter()
+    waiter_hide()
   })
 
 
