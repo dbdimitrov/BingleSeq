@@ -15,7 +15,8 @@ bulk_faDataUI <- function(id) {
               
               h4("Get Transcription Factor Activities with DoRothEA"),
               
-              checkboxInput(ns("faGeneType"), label = ("Gene IDs are Symbols"),
+              checkboxInput(ns("faGeneType"),
+                            label = ("Gene IDs are Symbols"),
                             value = TRUE),
               
               conditionalPanel(condition = "!input.faGeneType",
@@ -226,10 +227,14 @@ bulk_faData <- function(input, output, session, counts, de) {
     
    fa$data_de <- tibble::rownames_to_column(de$merged, "X")
    if(!input$faGeneType){
-     fa$data_de <- convert_gene_type(fa$data_de, input$faTypeInput, "SYMBOL")
+     fa$data_de <- convert_gene_type(fa$data_de, input$faTypeInput,
+                                     "SYMBOL", input$faOrganism, session)
    }
    fa$regulons <- fetch_regulons(input$faOrganism, input$faCheckBox)
-   fa$tfs <- fetch_tf_activities(fa$data_de, input$faTermRegulonValue, fa$regulons, session)
+   fa$tfs <- fetch_tf_activities(fa$data_de, input$faTermRegulonValue,
+                                 fa$regulons, session)
+   print(2)
+   print(fa$tfs %>% as_tibble())
    
    output$faTable <-
      DT::renderDataTable(as.data.frame(fa$tfs), colnames = ("NES"))
@@ -276,12 +281,15 @@ bulk_faData <- function(input, output, session, counts, de) {
   
   
   # Progeny ----
-  
   observeEvent(input$faProSampleButton,{
     
     fa$data_de <- tibble::rownames_to_column(de$merged, "X")
     if(!input$faProGeneType){
-      fa$data_de <- convert_gene_type(fa$data_de, input$faTypeInput, "SYMBOL")
+      fa$data_de <- convert_gene_type(fa$data_de,
+                                      input$faTypeInput,
+                                      "SYMBOL",
+                                      input$faOrganism,
+                                      session)
     }
     fa$progSample<- get_pathway_activity_per_sample(fa$data_de,
                                                     as.character(input$faProOrganism),
@@ -309,7 +317,11 @@ bulk_faData <- function(input, output, session, counts, de) {
     
     fa$data_de <- tibble::rownames_to_column(de$merged, "X")
     if(!input$faProGeneType){
-      fa$data_de <- convert_gene_type(fa$data_de, input$faTypeInput, "SYMBOL")
+      fa$data_de <- convert_gene_type(fa$data_de,
+                                      input$faTypeInput,
+                                      "SYMBOL",
+                                      input$faOrganism,
+                                      session)
     }
     fa$proCondition <- get_pathway_activity(fa$data_de,
                                              as.character(input$faProOrganism),
@@ -369,6 +381,7 @@ fetch_tf_activities <- function(de_data, reg_size, regulons, session) {
     de_data$gene <- de_data$X
     gene_counts <- de_data[,6:ncol(de_data)]
     de_data$stat <- de_data[[3]] # reassign package-specific stat 
+    print(de_data %>% as_tibble())
     
     de_data_matrix <- de_data %>% 
       dplyr::select(gene, stat) %>% 
@@ -376,13 +389,23 @@ fetch_tf_activities <- function(de_data, reg_size, regulons, session) {
       column_to_rownames(var = "gene") %>%
       as.matrix()
     
+    print(0)
+    print(de_data_matrix)
+    print(1)
+    print(regulons)
+    
     out <- dorothea::run_viper(de_data_matrix, regulons,
                                options =  list(minsize = reg_size,
                                                eset.filter = FALSE, 
                                                cores = 1, verbose = FALSE,
                                                nes = TRUE))
+    print(3)
+    print(out)
+    
   },
   error = function(cond) {
+    print(cond)
+    
     sendSweetAlert(
       session = session,
       title = "Data Mismatch",
@@ -514,21 +537,50 @@ plot_tfa_per_sample <- function(tf_activities, tf_activities_counts, tf_num) {
 #' @param de_data Table with de results
 #' @param input_type input gene type e.g. ENSEMBL
 #' @param output_type output gene type e.g. Symbol
+#' @param fa_organism mm (mouse) or hh (human)
+#' 
 #' @export
 #' @return Returns a df with gene names convert to symbols
-convert_gene_type <- function(de_data, input_type, output_type) {
-  require(AnnotationDbi)
-  geneIDs1 <- AnnotationDbi::select(org.Hs.eg.db,
-                                    keys=de_data$X,
-                                    keytype = input_type, 
-                                    columns = c(output_type, input_type))
+convert_gene_type <- function(de_data,
+                              input_type,
+                              output_type,
+                              fa_organism = "hh",
+                              session
+                              ){
   
-  geneIDs1 <- subset(geneIDs1, (!duplicated(geneIDs1[[output_type]])))
-  geneIDs1 <- subset(geneIDs1, !is.na(geneIDs1[[output_type]]))
-  data_me <- merge(de_data, geneIDs1, by.x = "X", by.y = input_type)
-  data_me$X <- data_me[[output_type]]
-  data_me <- within(data_me, rm(list=sub("[.]test","",output_type)))
-  return(data_me)
+  out <- tryCatch({
+    require(AnnotationDbi)
+    if(fa_organism=="hh"){
+      require(org.Hs.eg.db)
+      ann <- org.Hs.eg.db
+    } else{
+      require(org.Mm.eg.db)
+      ann <- org.Mm.eg.db
+    }
+    
+    geneIDs1 <- AnnotationDbi::select(ann,
+                                      keys=de_data$X,
+                                      keytype = input_type, 
+                                      columns = c(output_type, input_type))
+    
+    geneIDs1 <- subset(geneIDs1, (!duplicated(geneIDs1[[output_type]])))
+    geneIDs1 <- subset(geneIDs1, !is.na(geneIDs1[[output_type]]))
+    data_me <- merge(de_data, geneIDs1, by.x = "X", by.y = input_type)
+    data_me$X <- data_me[[output_type]]
+    data_me <- within(data_me, rm(list=sub("[.]test","",output_type)))
+  },
+  error = function(cond) {
+    sendSweetAlert(
+      session = session,
+      title = "Data Mismatch",
+      text = "Please ensure that Gene IDs are of the appropriate",
+      type = "error"
+    )
+    return()
+  })
+  
+
+  return(out)
 }
 
 #' Fetch Dorothea Regulon

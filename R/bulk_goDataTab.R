@@ -93,7 +93,7 @@ bulk_goDataUI <- function(id) {
                   "Homo sapiens (hg18)" = "hg18",
                   "Homo sapiens (hg17)" = "hg17",
                   "Mus musculus (mm9)" = "mm9",
-                  "Mus musculus (mm9)" = "mm8",
+                  "Mus musculus (mm8)" = "mm8",
                   "Mus musculus (mm7)" = "mm7",
                   "Danio rerio (danRer5)" = "danRer5",
                   "Drosophila melanogaster (dm3)" = "dm3",
@@ -361,7 +361,7 @@ getGenesetsGO <- function(assayed.genes, genome, geneset_symbol){
     
   } else if(startsWith(genome, "mm")) {
     require(org.Mm.eg.db)
-    go_data <- AnnotationDbi::select(org.Hs.eg.db,
+    go_data <- AnnotationDbi::select(org.Mm.eg.db,
                                      keys=assayed.genes,
                                      keytype = geneset_symbol, 
                                      columns = c(geneset_symbol, "GO")) %>%
@@ -441,7 +441,7 @@ runGOSEQ <-
         
         go_data <- getGenesetsGO(assayed.genes, genome, geneset_symbol)
         
-        pwf = nullp(gene.vector, genome, symbol)
+        pwf = nullp(gene.vector, genome, symbol, plot.fit = FALSE)
         
         
         GO.wall = goseq(pwf, gene2cat = go_data, test.cats = testType)
