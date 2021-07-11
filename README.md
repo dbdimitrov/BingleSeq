@@ -333,6 +333,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 
 ## R Session Info:
+```r
 ─ Session info ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
  setting  value                       
  version  R version 4.0.3 (2020-10-10)
@@ -616,3 +617,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 [2] /usr/local/lib/R/site-library
 [3] /usr/lib/R/site-library
 [4] /usr/lib/R/library
+```
